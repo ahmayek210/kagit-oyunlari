@@ -1,0 +1,1406 @@
+<!doctype html>
+<html lang="tr" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+  <meta name="theme-color" content="#e9e2d2" id="themeColor">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <title>Kurallar Her Tur Bozuluyor — Kâğıtlık</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --desk:#e9e2d2;
+      --desk-2:#d9cfbc;
+      --paper:#fffdf4;
+      --paper-2:#f6efdc;
+      --ink:#262321;
+      --muted:#70695f;
+      --soft:#a0988c;
+      --line-blue:rgba(67,137,178,.22);
+      --line-red:rgba(190,70,78,.42);
+      --border:rgba(62,52,40,.18);
+      --shadow:0 18px 42px rgba(73,58,37,.17),0 4px 10px rgba(73,58,37,.10);
+      --yellow:#e5c66d;
+      --blue:#7bb4cc;
+      --green:#8fbd9c;
+      --pink:#d79aa2;
+      --purple:#a896ce;
+      --danger:#b9575f;
+      --scribble:"Trebuchet MS","Arial Rounded MT Bold",ui-rounded,system-ui,sans-serif;
+      --sans:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+    }
+
+    html[data-theme="dark"] {
+      color-scheme:dark;
+      --desk:#171819;
+      --desk-2:#23211e;
+      --paper:#292824;
+      --paper-2:#23221e;
+      --ink:#f0eadd;
+      --muted:#bbb2a3;
+      --soft:#8d8578;
+      --line-blue:rgba(101,165,194,.17);
+      --line-red:rgba(217,99,108,.34);
+      --border:rgba(255,245,224,.14);
+      --shadow:0 20px 48px rgba(0,0,0,.40),0 5px 12px rgba(0,0,0,.28);
+      --yellow:#a78a40;
+      --blue:#4a8197;
+      --green:#557e60;
+      --pink:#8f555e;
+      --purple:#705f96;
+      --danger:#d26b74;
+    }
+
+    * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+    html,body { width:100%; min-height:100%; overscroll-behavior:none; }
+    body {
+      margin:0;
+      min-height:100dvh;
+      overflow:hidden;
+      color:var(--ink);
+      font-family:var(--sans);
+      background:
+        radial-gradient(circle at 18% 8%,rgba(255,255,255,.12),transparent 28%),
+        linear-gradient(135deg,var(--desk),var(--desk-2));
+      touch-action:none;
+      transition:background .22s ease,color .22s ease;
+    }
+
+    button { color:inherit; font:inherit; }
+    .app {
+      width:min(980px,100%);
+      height:100dvh;
+      margin:0 auto;
+      padding:max(10px,env(safe-area-inset-top)) 10px max(10px,env(safe-area-inset-bottom));
+      display:grid;
+      grid-template-rows:auto minmax(0,1fr);
+      gap:9px;
+    }
+
+    .topbar {
+      display:grid;
+      grid-template-columns:44px minmax(0,1fr) 44px;
+      align-items:center;
+      gap:8px;
+      min-height:46px;
+    }
+    .icon-btn {
+      width:44px;
+      height:44px;
+      border:1px solid var(--border);
+      border-radius:14px;
+      background:color-mix(in srgb,var(--paper) 84%,transparent);
+      box-shadow:0 4px 12px rgba(0,0,0,.08);
+      display:grid;
+      place-items:center;
+      cursor:pointer;
+    }
+    .icon-btn:active { transform:scale(.95); }
+    .icon-btn svg {
+      width:21px;
+      height:21px;
+      fill:none;
+      stroke:currentColor;
+      stroke-width:1.9;
+      stroke-linecap:round;
+      stroke-linejoin:round;
+    }
+    .title { min-width:0; text-align:center; }
+    .title strong {
+      display:block;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+      font:900 clamp(16px,3.8vw,22px)/1.05 var(--scribble);
+      letter-spacing:-.45px;
+    }
+    .title span {
+      display:block;
+      margin-top:3px;
+      color:var(--muted);
+      font-size:9px;
+      font-weight:800;
+      letter-spacing:.09em;
+      text-transform:uppercase;
+    }
+
+    .paper {
+      position:relative;
+      min-height:0;
+      overflow:hidden;
+      border:1px solid var(--border);
+      border-radius:9px 18px 11px 15px;
+      background:
+        linear-gradient(to right,transparent 0 50px,var(--line-red) 50px 52px,transparent 52px),
+        repeating-linear-gradient(to bottom,transparent 0 34px,var(--line-blue) 34px 35px),
+        var(--paper);
+      box-shadow:var(--shadow);
+      transform:rotate(-.12deg);
+      isolation:isolate;
+    }
+    .paper::before {
+      content:"";
+      position:absolute;
+      z-index:5;
+      top:-7px;
+      left:50%;
+      width:100px;
+      height:25px;
+      transform:translateX(-50%) rotate(1.4deg);
+      background:color-mix(in srgb,var(--yellow) 58%,transparent);
+      opacity:.72;
+      box-shadow:0 2px 4px rgba(0,0,0,.08);
+      pointer-events:none;
+    }
+    .paper::after {
+      content:"";
+      position:absolute;
+      z-index:4;
+      width:110px;
+      height:110px;
+      right:-29px;
+      bottom:-34px;
+      border:3px solid color-mix(in srgb,var(--pink) 65%,transparent);
+      border-radius:50%;
+      opacity:.24;
+      pointer-events:none;
+    }
+
+    .game-layout {
+      position:absolute;
+      inset:0;
+      padding:19px 15px 14px 61px;
+      display:grid;
+      grid-template-rows:auto minmax(0,1fr) auto;
+      gap:10px;
+    }
+
+    .hud {
+      display:grid;
+      grid-template-columns:minmax(0,1fr) auto;
+      align-items:start;
+      gap:10px;
+      min-height:54px;
+      position:relative;
+      z-index:3;
+    }
+    .hud-notes {
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+    }
+    .note {
+      min-width:78px;
+      padding:8px 10px;
+      border:1px solid var(--border);
+      border-radius:5px;
+      background:color-mix(in srgb,var(--paper) 84%,transparent);
+      box-shadow:0 4px 9px rgba(0,0,0,.06);
+      transform:rotate(-1deg);
+    }
+    .note:nth-child(2) {
+      transform:rotate(1deg);
+      background:color-mix(in srgb,var(--blue) 21%,var(--paper));
+    }
+    .note small {
+      display:block;
+      color:var(--muted);
+      font-size:8px;
+      font-weight:850;
+      letter-spacing:.1em;
+      text-transform:uppercase;
+    }
+    .note strong {
+      display:block;
+      margin-top:2px;
+      font:900 17px var(--scribble);
+    }
+
+    .rule-chip {
+      max-width:240px;
+      padding:9px 12px;
+      border:2px solid color-mix(in srgb,var(--danger) 66%,var(--ink));
+      border-radius:7px;
+      color:color-mix(in srgb,var(--danger) 68%,var(--ink));
+      background:color-mix(in srgb,var(--paper) 85%,transparent);
+      box-shadow:0 5px 12px rgba(0,0,0,.07);
+      font:900 11px/1.25 var(--scribble);
+      text-align:center;
+      transform:rotate(1.2deg);
+    }
+
+    .board-wrap {
+      min-height:0;
+      display:grid;
+      place-items:center;
+      position:relative;
+    }
+    .board-shell {
+      position:relative;
+      width:min(100%,520px);
+      aspect-ratio:1;
+      border:1px solid var(--border);
+      border-radius:12px 8px 15px 9px;
+      background:color-mix(in srgb,var(--paper) 62%,transparent);
+      box-shadow:0 11px 25px rgba(0,0,0,.10);
+      overflow:hidden;
+      transform:rotate(.15deg);
+    }
+    .board-shell::before {
+      content:"";
+      position:absolute;
+      inset:0;
+      background:
+        linear-gradient(rgba(255,255,255,.05),rgba(255,255,255,.05)),
+        repeating-linear-gradient(to right,transparent 0 calc(14.285% - 1px),var(--line-blue) calc(14.285% - 1px) 14.285%),
+        repeating-linear-gradient(to bottom,transparent 0 calc(14.285% - 1px),var(--line-blue) calc(14.285% - 1px) 14.285%);
+      pointer-events:none;
+      z-index:0;
+    }
+    canvas {
+      position:absolute;
+      inset:0;
+      width:100%;
+      height:100%;
+      display:block;
+      z-index:1;
+      touch-action:none;
+    }
+    .swipe-hint {
+      position:absolute;
+      left:50%;
+      bottom:8px;
+      z-index:4;
+      transform:translateX(-50%) rotate(-1deg);
+      padding:7px 11px;
+      border:1px dashed var(--border);
+      border-radius:8px;
+      color:var(--muted);
+      background:color-mix(in srgb,var(--paper) 79%,transparent);
+      font:850 9px var(--scribble);
+      letter-spacing:.08em;
+      text-transform:uppercase;
+      pointer-events:none;
+      transition:opacity .18s ease;
+    }
+    .playing .swipe-hint { opacity:.38; }
+
+    .controls {
+      display:grid;
+      grid-template-columns:repeat(3,54px);
+      grid-template-rows:repeat(2,46px);
+      justify-content:center;
+      gap:6px;
+      position:relative;
+      z-index:3;
+    }
+    .move-btn {
+      border:1px solid var(--border);
+      border-radius:11px 8px 12px 9px;
+      background:color-mix(in srgb,var(--paper) 83%,transparent);
+      box-shadow:0 5px 11px rgba(0,0,0,.07);
+      display:grid;
+      place-items:center;
+      cursor:pointer;
+      font:900 21px var(--scribble);
+      user-select:none;
+    }
+    .move-btn:active { transform:scale(.94); background:color-mix(in srgb,var(--blue) 24%,var(--paper)); }
+    .move-btn.up { grid-column:2; grid-row:1; }
+    .move-btn.left { grid-column:1; grid-row:2; }
+    .move-btn.down { grid-column:2; grid-row:2; }
+    .move-btn.right { grid-column:3; grid-row:2; }
+
+    .screen {
+      position:absolute;
+      z-index:20;
+      inset:0;
+      padding:66px 18px 20px 63px;
+      display:grid;
+      place-items:center;
+      background:color-mix(in srgb,var(--paper) 66%,transparent);
+      backdrop-filter:blur(3px);
+      opacity:0;
+      pointer-events:none;
+      transition:opacity .18s ease;
+    }
+    .screen.show { opacity:1; pointer-events:auto; }
+    .panel {
+      width:min(540px,100%);
+      max-height:100%;
+      overflow:auto;
+      padding:27px 24px 23px;
+      border:1px solid var(--border);
+      border-radius:8px 17px 10px 14px;
+      background:
+        repeating-linear-gradient(to bottom,transparent 0 30px,var(--line-blue) 30px 31px),
+        var(--paper);
+      box-shadow:0 20px 55px rgba(0,0,0,.23);
+      transform:rotate(-.35deg);
+      text-align:center;
+    }
+    .stamp {
+      width:62px;
+      height:62px;
+      margin:0 auto 15px;
+      display:grid;
+      place-items:center;
+      border:2px solid color-mix(in srgb,var(--purple) 72%,var(--ink));
+      border-radius:17px 12px 18px 11px;
+      background:color-mix(in srgb,var(--purple) 20%,transparent);
+      font:900 26px var(--scribble);
+      transform:rotate(-4deg);
+    }
+    .panel h1,.panel h2 {
+      margin:0;
+      font:900 clamp(29px,6vw,48px)/1 var(--scribble);
+      letter-spacing:-1.4px;
+    }
+    .panel h2 { font-size:clamp(27px,5vw,41px); }
+    .panel p {
+      max-width:430px;
+      margin:14px auto 0;
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.58;
+    }
+    .rule-card {
+      margin:20px 0;
+      padding:16px 15px;
+      border:2px dashed color-mix(in srgb,var(--danger) 64%,var(--border));
+      border-radius:10px 7px 12px 8px;
+      background:color-mix(in srgb,var(--pink) 14%,var(--paper));
+      transform:rotate(.4deg);
+    }
+    .rule-card small {
+      display:block;
+      color:var(--danger);
+      font-size:9px;
+      font-weight:900;
+      letter-spacing:.13em;
+      text-transform:uppercase;
+    }
+    .rule-card strong {
+      display:block;
+      margin-top:6px;
+      font:900 22px/1.08 var(--scribble);
+    }
+    .rule-card span {
+      display:block;
+      margin-top:7px;
+      color:var(--muted);
+      font-size:12px;
+      line-height:1.48;
+    }
+    .primary-btn,.secondary-btn {
+      width:100%;
+      border-radius:12px;
+      padding:13px 16px;
+      font-weight:900;
+      cursor:pointer;
+    }
+    .primary-btn {
+      border:1px solid color-mix(in srgb,var(--green) 60%,var(--border));
+      background:color-mix(in srgb,var(--green) 40%,var(--paper));
+      box-shadow:0 7px 15px rgba(0,0,0,.09);
+    }
+    .secondary-btn {
+      margin-top:8px;
+      border:1px solid var(--border);
+      background:transparent;
+      color:var(--muted);
+    }
+    .primary-btn:active,.secondary-btn:active { transform:scale(.985); }
+
+    .level-list {
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:8px;
+      margin:18px 0;
+    }
+    .level-card {
+      position:relative;
+      min-height:85px;
+      padding:12px;
+      border:1px solid var(--border);
+      border-radius:9px 7px 11px 8px;
+      background:color-mix(in srgb,var(--paper-2) 76%,var(--paper));
+      text-align:left;
+      cursor:pointer;
+    }
+    .level-card:nth-child(2n) { transform:rotate(.6deg); }
+    .level-card:nth-child(2n+1) { transform:rotate(-.5deg); }
+    .level-card.locked { opacity:.42; cursor:not-allowed; }
+    .level-card.done::after {
+      content:"✓";
+      position:absolute;
+      right:9px;
+      top:7px;
+      color:var(--green);
+      font:900 18px var(--scribble);
+      transform:rotate(-8deg);
+    }
+    .level-card small {
+      display:block;
+      color:var(--muted);
+      font-size:8px;
+      font-weight:850;
+      letter-spacing:.09em;
+      text-transform:uppercase;
+    }
+    .level-card strong {
+      display:block;
+      margin-top:5px;
+      padding-right:18px;
+      font:850 13px/1.2 var(--scribble);
+    }
+
+    .result-grid {
+      display:grid;
+      grid-template-columns:repeat(2,1fr);
+      gap:8px;
+      margin:18px 0;
+    }
+    .result-note {
+      padding:12px 10px;
+      border:1px solid var(--border);
+      border-radius:8px;
+      background:color-mix(in srgb,var(--blue) 18%,var(--paper));
+    }
+    .result-note:nth-child(2) { background:color-mix(in srgb,var(--yellow) 19%,var(--paper)); }
+    .result-note small {
+      display:block;
+      color:var(--muted);
+      font-size:9px;
+      font-weight:850;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+    }
+    .result-note strong {
+      display:block;
+      margin-top:3px;
+      font:900 24px var(--scribble);
+    }
+
+    .toast {
+      position:absolute;
+      z-index:30;
+      top:88px;
+      left:50%;
+      transform:translate(-50%,-15px) rotate(-2deg);
+      padding:9px 13px;
+      border:2px solid var(--danger);
+      border-radius:7px;
+      color:var(--danger);
+      background:var(--paper);
+      box-shadow:var(--shadow);
+      font:900 12px var(--scribble);
+      opacity:0;
+      pointer-events:none;
+      transition:opacity .2s ease,transform .2s ease;
+    }
+    .toast.show {
+      opacity:1;
+      transform:translate(-50%,0) rotate(-2deg);
+    }
+
+    .shake { animation:shake .22s linear; }
+    @keyframes shake {
+      0%,100% { transform:translateX(0); }
+      25% { transform:translateX(-5px); }
+      75% { transform:translateX(5px); }
+    }
+
+    @media (max-width:620px) {
+      .app { padding-left:7px; padding-right:7px; }
+      .paper {
+        background:
+          linear-gradient(to right,transparent 0 30px,var(--line-red) 30px 32px,transparent 32px),
+          repeating-linear-gradient(to bottom,transparent 0 31px,var(--line-blue) 31px 32px),
+          var(--paper);
+      }
+      .game-layout { padding:14px 8px 10px 39px; gap:7px; }
+      .hud { gap:6px; }
+      .note { min-width:64px; padding:6px 8px; }
+      .note strong { font-size:15px; }
+      .rule-chip { max-width:135px; padding:7px 8px; font-size:9px; }
+      .controls {
+        grid-template-columns:repeat(3,50px);
+        grid-template-rows:repeat(2,42px);
+      }
+      .screen { padding:60px 10px 15px 40px; }
+      .panel { padding:21px 16px 18px; }
+      .level-list { grid-template-columns:1fr; }
+    }
+
+    @media (max-height:650px) and (orientation:landscape) {
+      .app { grid-template-rows:42px minmax(0,1fr); gap:5px; }
+      .topbar { min-height:42px; }
+      .icon-btn { width:39px; height:39px; }
+      .title span { display:none; }
+      .game-layout {
+        grid-template-columns:minmax(0,1fr) 165px;
+        grid-template-rows:auto minmax(0,1fr);
+        padding:10px 12px 9px 52px;
+      }
+      .hud { grid-column:1 / -1; }
+      .board-wrap { grid-column:1; grid-row:2; }
+      .controls { grid-column:2; grid-row:2; align-self:center; }
+      .board-shell { width:auto; height:100%; max-height:430px; }
+      .screen { padding-top:42px; }
+      .panel { padding:14px 17px; }
+      .stamp { width:43px; height:43px; margin-bottom:8px; font-size:20px; }
+      .panel p { margin-top:8px; font-size:11px; }
+      .rule-card { margin:10px 0; padding:10px; }
+      .rule-card strong { font-size:18px; }
+      .level-list { grid-template-columns:repeat(4,1fr); margin:10px 0; }
+      .level-card { min-height:64px; padding:8px; }
+      .result-grid { margin:10px 0; }
+    }
+
+    @media (prefers-reduced-motion:reduce) {
+      *,*::before,*::after { transition:none!important; animation:none!important; }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <header class="topbar">
+      <button class="icon-btn" id="backBtn" aria-label="Geri dön">
+        <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+      </button>
+      <div class="title">
+        <strong>Kurallar Her Tur Bozuluyor</strong>
+        <span>Kâğıtlık · tek oyunculu</span>
+      </div>
+      <button class="icon-btn" id="themeBtn" aria-label="Temayı değiştir">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+      </button>
+    </header>
+
+    <section class="paper" id="paper">
+      <div class="game-layout">
+        <div class="hud">
+          <div class="hud-notes">
+            <div class="note"><small>Bölüm</small><strong id="levelText">1 / 8</strong></div>
+            <div class="note"><small>Hamle</small><strong id="moveText">0</strong></div>
+          </div>
+          <div class="rule-chip" id="ruleChip">Kurallar yerinde</div>
+        </div>
+
+        <div class="board-wrap">
+          <div class="board-shell" id="boardShell">
+            <canvas id="gameCanvas" aria-label="Kâğıt bulmaca oyun alanı"></canvas>
+            <div class="swipe-hint">Kaydır veya okları kullan</div>
+          </div>
+        </div>
+
+        <div class="controls" aria-label="Hareket kontrolleri">
+          <button class="move-btn up" data-dir="up" aria-label="Yukarı">↑</button>
+          <button class="move-btn left" data-dir="left" aria-label="Sol">←</button>
+          <button class="move-btn down" data-dir="down" aria-label="Aşağı">↓</button>
+          <button class="move-btn right" data-dir="right" aria-label="Sağ">→</button>
+        </div>
+      </div>
+
+      <div class="toast" id="toast">Duvar seni durdurdu.</div>
+
+      <div class="screen show" id="menuScreen">
+        <div class="panel">
+          <div class="stamp">↯</div>
+          <h1>Kurala güvenme.</h1>
+          <p>Küçük kâğıt karakteri pembe hedefe götür. Her bölümde oyunun bildiğin tek bir kuralı bozulacak.</p>
+          <div class="rule-card">
+            <small>Nasıl oynanır?</small>
+            <strong>Kaydır ve hedefe ulaş.</strong>
+            <span>Telefon ekranında istediğin yöne kaydır. Alttaki oklar ve klavye yön tuşları da çalışır.</span>
+          </div>
+          <button class="primary-btn" id="continueBtn">Bölüm 1'i aç</button>
+          <button class="secondary-btn" id="levelsBtn">Bölümleri göster</button>
+        </div>
+      </div>
+
+      <div class="screen" id="levelsScreen">
+        <div class="panel">
+          <div class="stamp">8</div>
+          <h2>Bölümler</h2>
+          <p>Tamamlanan bölümleri yeniden oynayabilirsin. Yeni bölümler sırayla açılır.</p>
+          <div class="level-list" id="levelList"></div>
+          <button class="secondary-btn" id="closeLevelsBtn">Geri dön</button>
+        </div>
+      </div>
+
+      <div class="screen" id="ruleScreen">
+        <div class="panel">
+          <div class="stamp" id="ruleStamp">1</div>
+          <h2 id="ruleTitle">Kurallar yerinde.</h2>
+          <p id="ruleIntro">İlk bölüm seni kandırmıyor. Şimdilik.</p>
+          <div class="rule-card">
+            <small>Bu bölümün bozuk kuralı</small>
+            <strong id="ruleName">Hiçbiri</strong>
+            <span id="ruleDescription">Kaydırdığın yönde bir kare ilerlersin.</span>
+          </div>
+          <button class="primary-btn" id="playLevelBtn">Bölümü başlat</button>
+          <button class="secondary-btn" id="ruleLevelsBtn">Başka bölüm seç</button>
+        </div>
+      </div>
+
+      <div class="screen" id="winScreen">
+        <div class="panel">
+          <div class="stamp">✓</div>
+          <h2 id="winTitle">Kuralı yendin.</h2>
+          <p id="winText">Bir sonraki bölümde oyun biraz daha güvenilmez olacak.</p>
+          <div class="result-grid">
+            <div class="result-note"><small>Bölüm</small><strong id="resultLevel">1</strong></div>
+            <div class="result-note"><small>Hamle</small><strong id="resultMoves">0</strong></div>
+          </div>
+          <button class="primary-btn" id="nextBtn">Sonraki bölüm</button>
+          <button class="secondary-btn" id="replayBtn">Bu bölümü tekrar oyna</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    (() => {
+      "use strict";
+
+      const STORAGE = {
+        theme:"kagitlik-theme",
+        unlocked:"kagitlik-rulebreak-unlocked",
+        completed:"kagitlik-rulebreak-completed"
+      };
+
+      const SIZE = 7;
+      const DIRECTIONS = {
+        up:{dx:0,dy:-1,label:"Yukarı"},
+        down:{dx:0,dy:1,label:"Aşağı"},
+        left:{dx:-1,dy:0,label:"Sol"},
+        right:{dx:1,dy:0,label:"Sağ"}
+      };
+
+      const levels = [
+        {
+          title:"Kurallar yerinde.",
+          intro:"İlk bölüm seni kandırmıyor. Şimdilik.",
+          ruleName:"Hiçbiri",
+          ruleDescription:"Kaydırdığın yönde bir kare ilerlersin.",
+          chip:"Kurallar yerinde",
+          start:[0,6], goal:[[6,0]],
+          walls:[[2,1],[2,2],[2,3],[4,3],[4,4],[4,5]]
+        },
+        {
+          title:"Yönler ters döndü.",
+          intro:"Oyun okları yanlış anlamaya karar verdi.",
+          ruleName:"Ters kontroller",
+          ruleDescription:"Yukarı kaydırırsan aşağı, sağa kaydırırsan sola gidersin.",
+          chip:"Her yön ters",
+          reverse:true,
+          start:[6,6], goal:[[0,0]],
+          walls:[[4,1],[4,2],[4,3],[2,3],[2,4],[2,5]]
+        },
+        {
+          title:"Zemin sabun oldu.",
+          intro:"Bir kez hareket edince durmayı unutuyorsun.",
+          ruleName:"Kaygan kâğıt",
+          ruleDescription:"Karakter duvara veya kâğıdın kenarına çarpana kadar kayar.",
+          chip:"Durmak yasak",
+          ice:true,
+          start:[0,6], goal:[[6,0]],
+          walls:[[2,0],[2,1],[2,2],[4,4],[4,5],[4,6]]
+        },
+        {
+          title:"Kâğıdın kenarı yok.",
+          intro:"Sayfanın bir ucundan çıkınca öbür ucundan giriyorsun.",
+          ruleName:"Kenarlar birleşti",
+          ruleDescription:"Dışarı çıkan hareket karşı tarafta devam eder.",
+          chip:"Kenarlar portal",
+          wrap:true,
+          start:[1,3], goal:[[5,3]],
+          walls:[[3,0],[3,1],[3,2],[3,3],[3,4],[3,5],[3,6]]
+        },
+        {
+          title:"Işıklar söndü.",
+          intro:"Oyun alanı hâlâ orada. Sadece çoğunu göremiyorsun.",
+          ruleName:"Karanlık alan",
+          ruleDescription:"Yalnızca karakterin yakınındaki kareler görünür.",
+          chip:"Yakınını görebilirsin",
+          dark:true,
+          start:[0,6], goal:[[6,0]],
+          walls:[[1,4],[2,4],[3,4],[3,3],[3,2],[4,2],[5,2]]
+        },
+        {
+          title:"Aynı yön küstü.",
+          intro:"Bir yöne gittikten sonra hemen tekrar aynı yöne gidemezsin.",
+          ruleName:"Tekrar yasak",
+          ruleDescription:"Arka arkaya iki kez aynı yönü kullanamazsın.",
+          chip:"Aynı yön 2 kez yok",
+          noRepeat:true,
+          start:[0,6], goal:[[6,0]],
+          walls:[[2,6],[3,5],[4,4],[5,3],[6,2]]
+        },
+        {
+          title:"Hedef kaçıyor.",
+          intro:"Pembe damga her hamleden sonra sayfanın öbür köşesine sıçrıyor.",
+          ruleName:"Kaçan hedef",
+          ruleDescription:"Hedef iki köşe arasında yer değiştirir. Üzerine doğru zamanda basmalısın.",
+          chip:"Hedef her adım kaçar",
+          movingGoal:true,
+          start:[3,6], goal:[[6,0],[0,0]],
+          walls:[[2,4],[4,4],[2,2],[4,2]]
+        },
+        {
+          title:"Oyun fikrini değiştiriyor.",
+          intro:"Her hamlede kontroller normal ve ters arasında değişiyor. Üstelik ortalık karanlık.",
+          ruleName:"Her adımda yön değişir",
+          ruleDescription:"Bir hamle normal, sonraki hamle ters çalışır. Yakındaki kareler dışında her yer gizlidir.",
+          chip:"Normal ↔ ters",
+          alternateReverse:true,
+          dark:true,
+          start:[0,6], goal:[[6,0]],
+          walls:[[1,4],[2,4],[2,2],[3,2],[4,2],[4,4],[5,4]]
+        }
+      ];
+
+      const paper = document.getElementById("paper");
+      const boardShell = document.getElementById("boardShell");
+      const canvas = document.getElementById("gameCanvas");
+      const ctx = canvas.getContext("2d",{alpha:true});
+      const menuScreen = document.getElementById("menuScreen");
+      const levelsScreen = document.getElementById("levelsScreen");
+      const ruleScreen = document.getElementById("ruleScreen");
+      const winScreen = document.getElementById("winScreen");
+      const levelText = document.getElementById("levelText");
+      const moveText = document.getElementById("moveText");
+      const ruleChip = document.getElementById("ruleChip");
+      const toast = document.getElementById("toast");
+      const themeColor = document.getElementById("themeColor");
+
+      let css = {};
+      let width = 0;
+      let dpr = 1;
+      let cell = 0;
+      let currentLevel = 0;
+      let unlocked = clampInt(Number(localStorage.getItem(STORAGE.unlocked)) || 1,1,levels.length);
+      let completed = parseCompleted();
+      let player = {x:0,y:0,rx:0,ry:0};
+      let goalIndex = 0;
+      let moves = 0;
+      let lastDirection = null;
+      let inputLocked = true;
+      let state = "menu";
+      let raf = 0;
+      let swipeStart = null;
+      let shakeUntil = 0;
+
+      function parseCompleted() {
+        try {
+          const value = JSON.parse(localStorage.getItem(STORAGE.completed) || "[]");
+          return Array.isArray(value) ? value.filter(Number.isInteger) : [];
+        } catch {
+          return [];
+        }
+      }
+
+      function clampInt(value,min,max) {
+        return Math.max(min,Math.min(max,Math.floor(value)));
+      }
+
+      function refreshPalette() {
+        const style = getComputedStyle(document.documentElement);
+        css = {
+          paper:style.getPropertyValue("--paper").trim(),
+          paper2:style.getPropertyValue("--paper-2").trim(),
+          ink:style.getPropertyValue("--ink").trim(),
+          muted:style.getPropertyValue("--muted").trim(),
+          soft:style.getPropertyValue("--soft").trim(),
+          blue:style.getPropertyValue("--blue").trim(),
+          pink:style.getPropertyValue("--pink").trim(),
+          purple:style.getPropertyValue("--purple").trim(),
+          yellow:style.getPropertyValue("--yellow").trim(),
+          green:style.getPropertyValue("--green").trim(),
+          danger:style.getPropertyValue("--danger").trim(),
+          lineBlue:style.getPropertyValue("--line-blue").trim()
+        };
+      }
+
+      function applyTheme(theme) {
+        document.documentElement.dataset.theme = theme;
+        localStorage.setItem(STORAGE.theme,theme);
+        themeColor.content = theme === "dark" ? "#171819" : "#e9e2d2";
+        refreshPalette();
+        draw();
+      }
+
+      function openScreen(screen) {
+        [menuScreen,levelsScreen,ruleScreen,winScreen].forEach(el => el.classList.remove("show"));
+        if (screen) screen.classList.add("show");
+      }
+
+      function resize() {
+        const rect = boardShell.getBoundingClientRect();
+        width = Math.max(1,Math.min(rect.width,rect.height));
+        dpr = Math.min(window.devicePixelRatio || 1,2);
+        canvas.width = Math.round(width*dpr);
+        canvas.height = Math.round(width*dpr);
+        canvas.style.width = width+"px";
+        canvas.style.height = width+"px";
+        ctx.setTransform(dpr,0,0,dpr,0,0);
+        cell = width/SIZE;
+        draw();
+      }
+
+      function showMenu() {
+        state = "menu";
+        inputLocked = true;
+        paper.classList.remove("playing");
+        const continueLevel = Math.min(unlocked,levels.length);
+        document.getElementById("continueBtn").textContent =
+          continueLevel >= levels.length && completed.includes(levels.length-1)
+            ? "Son bölümü tekrar aç"
+            : `Bölüm ${continueLevel}'i aç`;
+        openScreen(menuScreen);
+      }
+
+      function showLevels() {
+        state = "levels";
+        inputLocked = true;
+        renderLevelList();
+        openScreen(levelsScreen);
+      }
+
+      function renderLevelList() {
+        const list = document.getElementById("levelList");
+        list.innerHTML = "";
+        levels.forEach((level,index) => {
+          const button = document.createElement("button");
+          const locked = index+1 > unlocked;
+          const done = completed.includes(index);
+          button.type = "button";
+          button.className = "level-card"+(locked?" locked":"")+(done?" done":"");
+          button.innerHTML = `<small>Bölüm ${index+1}</small><strong>${level.title}</strong>`;
+          button.disabled = locked;
+          button.addEventListener("click",() => showRule(index));
+          list.appendChild(button);
+        });
+      }
+
+      function showRule(index) {
+        currentLevel = clampInt(index,0,levels.length-1);
+        const level = levels[currentLevel];
+        state = "rule";
+        inputLocked = true;
+        paper.classList.remove("playing");
+        document.getElementById("ruleStamp").textContent = String(currentLevel+1);
+        document.getElementById("ruleTitle").textContent = level.title;
+        document.getElementById("ruleIntro").textContent = level.intro;
+        document.getElementById("ruleName").textContent = level.ruleName;
+        document.getElementById("ruleDescription").textContent = level.ruleDescription;
+        document.getElementById("playLevelBtn").textContent = `Bölüm ${currentLevel+1}'i başlat`;
+        openScreen(ruleScreen);
+        prepareLevel();
+      }
+
+      function prepareLevel() {
+        const level = levels[currentLevel];
+        player.x = level.start[0];
+        player.y = level.start[1];
+        player.rx = player.x;
+        player.ry = player.y;
+        goalIndex = 0;
+        moves = 0;
+        lastDirection = null;
+        levelText.textContent = `${currentLevel+1} / ${levels.length}`;
+        moveText.textContent = "0";
+        updateRuleChip();
+        draw();
+      }
+
+      function startLevel() {
+        prepareLevel();
+        state = "playing";
+        inputLocked = false;
+        paper.classList.add("playing");
+        openScreen(null);
+        vibrate(15);
+        beep(360,.04,.02);
+        draw();
+      }
+
+      function updateRuleChip() {
+        const level = levels[currentLevel];
+        if (level.alternateReverse) {
+          ruleChip.textContent = moves % 2 === 0 ? "Bu hamle NORMAL" : "Bu hamle TERS";
+        } else {
+          ruleChip.textContent = level.chip;
+        }
+      }
+
+      function isWall(x,y) {
+        return levels[currentLevel].walls.some(([wx,wy]) => wx===x && wy===y);
+      }
+
+      function normalizedStep(x,y,dx,dy) {
+        const level = levels[currentLevel];
+        let nx = x+dx;
+        let ny = y+dy;
+
+        if (level.wrap) {
+          nx = (nx+SIZE)%SIZE;
+          ny = (ny+SIZE)%SIZE;
+        }
+
+        if (nx<0 || nx>=SIZE || ny<0 || ny>=SIZE) return null;
+        if (isWall(nx,ny)) return null;
+        return {x:nx,y:ny};
+      }
+
+      async function attemptMove(name) {
+        if (state!=="playing" || inputLocked) return;
+        const level = levels[currentLevel];
+        const original = DIRECTIONS[name];
+        if (!original) return;
+
+        if (level.noRepeat && lastDirection===name) {
+          rejectMove("Aynı yön arka arkaya kullanılamaz.");
+          return;
+        }
+
+        let dx = original.dx;
+        let dy = original.dy;
+        const reversed = level.reverse || (level.alternateReverse && moves%2===1);
+        if (reversed) {
+          dx *= -1;
+          dy *= -1;
+        }
+
+        const path = [];
+        let cursor = {x:player.x,y:player.y};
+        let guard = 0;
+
+        while (guard++ < SIZE*SIZE) {
+          const next = normalizedStep(cursor.x,cursor.y,dx,dy);
+          if (!next) break;
+          if (path.some(p => p.x===next.x && p.y===next.y)) break;
+          path.push(next);
+          cursor = next;
+          if (!level.ice) break;
+        }
+
+        if (!path.length) {
+          rejectMove("Duvar seni durdurdu.");
+          return;
+        }
+
+        inputLocked = true;
+        lastDirection = name;
+
+        for (const point of path) {
+          await animatePlayerTo(point.x,point.y,level.ice?80:115);
+        }
+
+        player.x = cursor.x;
+        player.y = cursor.y;
+        moves++;
+        moveText.textContent = String(moves);
+
+        if (isOnGoal()) {
+          winLevel();
+          return;
+        }
+
+        if (level.movingGoal) goalIndex = (goalIndex+1)%level.goal.length;
+        updateRuleChip();
+        inputLocked = false;
+        draw();
+      }
+
+      function isOnGoal() {
+        const [gx,gy] = levels[currentLevel].goal[goalIndex];
+        return player.x===gx && player.y===gy;
+      }
+
+      function animatePlayerTo(x,y,duration) {
+        return new Promise(resolve => {
+          const startX = player.rx;
+          const startY = player.ry;
+          const start = performance.now();
+
+          function frame(now) {
+            const t = Math.min(1,(now-start)/duration);
+            const eased = 1-Math.pow(1-t,3);
+            player.rx = startX+(x-startX)*eased;
+            player.ry = startY+(y-startY)*eased;
+            draw();
+            if (t<1) requestAnimationFrame(frame);
+            else {
+              player.rx = x;
+              player.ry = y;
+              resolve();
+            }
+          }
+          requestAnimationFrame(frame);
+        });
+      }
+
+      function rejectMove(message) {
+        showToast(message);
+        boardShell.classList.remove("shake");
+        void boardShell.offsetWidth;
+        boardShell.classList.add("shake");
+        vibrate(25);
+        beep(125,.06,.025);
+      }
+
+      function winLevel() {
+        state = "win";
+        inputLocked = true;
+        paper.classList.remove("playing");
+
+        if (!completed.includes(currentLevel)) {
+          completed.push(currentLevel);
+          completed.sort((a,b)=>a-b);
+          localStorage.setItem(STORAGE.completed,JSON.stringify(completed));
+        }
+
+        if (currentLevel+1 < levels.length) {
+          unlocked = Math.max(unlocked,currentLevel+2);
+          localStorage.setItem(STORAGE.unlocked,String(unlocked));
+        }
+
+        document.getElementById("resultLevel").textContent = String(currentLevel+1);
+        document.getElementById("resultMoves").textContent = String(moves);
+
+        if (currentLevel===levels.length-1) {
+          document.getElementById("winTitle").textContent = "Bütün kuralları kırdın.";
+          document.getElementById("winText").textContent = "Oyun artık sana güvenmiyor. Sekiz bölümün tamamı bitti.";
+          document.getElementById("nextBtn").textContent = "Bölümlere dön";
+        } else {
+          document.getElementById("winTitle").textContent = "Kuralı yendin.";
+          document.getElementById("winText").textContent = "Bir sonraki bölümde oyun biraz daha güvenilmez olacak.";
+          document.getElementById("nextBtn").textContent = `Bölüm ${currentLevel+2}'yi aç`;
+        }
+
+        vibrate([35,25,65]);
+        beep(640,.06,.025);
+        setTimeout(()=>beep(840,.08,.02),70);
+        setTimeout(()=>openScreen(winScreen),180);
+      }
+
+      function showToast(message) {
+        toast.textContent = message;
+        toast.classList.add("show");
+        clearTimeout(showToast.timer);
+        showToast.timer = setTimeout(()=>toast.classList.remove("show"),1150);
+      }
+
+      function draw() {
+        if (!ctx || !cell) return;
+        ctx.clearRect(0,0,width,width);
+        drawGrid();
+        drawGoal();
+        drawWalls();
+        drawPlayer();
+        if (levels[currentLevel]?.dark && state==="playing") drawDarkness();
+      }
+
+      function drawGrid() {
+        ctx.save();
+        ctx.strokeStyle = css.lineBlue;
+        ctx.lineWidth = 1;
+        for (let i=1;i<SIZE;i++) {
+          const p=i*cell;
+          ctx.beginPath();
+          ctx.moveTo(p,0);
+          ctx.lineTo(p,width);
+          ctx.stroke();
+          ctx.beginPath();
+          ctx.moveTo(0,p);
+          ctx.lineTo(width,p);
+          ctx.stroke();
+        }
+
+        ctx.globalAlpha=.10;
+        ctx.strokeStyle=css.muted;
+        for (let y=0;y<SIZE;y++) {
+          for (let x=0;x<SIZE;x++) {
+            if ((x+y)%3!==0) continue;
+            const cx=x*cell+cell*.5;
+            const cy=y*cell+cell*.5;
+            ctx.beginPath();
+            ctx.arc(cx,cy,cell*.09,.2,Math.PI*1.7);
+            ctx.stroke();
+          }
+        }
+        ctx.restore();
+      }
+
+      function drawGoal() {
+        const level = levels[currentLevel];
+        if (!level) return;
+        const [gx,gy] = level.goal[goalIndex];
+        const cx = gx*cell+cell/2;
+        const cy = gy*cell+cell/2;
+        const r = cell*.27;
+
+        ctx.save();
+        ctx.translate(cx,cy);
+        ctx.rotate(-.12);
+        ctx.fillStyle=css.pink;
+        ctx.globalAlpha=.26;
+        ctx.beginPath();
+        ctx.arc(0,0,r*1.35,0,Math.PI*2);
+        ctx.fill();
+
+        ctx.globalAlpha=.92;
+        ctx.strokeStyle=css.danger;
+        ctx.lineWidth=Math.max(2,cell*.035);
+        ctx.setLineDash([cell*.09,cell*.06]);
+        ctx.beginPath();
+        ctx.arc(0,0,r,0,Math.PI*2);
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        ctx.fillStyle=css.danger;
+        ctx.font=`900 ${Math.max(13,cell*.23)}px ${getComputedStyle(document.documentElement).getPropertyValue("--scribble")}`;
+        ctx.textAlign="center";
+        ctx.textBaseline="middle";
+        ctx.fillText("HEDEF",0,1);
+        ctx.restore();
+      }
+
+      function drawWalls() {
+        const level = levels[currentLevel];
+        if (!level) return;
+        level.walls.forEach(([x,y],index) => {
+          const px=x*cell;
+          const py=y*cell;
+          ctx.save();
+          ctx.translate(px+cell/2,py+cell/2);
+          ctx.rotate(((index%3)-1)*.035);
+          ctx.fillStyle=css.ink;
+          ctx.globalAlpha=.84;
+          roughBlob(-cell*.34,-cell*.31,cell*.68,cell*.62,index);
+          ctx.fill();
+
+          ctx.globalAlpha=.18;
+          ctx.fillStyle=css.paper;
+          ctx.beginPath();
+          ctx.arc(-cell*.11,-cell*.08,cell*.045,0,Math.PI*2);
+          ctx.arc(cell*.14,cell*.09,cell*.035,0,Math.PI*2);
+          ctx.fill();
+          ctx.restore();
+        });
+      }
+
+      function roughBlob(x,y,w,h,seed) {
+        const wobble=(seed%4)*.02;
+        ctx.beginPath();
+        ctx.moveTo(x+w*.12,y+h*.08);
+        ctx.bezierCurveTo(x+w*.42,y-h*wobble,x+w*.79,y+h*.02,x+w*.91,y+h*.22);
+        ctx.bezierCurveTo(x+w*1.02,y+h*.45,x+w*.91,y+h*.82,x+w*.72,y+h*.93);
+        ctx.bezierCurveTo(x+w*.45,y+h*1.02,x+w*.10,y+h*.93,x+w*.03,y+h*.67);
+        ctx.bezierCurveTo(x-w*wobble,y+h*.42,x+w*.01,y+h*.18,x+w*.12,y+h*.08);
+        ctx.closePath();
+      }
+
+      function drawPlayer() {
+        const cx=player.rx*cell+cell/2;
+        const cy=player.ry*cell+cell/2;
+        const size=cell*.48;
+
+        ctx.save();
+        ctx.translate(cx,cy);
+        ctx.rotate(.03);
+        ctx.globalAlpha=.13;
+        ctx.fillStyle=css.ink;
+        ctx.beginPath();
+        ctx.ellipse(0,size*.48,size*.42,size*.12,0,0,Math.PI*2);
+        ctx.fill();
+
+        ctx.globalAlpha=1;
+        ctx.fillStyle=css.paper2;
+        ctx.strokeStyle=css.ink;
+        ctx.lineWidth=Math.max(2,cell*.035);
+        roughRoundRect(-size/2,-size/2,size,size,cell*.12);
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.fillStyle=css.ink;
+        ctx.beginPath();
+        ctx.arc(-size*.16,-size*.08,Math.max(1.5,size*.045),0,Math.PI*2);
+        ctx.arc(size*.16,-size*.08,Math.max(1.5,size*.045),0,Math.PI*2);
+        ctx.fill();
+
+        ctx.strokeStyle=css.ink;
+        ctx.lineWidth=Math.max(1.5,cell*.025);
+        ctx.beginPath();
+        ctx.arc(0,size*.06,size*.15,.15,Math.PI-.15);
+        ctx.stroke();
+
+        ctx.fillStyle=css.blue;
+        ctx.globalAlpha=.56;
+        ctx.beginPath();
+        ctx.moveTo(-size*.38,-size*.48);
+        ctx.lineTo(size*.24,-size*.56);
+        ctx.lineTo(size*.38,-size*.34);
+        ctx.closePath();
+        ctx.fill();
+        ctx.restore();
+      }
+
+      function roughRoundRect(x,y,w,h,r) {
+        ctx.beginPath();
+        ctx.moveTo(x+r,y);
+        ctx.quadraticCurveTo(x+w*.5,y-.7,x+w-r,y);
+        ctx.quadraticCurveTo(x+w+.5,y,x+w,y+r);
+        ctx.lineTo(x+w,y+h-r);
+        ctx.quadraticCurveTo(x+w,y+h+.5,x+w-r,y+h);
+        ctx.lineTo(x+r,y+h);
+        ctx.quadraticCurveTo(x-.5,y+h,x,y+h-r);
+        ctx.lineTo(x,y+r);
+        ctx.quadraticCurveTo(x,y,x+r,y);
+        ctx.closePath();
+      }
+
+      function drawDarkness() {
+        const px=player.rx*cell+cell/2;
+        const py=player.ry*cell+cell/2;
+        const radius=cell*1.55;
+
+        ctx.save();
+        ctx.fillStyle = document.documentElement.dataset.theme==="dark"
+          ? "rgba(8,8,8,.80)"
+          : "rgba(31,29,26,.77)";
+        ctx.fillRect(0,0,width,width);
+        ctx.globalCompositeOperation="destination-out";
+        const gradient=ctx.createRadialGradient(px,py,cell*.35,px,py,radius);
+        gradient.addColorStop(0,"rgba(0,0,0,1)");
+        gradient.addColorStop(.58,"rgba(0,0,0,.92)");
+        gradient.addColorStop(1,"rgba(0,0,0,0)");
+        ctx.fillStyle=gradient;
+        ctx.beginPath();
+        ctx.arc(px,py,radius,0,Math.PI*2);
+        ctx.fill();
+        ctx.restore();
+
+        drawPlayer();
+      }
+
+      function directionFromDelta(dx,dy) {
+        if (Math.abs(dx)<18 && Math.abs(dy)<18) return null;
+        if (Math.abs(dx)>Math.abs(dy)) return dx>0?"right":"left";
+        return dy>0?"down":"up";
+      }
+
+      function vibrate(pattern) {
+        if (navigator.vibrate) navigator.vibrate(pattern);
+      }
+
+      let audioContext=null;
+      function unlockAudio() {
+        try {
+          if (!audioContext) {
+            const AC=window.AudioContext||window.webkitAudioContext;
+            if (AC) audioContext=new AC();
+          }
+          if (audioContext?.state==="suspended") audioContext.resume();
+        } catch {}
+      }
+
+      function beep(freq,duration,volume) {
+        try {
+          unlockAudio();
+          if (!audioContext) return;
+          const oscillator=audioContext.createOscillator();
+          const gain=audioContext.createGain();
+          oscillator.type="triangle";
+          oscillator.frequency.value=freq;
+          gain.gain.setValueAtTime(volume,audioContext.currentTime);
+          gain.gain.exponentialRampToValueAtTime(.0001,audioContext.currentTime+duration);
+          oscillator.connect(gain).connect(audioContext.destination);
+          oscillator.start();
+          oscillator.stop(audioContext.currentTime+duration);
+        } catch {}
+      }
+
+      document.getElementById("continueBtn").addEventListener("click",() => {
+        const index=Math.min(unlocked,levels.length)-1;
+        showRule(Math.max(0,index));
+      });
+      document.getElementById("levelsBtn").addEventListener("click",showLevels);
+      document.getElementById("closeLevelsBtn").addEventListener("click",showMenu);
+      document.getElementById("ruleLevelsBtn").addEventListener("click",showLevels);
+      document.getElementById("playLevelBtn").addEventListener("click",startLevel);
+      document.getElementById("replayBtn").addEventListener("click",startLevel);
+      document.getElementById("nextBtn").addEventListener("click",() => {
+        if (currentLevel>=levels.length-1) showLevels();
+        else showRule(currentLevel+1);
+      });
+
+      document.querySelectorAll(".move-btn").forEach(button => {
+        button.addEventListener("pointerdown",event => {
+          event.preventDefault();
+          attemptMove(button.dataset.dir);
+        });
+      });
+
+      boardShell.addEventListener("pointerdown",event => {
+        if (state!=="playing") return;
+        event.preventDefault();
+        boardShell.setPointerCapture?.(event.pointerId);
+        swipeStart={x:event.clientX,y:event.clientY};
+      },{passive:false});
+
+      boardShell.addEventListener("pointerup",event => {
+        if (!swipeStart || state!=="playing") return;
+        event.preventDefault();
+        const direction=directionFromDelta(event.clientX-swipeStart.x,event.clientY-swipeStart.y);
+        swipeStart=null;
+        if (direction) attemptMove(direction);
+      },{passive:false});
+
+      boardShell.addEventListener("pointercancel",()=>{ swipeStart=null; });
+
+      document.addEventListener("keydown",event => {
+        const map={
+          ArrowUp:"up",KeyW:"up",
+          ArrowDown:"down",KeyS:"down",
+          ArrowLeft:"left",KeyA:"left",
+          ArrowRight:"right",KeyD:"right"
+        };
+        const direction=map[event.code];
+        if (direction) {
+          event.preventDefault();
+          attemptMove(direction);
+        }
+      });
+
+      document.getElementById("themeBtn").addEventListener("click",() => {
+        applyTheme(document.documentElement.dataset.theme==="dark"?"light":"dark");
+      });
+
+      document.getElementById("backBtn").addEventListener("click",() => {
+        if (state==="playing" || state==="rule" || state==="levels" || state==="win") {
+          showMenu();
+        } else if (history.length>1) {
+          history.back();
+        } else {
+          location.href="index.html";
+        }
+      });
+
+      window.addEventListener("resize",resize);
+      window.addEventListener("orientationchange",()=>setTimeout(resize,120));
+
+      const storedTheme=localStorage.getItem(STORAGE.theme);
+      const prefersDark=window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches;
+      applyTheme(storedTheme||(prefersDark?"dark":"light"));
+      prepareLevel();
+      resize();
+      showMenu();
+    })();
+  </script>
+</body>
+</html>

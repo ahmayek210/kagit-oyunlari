@@ -1,0 +1,2514 @@
+<!doctype html>
+<html lang="tr" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+  <meta name="theme-color" content="#e9e2d2" id="themeColor">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <title>Slingshot Arena — Kâğıtlık Online</title>
+
+  <style>
+    :root{
+      color-scheme:light;
+      --desk:#e9e2d2;--desk2:#d8cdb8;--paper:#fffdf4;--paper2:#f6efdc;
+      --ink:#272421;--muted:#716a60;--soft:#9c9488;
+      --line-blue:rgba(67,137,178,.22);--line-red:rgba(190,70,78,.42);
+      --border:rgba(62,52,40,.18);--shadow:0 18px 42px rgba(73,58,37,.17),0 4px 10px rgba(73,58,37,.10);
+      --yellow:#e5c66d;--blue:#7bb4cc;--green:#8fbd9c;--pink:#d79aa2;--purple:#a896ce;--danger:#b9575f;
+      --scribble:"Trebuchet MS","Arial Rounded MT Bold",ui-rounded,system-ui,sans-serif;
+      --sans:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+    }
+
+    html[data-theme="dark"]{
+      color-scheme:dark;
+      --desk:#171819;--desk2:#23211e;--paper:#292824;--paper2:#23221e;
+      --ink:#f0eadd;--muted:#bbb2a3;--soft:#8d8578;
+      --line-blue:rgba(101,165,194,.17);--line-red:rgba(217,99,108,.34);
+      --border:rgba(255,245,224,.14);--shadow:0 20px 48px rgba(0,0,0,.40),0 5px 12px rgba(0,0,0,.28);
+      --yellow:#a78a40;--blue:#4a8197;--green:#557e60;--pink:#8f555e;--purple:#705f96;--danger:#d26b74;
+    }
+
+    *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+    html,body{margin:0;min-height:100%;overscroll-behavior:none}
+    body{
+      min-height:100dvh;overflow:hidden;color:var(--ink);font-family:var(--sans);
+      background:radial-gradient(circle at 18% 8%,rgba(255,255,255,.12),transparent 28%),linear-gradient(135deg,var(--desk),var(--desk2))
+    }
+
+    button,input{font:inherit;color:inherit}
+    button{cursor:pointer}
+
+    .app{
+      width:min(1060px,100%);height:100dvh;margin:0 auto;
+      padding:max(8px,env(safe-area-inset-top)) 8px max(8px,env(safe-area-inset-bottom));
+      display:grid;grid-template-rows:44px minmax(0,1fr);gap:7px
+    }
+
+    .topbar{display:grid;grid-template-columns:43px minmax(0,1fr) 43px;align-items:center;gap:8px}
+    .icon-btn{
+      width:43px;height:43px;border:1px solid var(--border);border-radius:14px;
+      background:color-mix(in srgb,var(--paper) 84%,transparent);
+      box-shadow:0 4px 12px rgba(0,0,0,.08);display:grid;place-items:center
+    }
+    .icon-btn:active{transform:scale(.95)}
+    .icon-btn svg{width:21px;height:21px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+    .title{text-align:center;min-width:0}
+    .title strong{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font:900 clamp(16px,3.6vw,22px)/1 var(--scribble);letter-spacing:-.5px}
+    .title span{display:block;margin-top:4px;color:var(--muted);font-size:8px;font-weight:850;letter-spacing:.11em;text-transform:uppercase}
+
+    .paper{
+      position:relative;min-height:0;overflow:hidden;border:1px solid var(--border);border-radius:9px 18px 11px 15px;
+      background:linear-gradient(to right,transparent 0 49px,var(--line-red) 49px 51px,transparent 51px),
+      repeating-linear-gradient(to bottom,transparent 0 34px,var(--line-blue) 34px 35px),var(--paper);
+      box-shadow:var(--shadow);isolation:isolate
+    }
+    .paper::before{
+      content:"";position:absolute;z-index:8;top:-7px;left:50%;width:104px;height:25px;
+      transform:translateX(-50%) rotate(1.4deg);
+      background:color-mix(in srgb,var(--yellow) 58%,transparent);
+      opacity:.72;box-shadow:0 2px 4px rgba(0,0,0,.08);pointer-events:none
+    }
+
+    .screen{display:none;position:absolute;inset:0;z-index:2;padding:27px 26px 22px 62px;overflow:auto}
+    .screen.active{display:block;animation:appear .18s ease}
+    @keyframes appear{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+
+    .eyebrow{margin:0 0 9px;color:var(--muted);font-size:9px;font-weight:900;letter-spacing:.14em;text-transform:uppercase}
+    h1,h2{margin:0;font:900 clamp(31px,7vw,55px)/.98 var(--scribble);letter-spacing:-1.7px}
+    h2{font-size:clamp(27px,5.5vw,42px)}
+    .lead{max-width:620px;margin:15px 0 22px;color:var(--muted);font-size:13px;line-height:1.65}
+
+    .status{
+      display:flex;align-items:center;gap:8px;width:fit-content;max-width:100%;
+      padding:8px 11px;margin-bottom:17px;border:1px dashed var(--border);border-radius:9px;
+      background:color-mix(in srgb,var(--paper) 78%,transparent);
+      color:var(--muted);font-size:10px;font-weight:800
+    }
+    .status i{width:9px;height:9px;border-radius:50%;background:var(--soft);box-shadow:0 0 0 4px color-mix(in srgb,var(--soft) 15%,transparent)}
+    .status.online i{background:var(--green);box-shadow:0 0 0 4px color-mix(in srgb,var(--green) 17%,transparent)}
+    .status.error i{background:var(--danger);box-shadow:0 0 0 4px color-mix(in srgb,var(--danger) 17%,transparent)}
+
+    .card{
+      padding:17px;border:1px solid var(--border);border-radius:10px 7px 13px 8px;
+      background:color-mix(in srgb,var(--paper) 84%,transparent);box-shadow:0 8px 20px rgba(0,0,0,.08)
+    }
+    .card+.card{margin-top:12px}
+    label{display:block;margin-bottom:7px;color:var(--muted);font-size:9px;font-weight:900;letter-spacing:.11em;text-transform:uppercase}
+    input{
+      width:100%;min-height:48px;padding:11px 13px;border:1px solid var(--border);border-radius:10px;
+      outline:none;background:var(--paper2);font-weight:800
+    }
+    input:focus{border-color:color-mix(in srgb,var(--blue) 70%,var(--ink));box-shadow:0 0 0 4px color-mix(in srgb,var(--blue) 15%,transparent)}
+    .code-input{text-transform:uppercase;text-align:center;letter-spacing:.22em;font:900 21px var(--scribble)}
+
+    .btn{
+      min-height:47px;padding:11px 14px;border:1px solid var(--border);border-radius:12px 9px 13px 10px;
+      background:var(--paper);box-shadow:0 6px 14px rgba(0,0,0,.07);font-weight:900
+    }
+    .btn:active:not(:disabled){transform:scale(.98)}
+    .btn:disabled{opacity:.42;cursor:not-allowed}
+    .btn.primary{background:color-mix(in srgb,var(--green) 38%,var(--paper));border-color:color-mix(in srgb,var(--green) 55%,var(--border))}
+    .btn.blue{background:color-mix(in srgb,var(--blue) 27%,var(--paper));border-color:color-mix(in srgb,var(--blue) 48%,var(--border))}
+    .btn.danger{color:var(--danger);background:color-mix(in srgb,var(--pink) 14%,var(--paper));border-color:color-mix(in srgb,var(--danger) 40%,var(--border))}
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:11px}
+
+    .message{
+      display:none;margin-top:12px;padding:10px 12px;border:1px dashed var(--border);border-radius:9px;
+      background:color-mix(in srgb,var(--yellow) 14%,var(--paper));color:var(--muted);font-size:11px;line-height:1.5
+    }
+    .message.show{display:block}.message.error{color:var(--danger);border-color:color-mix(in srgb,var(--danger) 45%,var(--border))}
+
+    .room-head{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:start}
+    .code-note{
+      min-width:150px;padding:10px 12px;border:2px solid color-mix(in srgb,var(--purple) 65%,var(--ink));border-radius:7px;
+      background:color-mix(in srgb,var(--purple) 14%,var(--paper));text-align:center;transform:rotate(1.2deg)
+    }
+    .code-note small{display:block;color:var(--muted);font-size:8px;font-weight:900;letter-spacing:.11em;text-transform:uppercase}
+    .code-note strong{display:block;margin-top:4px;font:900 23px var(--scribble);letter-spacing:.12em}
+    .players{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin:16px 0}
+    .player{
+      min-height:119px;padding:14px;border:1px solid var(--border);border-radius:10px 7px 13px 8px;
+      background:color-mix(in srgb,var(--paper) 82%,transparent);box-shadow:0 7px 17px rgba(0,0,0,.06)
+    }
+    .player.empty{opacity:.53;border-style:dashed}.player:nth-child(2){transform:rotate(.35deg)}
+    .player small{color:var(--muted);font-size:8px;font-weight:900;letter-spacing:.1em;text-transform:uppercase}
+    .player strong{display:block;margin-top:10px;font:900 19px var(--scribble);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .pstate{display:flex;align-items:center;gap:7px;margin-top:11px;color:var(--muted);font-size:10px;font-weight:800}
+    .pstate i{width:11px;height:11px;border:2px solid var(--soft);border-radius:50%}
+    .player.ready .pstate i{border-color:var(--green);background:var(--green);box-shadow:0 0 0 4px color-mix(in srgb,var(--green) 15%,transparent)}
+    .room-actions{display:grid;grid-template-columns:1.35fr 1fr 1fr;gap:8px}
+    .diag{margin-top:15px;padding:10px 12px;border:1px dashed var(--border);border-radius:9px;background:color-mix(in srgb,var(--paper2) 72%,transparent);color:var(--muted);font-size:9px;line-height:1.55}
+    .diag code{color:var(--ink);font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+
+    #game{padding:10px 12px 9px 57px;overflow:hidden}
+    .game-layout{height:100%;display:grid;grid-template-rows:auto minmax(0,1fr) auto;gap:7px}
+
+    .scorebar{display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:stretch}
+    .fighter-card{
+      min-width:0;padding:8px 11px;border:1px solid var(--border);border-radius:9px 7px 11px 8px;
+      background:color-mix(in srgb,var(--paper) 84%,transparent);box-shadow:0 5px 12px rgba(0,0,0,.06)
+    }
+    .fighter-card.p1{border-left:5px solid var(--blue)}
+    .fighter-card.p2{border-right:5px solid var(--pink);text-align:right}
+    .fighter-card small{display:block;color:var(--muted);font-size:8px;font-weight:900;letter-spacing:.09em;text-transform:uppercase}
+    .fighter-card strong{display:block;margin-top:2px;font:900 clamp(16px,3vw,22px) var(--scribble);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .hearts{display:flex;gap:4px;margin-top:5px}
+    .p2 .hearts{justify-content:flex-end}
+    .heart{font:900 18px var(--scribble);color:var(--danger);text-shadow:0 1px 0 color-mix(in srgb,var(--ink) 30%,transparent)}
+    .heart.empty{color:color-mix(in srgb,var(--soft) 34%,transparent);text-shadow:none}
+
+    .turn-card{
+      min-width:132px;padding:7px 10px;border:2px solid color-mix(in srgb,var(--purple) 50%,var(--border));border-radius:8px;
+      background:color-mix(in srgb,var(--purple) 11%,var(--paper));text-align:center
+    }
+    .turn-card.mine{border-color:color-mix(in srgb,var(--green) 68%,var(--ink));background:color-mix(in srgb,var(--green) 15%,var(--paper))}
+    .turn-card small{display:block;color:var(--muted);font-size:8px;font-weight:900;letter-spacing:.1em;text-transform:uppercase}
+    .turn-card strong{display:block;margin-top:2px;font:900 16px var(--scribble)}
+    .turn-meta{display:flex;justify-content:center;align-items:center;gap:7px;margin-top:4px}
+    .turn-time{font:900 17px var(--scribble);color:var(--danger)}
+    .wind{font-size:10px;color:var(--muted);font-weight:850}
+
+    .arena-shell{
+      position:relative;min-height:0;border:1px solid var(--border);border-radius:11px 8px 14px 9px;
+      overflow:hidden;background:color-mix(in srgb,var(--paper) 84%,transparent);box-shadow:0 11px 25px rgba(0,0,0,.09)
+    }
+    #arenaCanvas{display:block;width:100%;height:100%;touch-action:none;cursor:crosshair}
+
+    .arena-message{
+      position:absolute;left:50%;top:12px;z-index:4;transform:translateX(-50%) rotate(-.5deg);
+      max-width:82%;padding:8px 12px;border:1px dashed var(--border);border-radius:9px;
+      background:color-mix(in srgb,var(--paper) 86%,transparent);box-shadow:0 5px 14px rgba(0,0,0,.07);
+      text-align:center;pointer-events:none
+    }
+    .arena-message strong{display:block;font:900 14px var(--scribble)}
+    .arena-message span{display:block;margin-top:3px;color:var(--muted);font-size:9px;line-height:1.35}
+
+    .power-card{
+      position:absolute;left:10px;bottom:9px;z-index:4;width:min(190px,42%);
+      padding:7px 9px;border:1px solid var(--border);border-radius:8px;background:color-mix(in srgb,var(--paper) 86%,transparent);
+      pointer-events:none
+    }
+    .power-label{display:flex;justify-content:space-between;gap:8px;margin-bottom:5px;color:var(--muted);font-size:8px;font-weight:900;letter-spacing:.08em;text-transform:uppercase}
+    .power-track{height:7px;border:1px solid var(--border);border-radius:999px;background:var(--paper2);overflow:hidden}
+    .power-fill{height:100%;width:0;background:var(--green);border-radius:inherit}
+
+    .shot-log{
+      position:absolute;right:10px;bottom:9px;z-index:4;max-width:42%;padding:7px 10px;border:1px dashed var(--border);
+      border-radius:8px;background:color-mix(in srgb,var(--paper) 84%,transparent);color:var(--muted);
+      font:800 9px/1.35 var(--scribble);text-align:right;pointer-events:none
+    }
+
+    .game-footer{display:flex;justify-content:space-between;align-items:center;gap:8px}
+    .tip{color:var(--muted);font-size:9px;line-height:1.4}
+    .leave-small{
+      height:38px;padding:0 12px;border:1px solid color-mix(in srgb,var(--danger) 40%,var(--border));border-radius:10px;
+      background:color-mix(in srgb,var(--pink) 13%,var(--paper));color:var(--danger);font-weight:900
+    }
+
+    .overlay{
+      position:absolute;inset:0;z-index:20;display:none;place-items:center;padding:18px;
+      background:color-mix(in srgb,var(--paper) 62%,transparent);backdrop-filter:blur(4px)
+    }
+    .overlay.show{display:grid}
+    .result-card{
+      width:min(500px,100%);padding:23px;border:1px solid var(--border);border-radius:10px 16px 11px 14px;
+      background:var(--paper);box-shadow:0 20px 55px rgba(0,0,0,.23);text-align:center
+    }
+    .stamp{
+      width:61px;height:61px;margin:0 auto 14px;display:grid;place-items:center;
+      border:2px solid color-mix(in srgb,var(--purple) 68%,var(--ink));border-radius:17px 12px 18px 11px;
+      background:color-mix(in srgb,var(--purple) 18%,var(--paper));font:900 24px var(--scribble);transform:rotate(-4deg)
+    }
+    .final-score{display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:center;margin:16px 0}
+    .final-player{padding:12px;border:1px solid var(--border);border-radius:9px;background:color-mix(in srgb,var(--paper2) 75%,var(--paper))}
+    .final-player strong{display:block;font:900 18px var(--scribble);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .final-player span{display:block;margin-top:5px;font:900 25px var(--scribble);color:var(--danger)}
+    .versus{font:900 16px var(--scribble);color:var(--muted)}
+    .finish-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:13px}
+    .rematch-note{margin-top:10px;color:var(--muted);font-size:10px}
+
+    @media(max-width:700px){
+      .app{padding-left:5px;padding-right:5px}
+      .paper{
+        background:linear-gradient(to right,transparent 0 29px,var(--line-red) 29px 31px,transparent 31px),
+        repeating-linear-gradient(to bottom,transparent 0 31px,var(--line-blue) 31px 32px),var(--paper)
+      }
+      .screen{padding:27px 11px 18px 39px}
+      .room-head{grid-template-columns:1fr}.code-note{width:100%;transform:none}
+      .players{gap:6px}.player{min-height:111px;padding:11px}.player strong{font-size:16px}
+      .room-actions{grid-template-columns:1fr 1fr}.room-actions .ready{grid-column:1/-1}
+
+      #game{padding:8px 6px 7px 36px}
+      .scorebar{gap:4px}.fighter-card{padding:6px 7px}.fighter-card strong{font-size:13px}.heart{font-size:15px}
+      .turn-card{min-width:105px;padding:5px}.turn-card strong{font-size:12px}.turn-time{font-size:14px}.wind{font-size:8px}
+      .arena-message{top:6px;padding:6px 8px}.arena-message strong{font-size:11px}.arena-message span{font-size:8px}
+      .power-card{left:6px;bottom:6px;padding:5px 7px}.shot-log{right:6px;bottom:6px;padding:5px 7px;font-size:8px}
+      .tip{font-size:8px}
+    }
+
+    @media(max-height:610px) and (orientation:landscape){
+      .app{grid-template-rows:39px minmax(0,1fr);gap:4px}.topbar{height:39px}.icon-btn{width:38px;height:38px}.title span{display:none}
+      #game{padding-top:5px}.game-layout{gap:4px}
+      .fighter-card{padding-top:4px;padding-bottom:4px}.hearts{margin-top:2px}.heart{font-size:14px}
+      .turn-card{padding-top:3px;padding-bottom:3px}
+    }
+
+    @media(prefers-reduced-motion:reduce){
+      *,*::before,*::after{animation:none!important;transition:none!important}
+    }
+  </style>
+</head>
+
+<body>
+<main class="app">
+  <header class="topbar">
+    <button class="icon-btn" id="backBtn" aria-label="Geri dön">
+      <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+    </button>
+
+    <div class="title">
+      <strong>Slingshot Arena</strong>
+      <span>Kâğıtlık Online · iki kişilik</span>
+    </div>
+
+    <button class="icon-btn" id="themeBtn" aria-label="Temayı değiştir">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+    </button>
+  </header>
+
+  <section class="paper">
+    <section class="screen active" id="home">
+      <p class="eyebrow">Çek · bırak · sektir</p>
+      <h1>Kâğıt karakterini<br>sapan gibi fırlat.</h1>
+      <p class="lead">
+        Oda oluştur veya arkadaşının koduyla katıl. Sırayla atış yapın; topu duvarlardan sektirerek rakibe üç kez vur.
+      </p>
+
+      <div class="status" id="homeStatus"><i></i><span id="homeStatusText">Bağlantı hazırlanıyor…</span></div>
+
+      <div class="card">
+        <label for="nameInput">Adın veya kullanıcı adın</label>
+        <input id="nameInput" maxlength="22" autocomplete="nickname" placeholder="Mesela: Ahmet">
+        <div class="row">
+          <button class="btn primary" id="createBtn" style="grid-column:1/-1" disabled>Yeni oda oluştur</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <label for="codeInput">Oda koduyla katıl</label>
+        <input class="code-input" id="codeInput" maxlength="6" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="ABC234">
+        <div class="row">
+          <button class="btn blue" id="joinBtn" style="grid-column:1/-1" disabled>Odaya katıl</button>
+        </div>
+      </div>
+
+      <div class="message" id="homeMsg"></div>
+    </section>
+
+    <section class="screen" id="room">
+      <div class="room-head">
+        <div>
+          <p class="eyebrow">Slingshot Arena odası</p>
+          <h2 id="roomTitle">Oyuncu bekleniyor.</h2>
+          <p class="lead" id="roomLead">Kodu diğer oyuncuya gönder.</p>
+        </div>
+
+        <button class="code-note" id="copyBtn">
+          <small>Oda kodu · kopyala</small>
+          <strong id="roomCode">------</strong>
+        </button>
+      </div>
+
+      <div class="status" id="roomStatus"><i></i><span id="roomStatusText">Canlı bağlantı kuruluyor…</span></div>
+      <div class="players" id="players"></div>
+
+      <div class="room-actions">
+        <button class="btn primary ready" id="readyBtn">Hazırım</button>
+        <button class="btn blue" id="refreshBtn">Yenile</button>
+        <button class="btn danger" id="leaveBtn">Odadan ayrıl</button>
+      </div>
+
+      <div class="message" id="roomMsg"></div>
+
+      <div class="diag">
+        Kullanıcı: <code id="diagUser">—</code><br>
+        Oda: <code id="diagRoom">—</code><br>
+        Realtime: <code id="diagRt">bağlanıyor</code>
+      </div>
+    </section>
+
+    <section class="screen" id="game">
+      <div class="game-layout">
+        <div class="scorebar">
+          <div class="fighter-card p1">
+            <small id="p1Label">Oyuncu 1</small>
+            <strong id="p1Name">—</strong>
+            <div class="hearts" id="p1Hearts"></div>
+          </div>
+
+          <div class="turn-card" id="turnCard">
+            <small id="turnLabel">Atış</small>
+            <strong id="turnName">Hazırlanıyor</strong>
+            <div class="turn-meta">
+              <span class="turn-time" id="turnTime">—</span>
+              <span class="wind" id="windText">Rüzgâr: —</span>
+            </div>
+          </div>
+
+          <div class="fighter-card p2">
+            <small id="p2Label">Oyuncu 2</small>
+            <strong id="p2Name">—</strong>
+            <div class="hearts" id="p2Hearts"></div>
+          </div>
+        </div>
+
+        <div class="arena-shell" id="arenaShell">
+          <canvas id="arenaCanvas"></canvas>
+
+          <div class="arena-message">
+            <strong id="arenaTitle">Oyuncular bağlanıyor.</strong>
+            <span id="arenaText">İki oyuncu oyun ekranına gelince maç başlayacak.</span>
+          </div>
+
+          <div class="power-card">
+            <div class="power-label"><span>Atış gücü</span><span id="powerText">0%</span></div>
+            <div class="power-track"><div class="power-fill" id="powerFill"></div></div>
+          </div>
+
+          <div class="shot-log" id="shotLog">Karakterini geriye çekip bırak.</div>
+        </div>
+
+        <div class="game-footer">
+          <div class="tip">Sıra sendeyken karakterine dokun, geriye doğru çek ve bırak. Ortadaki karton duvardan sektirebilirsin.</div>
+          <button class="leave-small" id="gameLeaveBtn">Odadan ayrıl</button>
+        </div>
+      </div>
+    </section>
+
+    <div class="overlay" id="finishOverlay">
+      <div class="result-card">
+        <div class="stamp">➶</div>
+        <h2 id="finishTitle">Maç tamamlandı.</h2>
+        <p class="lead" id="finishText" style="margin-left:auto;margin-right:auto"></p>
+
+        <div class="final-score">
+          <div class="final-player">
+            <strong id="finalP1Name">—</strong>
+            <span id="finalP1Hp">♥♥♥</span>
+          </div>
+          <div class="versus">—</div>
+          <div class="final-player">
+            <strong id="finalP2Name">—</strong>
+            <span id="finalP2Hp">♥♥♥</span>
+          </div>
+        </div>
+
+        <div class="finish-actions">
+          <button class="btn primary" id="rematchBtn">Tekrar oyna</button>
+          <button class="btn danger" id="finishLeaveBtn">Odadan ayrıl</button>
+        </div>
+
+        <div class="rematch-note" id="rematchNote"></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script type="module">
+import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
+
+const SUPABASE_URL = "https://rffiqjndhwuwryxjrhdk.supabase.co";
+const SUPABASE_KEY = "sb_publishable_XKlA4dG_h2dyYizi6MsbKQ_A-biuHKG";
+
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY, {
+  auth: {
+    persistSession: true,
+    autoRefreshToken: true,
+    detectSessionInUrl: false
+  }
+});
+
+const $ = id => document.getElementById(id);
+
+const STORAGE = {
+  theme: "kagitlik-theme",
+  name: "kagitlik-name",
+  roomId: "kagitlik-slingshot-room-id",
+  roomCode: "kagitlik-slingshot-room-code"
+};
+
+const WORLD_W = 900;
+const WORLD_H = 500;
+const GROUND_Y = 438;
+const PLAYER_R = 27;
+const BALL_R = 16;
+const MAX_HP = 3;
+const MAX_TURNS = 10;
+const TURN_MS = 18000;
+const MAX_PULL = 108;
+const LAUNCH_FACTOR = 5.15;
+
+const ORIGINS = {
+  1: { x: 108, y: 398 },
+  2: { x: 792, y: 398 }
+};
+
+const TOWER = {
+  x: 420,
+  y: 278,
+  w: 60,
+  h: 160
+};
+
+const state = {
+  user: null,
+  room: null,
+  players: [],
+  channel: null,
+  pollTimer: null,
+  refreshTimer: null,
+  busy: false,
+  presence: {},
+  host: false,
+  gameReady: false
+};
+
+const game = {
+  sessionId: null,
+  started: false,
+  finished: false,
+  winner: 0,
+  turnIndex: 0,
+  activeNumber: 1,
+  turnEndsAt: 0,
+  wind: 0,
+  phase: "waiting",
+  hp: { 1: MAX_HP, 2: MAX_HP },
+  shotId: null,
+  shotAccepted: false,
+  projectile: null,
+  resultTimer: null,
+  turnTimer: null,
+  timerRaf: null,
+  rematch: new Set(),
+  lastLog: "Karakterini geriye çekip bırak.",
+  lastSyncSent: 0
+};
+
+const aim = {
+  dragging: false,
+  pointerId: null,
+  origin: { x: 0, y: 0 },
+  pull: { x: 0, y: 0 },
+  power: 0
+};
+
+let canvas;
+let ctx;
+let dpr = 1;
+let scale = 1;
+let offsetX = 0;
+let offsetY = 0;
+let animationFrame = null;
+let lastFrame = 0;
+let accumulator = 0;
+let particles = [];
+
+function showScreen(id) {
+  ["home", "room", "game"].forEach(name => {
+    $(name).classList.toggle("active", name === id);
+  });
+}
+
+function applyTheme(theme) {
+  document.documentElement.dataset.theme = theme;
+  localStorage.setItem(STORAGE.theme, theme);
+  $("themeColor").content = theme === "dark" ? "#171819" : "#e9e2d2";
+  drawArena();
+}
+
+function setMessage(id, text = "", error = false) {
+  const element = $(id);
+  element.textContent = text;
+  element.classList.toggle("show", Boolean(text));
+  element.classList.toggle("error", Boolean(text) && error);
+}
+
+function friendlyError(error) {
+  const text = error?.message || String(error || "Bilinmeyen hata");
+
+  if (/Failed to fetch/i.test(text)) return "Supabase'e ulaşılamadı.";
+  if (/anonymous sign-ins are disabled/i.test(text)) return "Anonim giriş Supabase'te kapalı.";
+  if (/Oda bulunamadı/i.test(text)) return "Oda bulunamadı veya artık açık değil.";
+  if (/Bu oda dolu/i.test(text)) return "Bu oda zaten iki oyuncuyla dolu.";
+
+  return text;
+}
+
+function cleanCode(value) {
+  return String(value || "")
+    .toUpperCase()
+    .replace(/[^A-Z2-9]/g, "")
+    .slice(0, 6);
+}
+
+function escapeHtml(value) {
+  const div = document.createElement("div");
+  div.textContent = String(value ?? "");
+  return div.innerHTML;
+}
+
+function vibrate(pattern) {
+  if (navigator.vibrate) navigator.vibrate(pattern);
+}
+
+function username() {
+  const value = $("nameInput").value.trim().replace(/\s+/g, " ");
+
+  if (value.length < 2 || value.length > 22) {
+    throw new Error("Kullanıcı adı 2 ile 22 karakter arasında olmalı.");
+  }
+
+  $("nameInput").value = value;
+  localStorage.setItem(STORAGE.name, value);
+  return value;
+}
+
+function currentPlayer() {
+  return state.players.find(player => player.user_id === state.user?.id);
+}
+
+function playerByNumber(number) {
+  return state.players.find(player => player.player_number === number);
+}
+
+function myNumber() {
+  return currentPlayer()?.player_number || 0;
+}
+
+function isMyTurn() {
+  return (
+    game.started &&
+    !game.finished &&
+    game.phase === "aiming" &&
+    myNumber() === game.activeNumber
+  );
+}
+
+function setBusy(value) {
+  state.busy = value;
+
+  ["createBtn", "joinBtn", "readyBtn", "refreshBtn", "leaveBtn"].forEach(id => {
+    $(id).disabled = value;
+  });
+
+  if (!value) renderRoom();
+}
+
+async function ensureSession() {
+  const { data, error } = await supabase.auth.getSession();
+  if (error) throw error;
+
+  if (data.session?.user) {
+    state.user = data.session.user;
+    return;
+  }
+
+  const result = await supabase.auth.signInAnonymously();
+  if (result.error) throw result.error;
+  state.user = result.data.user;
+}
+
+async function boot() {
+  showScreen("home");
+  $("homeStatus").classList.remove("online", "error");
+  $("homeStatusText").textContent = "Bağlantı hazırlanıyor…";
+  $("createBtn").disabled = true;
+  $("joinBtn").disabled = true;
+  setMessage("homeMsg");
+
+  try {
+    await ensureSession();
+
+    $("diagUser").textContent = state.user.id.slice(0, 8) + "…";
+    $("nameInput").value = localStorage.getItem(STORAGE.name) || "";
+
+    $("homeStatus").classList.add("online");
+    $("homeStatusText").textContent = "Supabase bağlantısı hazır.";
+    $("createBtn").disabled = false;
+    $("joinBtn").disabled = false;
+
+    const roomId = localStorage.getItem(STORAGE.roomId);
+    const roomCode = localStorage.getItem(STORAGE.roomCode);
+
+    if (roomId && roomCode) {
+      try {
+        await enterRoom(roomId, roomCode);
+      } catch (error) {
+        console.warn(error);
+        clearSavedRoom();
+      }
+    }
+  } catch (error) {
+    $("homeStatus").classList.add("error");
+    $("homeStatusText").textContent = "Bağlantı kurulamadı.";
+    setMessage("homeMsg", friendlyError(error) + " Sayfayı yenileyip tekrar dene.", true);
+  }
+}
+
+async function createRoom() {
+  if (state.busy) return;
+  setMessage("homeMsg");
+
+  try {
+    setBusy(true);
+
+    const { data, error } = await supabase.rpc("create_game_room", {
+      p_username: username(),
+      p_game_type: "slingshot_arena"
+    });
+
+    if (error) throw error;
+
+    const result = Array.isArray(data) ? data[0] : data;
+    await enterRoom(result.room_id, result.room_code);
+  } catch (error) {
+    setMessage("homeMsg", friendlyError(error), true);
+  } finally {
+    setBusy(false);
+  }
+}
+
+async function joinRoom() {
+  if (state.busy) return;
+  setMessage("homeMsg");
+
+  try {
+    const code = cleanCode($("codeInput").value);
+    $("codeInput").value = code;
+
+    if (code.length !== 6) {
+      throw new Error("Oda kodu 6 karakter olmalı.");
+    }
+
+    setBusy(true);
+
+    const { data, error } = await supabase.rpc("join_game_room", {
+      p_code: code,
+      p_username: username()
+    });
+
+    if (error) throw error;
+
+    const result = Array.isArray(data) ? data[0] : data;
+    await enterRoom(result.room_id, result.room_code);
+  } catch (error) {
+    setMessage("homeMsg", friendlyError(error), true);
+  } finally {
+    setBusy(false);
+  }
+}
+
+async function enterRoom(roomId, roomCode) {
+  state.room = {
+    id: roomId,
+    code: roomCode,
+    status: "waiting"
+  };
+
+  localStorage.setItem(STORAGE.roomId, roomId);
+  localStorage.setItem(STORAGE.roomCode, roomCode);
+
+  $("diagRoom").textContent = roomId.slice(0, 8) + "…";
+
+  showScreen("room");
+
+  await refreshRoom();
+  await subscribeRoom();
+
+  clearInterval(state.pollTimer);
+  state.pollTimer = setInterval(() => {
+    if (state.room && !document.hidden) {
+      refreshRoom().catch(() => {});
+    }
+  }, 4000);
+
+  if (state.room.status === "playing") {
+    await enterGame();
+  }
+}
+
+async function refreshRoom() {
+  if (!state.room) return;
+
+  const roomId = state.room.id;
+
+  const [roomResult, playersResult] = await Promise.all([
+    supabase
+      .from("rooms")
+      .select("id,code,host_id,status,game_type")
+      .eq("id", roomId)
+      .maybeSingle(),
+
+    supabase
+      .from("room_players")
+      .select("room_id,user_id,username,player_number,ready")
+      .eq("room_id", roomId)
+      .order("player_number")
+  ]);
+
+  if (roomResult.error) throw roomResult.error;
+  if (playersResult.error) throw playersResult.error;
+  if (!roomResult.data) throw new Error("Oda bulunamadı veya artık açık değil.");
+
+  state.room = roomResult.data;
+  state.players = playersResult.data || [];
+  state.host = myNumber() === 1;
+
+  renderRoom();
+
+  if (state.room.status === "playing") {
+    await enterGame();
+  }
+}
+
+function scheduleRefresh() {
+  clearTimeout(state.refreshTimer);
+
+  state.refreshTimer = setTimeout(() => {
+    refreshRoom().catch(error => {
+      setMessage("roomMsg", friendlyError(error), true);
+    });
+  }, 100);
+}
+
+async function subscribeRoom() {
+  if (state.channel) {
+    await supabase.removeChannel(state.channel);
+  }
+
+  const roomId = state.room.id;
+
+  state.channel = supabase
+    .channel(`slingshot-${roomId}`, {
+      config: {
+        broadcast: { self: true },
+        presence: { key: state.user.id }
+      }
+    })
+    .on(
+      "postgres_changes",
+      {
+        event: "*",
+        schema: "public",
+        table: "rooms",
+        filter: `id=eq.${roomId}`
+      },
+      scheduleRefresh
+    )
+    .on(
+      "postgres_changes",
+      {
+        event: "*",
+        schema: "public",
+        table: "room_players",
+        filter: `room_id=eq.${roomId}`
+      },
+      scheduleRefresh
+    )
+    .on("broadcast", { event: "slingshot" }, ({ payload }) => {
+      handleGameEvent(payload);
+    })
+    .on("presence", { event: "sync" }, () => {
+      state.presence = state.channel.presenceState();
+      maybeStartGame();
+      updateRematchText();
+    })
+    .subscribe(async status => {
+      $("diagRt").textContent = status;
+
+      $("roomStatus").classList.toggle("online", status === "SUBSCRIBED");
+      $("roomStatus").classList.toggle(
+        "error",
+        ["CHANNEL_ERROR", "TIMED_OUT", "CLOSED"].includes(status)
+      );
+
+      $("roomStatusText").textContent =
+        status === "SUBSCRIBED"
+          ? "Canlı bağlantı kuruldu."
+          : `Realtime: ${status}`;
+
+      if (status === "SUBSCRIBED" && state.gameReady) {
+        await trackGamePresence();
+      }
+    });
+}
+
+function renderRoom() {
+  if (!state.room) return;
+
+  $("roomCode").textContent =
+    state.room.code || localStorage.getItem(STORAGE.roomCode) || "------";
+
+  const playing = state.room.status === "playing";
+
+  $("roomTitle").textContent =
+    playing
+      ? "İki oyuncu da hazır."
+      : state.players.length < 2
+        ? "Oyuncu bekleniyor."
+        : "Hazır olmayı bekliyoruz.";
+
+  $("roomLead").textContent =
+    playing
+      ? "Arena açılıyor…"
+      : state.players.length < 2
+        ? "Kodu diğer oyuncuya gönder."
+        : "İkiniz de Hazırım düğmesine basın.";
+
+  $("players").innerHTML = "";
+
+  for (let number = 1; number <= 2; number++) {
+    const player = state.players.find(item => item.player_number === number);
+    const element = document.createElement("article");
+
+    if (!player) {
+      element.className = "player empty";
+      element.innerHTML = `
+        <small>Oyuncu ${number}</small>
+        <strong>Bekleniyor…</strong>
+        <div class="pstate"><i></i>Henüz katılmadı</div>
+      `;
+    } else {
+      const me = player.user_id === state.user?.id;
+      element.className = `player${player.ready ? " ready" : ""}`;
+      element.innerHTML = `
+        <small>Oyuncu ${number}${me ? " · sen" : ""}</small>
+        <strong>${escapeHtml(player.username)}</strong>
+        <div class="pstate"><i></i>${player.ready ? "Hazır" : "Hazır değil"}</div>
+      `;
+    }
+
+    $("players").appendChild(element);
+  }
+
+  const me = currentPlayer();
+
+  $("readyBtn").textContent = me?.ready ? "Hazır değilim" : "Hazırım";
+  $("readyBtn").disabled =
+    state.busy ||
+    !me ||
+    playing ||
+    state.players.length < 2;
+}
+
+async function toggleReady() {
+  const me = currentPlayer();
+  if (!me || state.busy) return;
+
+  try {
+    setBusy(true);
+
+    const { error } = await supabase.rpc("set_room_ready", {
+      p_room_id: state.room.id,
+      p_ready: !me.ready
+    });
+
+    if (error) throw error;
+    await refreshRoom();
+  } catch (error) {
+    setMessage("roomMsg", friendlyError(error), true);
+  } finally {
+    setBusy(false);
+  }
+}
+
+async function enterGame() {
+  if (!state.room || state.gameReady) return;
+
+  state.gameReady = true;
+  showScreen("game");
+  setupCanvas();
+  renderGame();
+  await trackGamePresence();
+  maybeStartGame();
+}
+
+async function trackGamePresence() {
+  if (!state.channel) return;
+
+  await state.channel.track({
+    user_id: state.user.id,
+    player_number: myNumber(),
+    screen: "game",
+    at: Date.now()
+  });
+}
+
+function presentGameUsers() {
+  const ids = new Set();
+
+  for (const entries of Object.values(state.presence || {})) {
+    for (const entry of entries) {
+      if (entry.screen === "game") {
+        ids.add(entry.user_id);
+      }
+    }
+  }
+
+  return ids;
+}
+
+function maybeStartGame() {
+  if (
+    !state.host ||
+    state.room?.status !== "playing" ||
+    game.started ||
+    presentGameUsers().size < 2
+  ) {
+    return;
+  }
+
+  setTimeout(() => {
+    if (
+      state.host &&
+      !game.started &&
+      presentGameUsers().size >= 2
+    ) {
+      hostStartSession();
+    }
+  }, 500);
+}
+
+function randomWind() {
+  const choices = [-18, -12, -8, 0, 0, 8, 12, 18];
+  return choices[Math.floor(Math.random() * choices.length)];
+}
+
+function sendGameEvent(type, data = {}) {
+  if (!state.channel) return Promise.resolve();
+
+  return state.channel.send({
+    type: "broadcast",
+    event: "slingshot",
+    payload: {
+      type,
+      sender: state.user.id,
+      sessionId: game.sessionId,
+      ...data
+    }
+  });
+}
+
+function hostStartSession() {
+  if (game.started && !game.finished) return;
+
+  const sessionId = crypto.randomUUID();
+
+  sendGameEvent("session_start", {
+    sessionId,
+    hp: { 1: MAX_HP, 2: MAX_HP },
+    turnIndex: 0,
+    activeNumber: 1,
+    turnEndsAt: Date.now() + TURN_MS,
+    wind: randomWind()
+  });
+}
+
+function clearGameTimers() {
+  clearTimeout(game.resultTimer);
+  clearTimeout(game.turnTimer);
+  cancelAnimationFrame(game.timerRaf);
+}
+
+function resetGame() {
+  clearGameTimers();
+  cancelAnimationFrame(animationFrame);
+
+  game.started = true;
+  game.finished = false;
+  game.winner = 0;
+  game.phase = "aiming";
+  game.shotId = null;
+  game.shotAccepted = false;
+  game.projectile = null;
+  game.rematch = new Set();
+  game.lastLog = "Karakterini geriye çekip bırak.";
+
+  aim.dragging = false;
+  aim.pointerId = null;
+  aim.pull = { x: 0, y: 0 };
+  aim.power = 0;
+
+  particles = [];
+
+  $("finishOverlay").classList.remove("show");
+  updatePower(0);
+  scheduleTurnTimeout();
+  startTurnTimer();
+  renderGame();
+  drawArena();
+}
+
+function handleGameEvent(payload) {
+  if (!payload?.type) return;
+
+  if (payload.type === "session_start") {
+    game.sessionId = payload.sessionId;
+    game.hp = {
+      1: Number(payload.hp?.[1] ?? MAX_HP),
+      2: Number(payload.hp?.[2] ?? MAX_HP)
+    };
+    game.turnIndex = Number(payload.turnIndex || 0);
+    game.activeNumber = Number(payload.activeNumber || 1);
+    game.turnEndsAt = Number(payload.turnEndsAt);
+    game.wind = Number(payload.wind || 0);
+
+    resetGame();
+    return;
+  }
+
+  if (
+    payload.sessionId &&
+    game.sessionId &&
+    payload.sessionId !== game.sessionId
+  ) {
+    return;
+  }
+
+  if (payload.type === "shot_request") {
+    if (state.host) hostAcceptShot(payload);
+    return;
+  }
+
+  if (payload.type === "shot_start") {
+    receiveShotStart(payload);
+    return;
+  }
+
+  if (payload.type === "shot_sync") {
+    receiveShotSync(payload);
+    return;
+  }
+
+  if (payload.type === "shot_result") {
+    receiveShotResult(payload);
+    return;
+  }
+
+  if (payload.type === "sync_request") {
+    if (state.host && game.started) {
+      sendGameEvent("sync_state", {
+        targetUser: payload.sender,
+        state: serialGameState()
+      });
+    }
+    return;
+  }
+
+  if (payload.type === "sync_state") {
+    if (payload.targetUser === state.user.id) {
+      applySyncedState(payload.state);
+    }
+    return;
+  }
+
+  if (payload.type === "rematch") {
+    game.rematch.add(payload.sender);
+    updateRematchText();
+
+    if (state.host && game.rematch.size >= 2) {
+      hostStartSession();
+    }
+  }
+}
+
+function hostAcceptShot(payload) {
+  if (
+    !state.host ||
+    game.finished ||
+    game.phase !== "aiming" ||
+    game.shotAccepted ||
+    payload.turnIndex !== game.turnIndex ||
+    payload.playerNumber !== game.activeNumber
+  ) {
+    return;
+  }
+
+  const shooter = playerByNumber(game.activeNumber);
+
+  if (!shooter || shooter.user_id !== payload.sender) {
+    return;
+  }
+
+  const vx = Math.max(-760, Math.min(760, Number(payload.vx)));
+  const vy = Math.max(-760, Math.min(760, Number(payload.vy)));
+
+  if (!Number.isFinite(vx) || !Number.isFinite(vy)) return;
+
+  game.shotAccepted = true;
+  game.phase = "launching";
+
+  const shotPayload = {
+    shotId: crypto.randomUUID(),
+    turnIndex: game.turnIndex,
+    activeNumber: game.activeNumber,
+    vx,
+    vy,
+    wind: game.wind
+  };
+
+  // Oda sahibinin kendi Broadcast paketini geri almasına güvenme.
+  receiveShotStart(shotPayload);
+  sendGameEvent("shot_start", shotPayload);
+
+  setTimeout(() => {
+    if (
+      game.projectile &&
+      game.shotId === shotPayload.shotId &&
+      !game.projectile.done
+    ) {
+      sendShotSync(true);
+    }
+  }, 110);
+}
+
+function receiveShotStart(payload) {
+  if (
+    payload.turnIndex !== game.turnIndex ||
+    game.finished
+  ) {
+    return;
+  }
+
+  if (
+    game.shotId === payload.shotId &&
+    game.projectile &&
+    !game.projectile.done
+  ) {
+    return;
+  }
+
+  clearGameTimers();
+
+  game.activeNumber = Number(payload.activeNumber);
+  game.wind = Number(payload.wind || 0);
+  game.phase = "flying";
+  game.shotId = payload.shotId;
+  game.shotAccepted = true;
+  game.lastSyncSent = 0;
+
+  aim.dragging = false;
+  aim.pull = { x: 0, y: 0 };
+  aim.power = 0;
+  updatePower(0);
+
+  const origin = ORIGINS[game.activeNumber];
+  const direction = game.activeNumber === 1 ? 1 : -1;
+
+  game.projectile = {
+    x: Number.isFinite(Number(payload.x))
+      ? Number(payload.x)
+      : origin.x + direction * (PLAYER_R + BALL_R + 5),
+    y: Number.isFinite(Number(payload.y))
+      ? Number(payload.y)
+      : origin.y - 20,
+    vx: Number(payload.vx),
+    vy: Number(payload.vy),
+    r: BALL_R,
+    age: Number(payload.age || 0),
+    bounces: Number(payload.bounces || 0),
+    hitPlayer: 0,
+    done: false,
+    trail: []
+  };
+
+  game.lastLog = `${playerByNumber(game.activeNumber)?.username || "Oyuncu"} atış yaptı.`;
+  renderGame();
+  drawArena();
+  startPhysicsLoop();
+}
+
+function sendShotSync(force = false) {
+  if (
+    !state.host ||
+    !game.projectile ||
+    game.projectile.done ||
+    game.phase !== "flying"
+  ) {
+    return;
+  }
+
+  const now = performance.now();
+
+  if (!force && now - game.lastSyncSent < 85) {
+    return;
+  }
+
+  game.lastSyncSent = now;
+
+  const p = game.projectile;
+
+  sendGameEvent("shot_sync", {
+    shotId: game.shotId,
+    turnIndex: game.turnIndex,
+    activeNumber: game.activeNumber,
+    x: p.x,
+    y: p.y,
+    vx: p.vx,
+    vy: p.vy,
+    age: p.age,
+    bounces: p.bounces,
+    wind: game.wind
+  });
+}
+
+function receiveShotSync(payload) {
+  if (
+    state.host ||
+    game.finished ||
+    payload.turnIndex !== game.turnIndex
+  ) {
+    return;
+  }
+
+  if (!game.projectile || game.shotId !== payload.shotId) {
+    receiveShotStart(payload);
+  }
+
+  const p = game.projectile;
+  if (!p || game.shotId !== payload.shotId) return;
+
+  game.phase = "flying";
+  game.activeNumber = Number(payload.activeNumber);
+  game.wind = Number(payload.wind || 0);
+
+  const syncX = Number(payload.x);
+  const syncY = Number(payload.y);
+  const error = Math.hypot(p.x - syncX, p.y - syncY);
+
+  if (error > 34) {
+    p.x = syncX;
+    p.y = syncY;
+  } else {
+    p.x += (syncX - p.x) * 0.48;
+    p.y += (syncY - p.y) * 0.48;
+  }
+
+  p.vx = Number(payload.vx);
+  p.vy = Number(payload.vy);
+  p.age = Number(payload.age);
+  p.bounces = Number(payload.bounces || 0);
+
+  drawArena();
+}
+
+function startPhysicsLoop() {
+  cancelAnimationFrame(animationFrame);
+
+  lastFrame = performance.now();
+  accumulator = 0;
+
+  const frame = now => {
+    const dt = Math.min(0.035, Math.max(0.001, (now - lastFrame) / 1000));
+    lastFrame = now;
+    accumulator += dt;
+
+    const fixed = 1 / 120;
+
+    while (
+      accumulator >= fixed &&
+      game.projectile &&
+      !game.projectile.done
+    ) {
+      simulateProjectile(fixed);
+      accumulator -= fixed;
+    }
+
+    updateParticles(dt);
+
+    if (state.host && game.projectile && !game.projectile.done) {
+      sendShotSync();
+    }
+
+    drawArena();
+
+    if (game.projectile && !game.projectile.done) {
+      animationFrame = requestAnimationFrame(frame);
+    } else if (
+      game.projectile &&
+      game.projectile.done &&
+      state.host
+    ) {
+      hostResolveShot();
+    }
+  };
+
+  animationFrame = requestAnimationFrame(frame);
+}
+
+function simulateProjectile(dt) {
+  const p = game.projectile;
+  if (!p || p.done) return;
+
+  p.age += dt;
+  p.vx += game.wind * dt;
+  p.vy += 390 * dt;
+  p.x += p.vx * dt;
+  p.y += p.vy * dt;
+
+  if (!Array.isArray(p.trail)) p.trail = [];
+  p.trail.push({ x: p.x, y: p.y });
+  if (p.trail.length > 15) p.trail.shift();
+
+  collideWorldBounds(p);
+  collideRect(p, TOWER);
+
+  const opponent = game.activeNumber === 1 ? 2 : 1;
+  const target = ORIGINS[opponent];
+
+  if (
+    p.age > 0.16 &&
+    Math.hypot(p.x - target.x, p.y - target.y) <
+      p.r + PLAYER_R
+  ) {
+    p.hitPlayer = opponent;
+    p.done = true;
+    burst(target.x, target.y, 20, opponent === 1 ? "#508eaa" : "#d05e68");
+    vibrate([35, 20, 60]);
+    return;
+  }
+
+  if (
+    p.age > 5.4 ||
+    p.x < -90 ||
+    p.x > WORLD_W + 90 ||
+    p.y > WORLD_H + 90 ||
+    p.bounces > 7
+  ) {
+    p.done = true;
+    return;
+  }
+
+  if (
+    p.age > 0.9 &&
+    p.y >= GROUND_Y - p.r - 1 &&
+    Math.abs(p.vy) < 34 &&
+    Math.abs(p.vx) < 34
+  ) {
+    p.done = true;
+  }
+}
+
+function collideWorldBounds(p) {
+  if (p.x - p.r < 0) {
+    p.x = p.r;
+    p.vx = Math.abs(p.vx) * 0.62;
+    p.vy *= 0.94;
+    p.bounces++;
+  }
+
+  if (p.x + p.r > WORLD_W) {
+    p.x = WORLD_W - p.r;
+    p.vx = -Math.abs(p.vx) * 0.62;
+    p.vy *= 0.94;
+    p.bounces++;
+  }
+
+  // Tavanda yapay sekme yok; top doğal olarak yukarı çıkıp geri düşer.
+  if (p.y + p.r > GROUND_Y) {
+    p.y = GROUND_Y - p.r;
+
+    if (p.vy > 0) {
+      p.vy *= -0.40;
+      p.vx *= 0.74;
+      p.bounces++;
+      burst(p.x, GROUND_Y - 2, 4, "#e5c66d");
+    }
+  }
+}
+
+function collideRect(p, rect) {
+  const nearestX = Math.max(rect.x, Math.min(p.x, rect.x + rect.w));
+  const nearestY = Math.max(rect.y, Math.min(p.y, rect.y + rect.h));
+
+  let dx = p.x - nearestX;
+  let dy = p.y - nearestY;
+  let distance = Math.hypot(dx, dy);
+
+  if (distance >= p.r) return;
+
+  if (distance < 0.0001) {
+    const left = Math.abs(p.x - rect.x);
+    const right = Math.abs(rect.x + rect.w - p.x);
+    const top = Math.abs(p.y - rect.y);
+    const bottom = Math.abs(rect.y + rect.h - p.y);
+    const smallest = Math.min(left, right, top, bottom);
+
+    if (smallest === left) {
+      dx = -1;
+      dy = 0;
+    } else if (smallest === right) {
+      dx = 1;
+      dy = 0;
+    } else if (smallest === top) {
+      dx = 0;
+      dy = -1;
+    } else {
+      dx = 0;
+      dy = 1;
+    }
+
+    distance = 1;
+  }
+
+  const nx = dx / distance;
+  const ny = dy / distance;
+  const penetration = p.r - distance;
+
+  p.x += nx * penetration;
+  p.y += ny * penetration;
+
+  const velocityNormal = p.vx * nx + p.vy * ny;
+
+  if (velocityNormal < 0) {
+    p.vx -= 1.58 * velocityNormal * nx;
+    p.vy -= 1.58 * velocityNormal * ny;
+    p.vx *= 0.88;
+    p.vy *= 0.88;
+    p.bounces++;
+    burst(p.x, p.y, 6, "#a896ce");
+  }
+}
+
+function hostResolveShot() {
+  if (
+    !state.host ||
+    !game.projectile ||
+    game.phase !== "flying"
+  ) {
+    return;
+  }
+
+  const hitPlayer = game.projectile.hitPlayer;
+  const hp = {
+    1: game.hp[1],
+    2: game.hp[2]
+  };
+
+  if (hitPlayer === 1 || hitPlayer === 2) {
+    hp[hitPlayer] = Math.max(0, hp[hitPlayer] - 1);
+  }
+
+  const nextTurnIndex = game.turnIndex + 1;
+  const hpWinner =
+    hp[1] <= 0 ? 2 :
+    hp[2] <= 0 ? 1 :
+    0;
+
+  let finished = hpWinner !== 0 || nextTurnIndex >= MAX_TURNS;
+  let winner = hpWinner;
+
+  if (finished && winner === 0) {
+    if (hp[1] > hp[2]) winner = 1;
+    else if (hp[2] > hp[1]) winner = 2;
+    else winner = 3;
+  }
+
+  const nextActiveNumber = game.activeNumber === 1 ? 2 : 1;
+  const nextStartsAt = Date.now() + 1250;
+
+  let reason = "Atış boşa gitti.";
+
+  if (hitPlayer) {
+    reason = `${playerByNumber(game.activeNumber)?.username || "Oyuncu"} rakibine vurdu!`;
+  } else if (game.projectile.bounces >= 2) {
+    reason = "Güzel sekti ama hedefi bulmadı.";
+  }
+
+  sendGameEvent("shot_result", {
+    shotId: game.shotId,
+    hitPlayer,
+    hp,
+    reason,
+    finished,
+    winner,
+    nextTurnIndex,
+    nextActiveNumber,
+    nextWind: randomWind(),
+    nextStartsAt
+  });
+}
+
+function receiveShotResult(payload) {
+  if (
+    payload.shotId !== game.shotId &&
+    game.phase === "flying"
+  ) {
+    return;
+  }
+
+  cancelAnimationFrame(animationFrame);
+  clearGameTimers();
+
+  game.phase = "result";
+  game.projectile = null;
+  game.hp = {
+    1: Number(payload.hp?.[1] ?? game.hp[1]),
+    2: Number(payload.hp?.[2] ?? game.hp[2])
+  };
+  game.lastLog = payload.reason || "Atış tamamlandı.";
+
+  renderGame();
+  drawArena();
+
+  $("arenaTitle").textContent =
+    payload.hitPlayer
+      ? "İsabet!"
+      : "Atış tamamlandı.";
+
+  $("arenaText").textContent = game.lastLog;
+  vibrate(payload.hitPlayer ? [30, 20, 60] : 10);
+
+  if (payload.finished) {
+    game.resultTimer = setTimeout(() => {
+      finishMatch(payload.winner);
+    }, 850);
+    return;
+  }
+
+  game.resultTimer = setTimeout(() => {
+    game.turnIndex = Number(payload.nextTurnIndex);
+    game.activeNumber = Number(payload.nextActiveNumber);
+    game.wind = Number(payload.nextWind || 0);
+    game.turnEndsAt = Date.now() + TURN_MS;
+    game.phase = "aiming";
+    game.shotId = null;
+    game.shotAccepted = false;
+    game.projectile = null;
+    game.lastLog = "Yeni atış sırası başladı.";
+
+    scheduleTurnTimeout();
+    startTurnTimer();
+    renderGame();
+    drawArena();
+  }, Math.max(0, Number(payload.nextStartsAt) - Date.now()));
+}
+
+function scheduleTurnTimeout() {
+  clearTimeout(game.turnTimer);
+
+  if (!state.host || game.finished || game.phase !== "aiming") return;
+
+  const delay = Math.max(0, game.turnEndsAt - Date.now() + 80);
+
+  game.turnTimer = setTimeout(() => {
+    hostPassTurn();
+  }, delay);
+}
+
+function hostPassTurn() {
+  if (
+    !state.host ||
+    game.finished ||
+    game.phase !== "aiming"
+  ) {
+    return;
+  }
+
+  game.phase = "launching";
+
+  const nextTurnIndex = game.turnIndex + 1;
+  const nextActiveNumber = game.activeNumber === 1 ? 2 : 1;
+  const finished = nextTurnIndex >= MAX_TURNS;
+
+  let winner = 0;
+
+  if (finished) {
+    if (game.hp[1] > game.hp[2]) winner = 1;
+    else if (game.hp[2] > game.hp[1]) winner = 2;
+    else winner = 3;
+  }
+
+  sendGameEvent("shot_result", {
+    shotId: null,
+    hitPlayer: 0,
+    hp: game.hp,
+    reason: `${playerByNumber(game.activeNumber)?.username || "Oyuncu"} süresinde atış yapamadı.`,
+    finished,
+    winner,
+    nextTurnIndex,
+    nextActiveNumber,
+    nextWind: randomWind(),
+    nextStartsAt: Date.now() + 1050
+  });
+}
+
+function startTurnTimer() {
+  cancelAnimationFrame(game.timerRaf);
+
+  const update = () => {
+    if (game.phase !== "aiming" || game.finished) return;
+
+    const left = Math.max(0, game.turnEndsAt - Date.now());
+    $("turnTime").textContent = (left / 1000).toFixed(1) + "s";
+
+    if (left > 0) {
+      game.timerRaf = requestAnimationFrame(update);
+    }
+  };
+
+  update();
+}
+
+function finishMatch(winner) {
+  clearGameTimers();
+  cancelAnimationFrame(animationFrame);
+
+  game.finished = true;
+  game.winner = Number(winner || 0);
+  game.phase = "finished";
+
+  renderGame();
+  drawArena();
+
+  const p1 = playerByNumber(1);
+  const p2 = playerByNumber(2);
+
+  $("finalP1Name").textContent = p1?.username || "Oyuncu 1";
+  $("finalP2Name").textContent = p2?.username || "Oyuncu 2";
+  $("finalP1Hp").textContent = heartsText(game.hp[1]);
+  $("finalP2Hp").textContent = heartsText(game.hp[2]);
+
+  if (game.winner === 3) {
+    $("finishTitle").textContent = "Maç berabere.";
+    $("finishText").textContent =
+      "On atış sonunda iki karakterin de aynı miktarda canı kaldı.";
+  } else {
+    const name = playerByNumber(game.winner)?.username || "Oyuncu";
+    $("finishTitle").textContent = `${name} kazandı.`;
+    $("finishText").textContent =
+      "Rakibine daha fazla isabet ettiren oyuncu arenayı aldı.";
+  }
+
+  $("rematchBtn").disabled = false;
+  $("rematchNote").textContent = "";
+  $("finishOverlay").classList.add("show");
+
+  vibrate([30, 25, 70]);
+}
+
+function heartsText(hp) {
+  return "♥".repeat(Math.max(0, hp)) + "♡".repeat(Math.max(0, MAX_HP - hp));
+}
+
+function serialGameState() {
+  return {
+    sessionId: game.sessionId,
+    started: game.started,
+    finished: game.finished,
+    winner: game.winner,
+    turnIndex: game.turnIndex,
+    activeNumber: game.activeNumber,
+    turnEndsAt: game.turnEndsAt,
+    wind: game.wind,
+    phase: game.phase,
+    hp: game.hp,
+    lastLog: game.lastLog
+  };
+}
+
+function applySyncedState(snapshot) {
+  if (!snapshot) return;
+
+  game.sessionId = snapshot.sessionId;
+  game.started = Boolean(snapshot.started);
+  game.finished = Boolean(snapshot.finished);
+  game.winner = Number(snapshot.winner || 0);
+  game.turnIndex = Number(snapshot.turnIndex || 0);
+  game.activeNumber = Number(snapshot.activeNumber || 1);
+  game.turnEndsAt = Number(snapshot.turnEndsAt || 0);
+  game.wind = Number(snapshot.wind || 0);
+  game.phase =
+    snapshot.phase === "flying"
+      ? "waiting_result"
+      : snapshot.phase;
+  game.hp = {
+    1: Number(snapshot.hp?.[1] ?? MAX_HP),
+    2: Number(snapshot.hp?.[2] ?? MAX_HP)
+  };
+  game.lastLog = snapshot.lastLog || "";
+
+  if (game.finished) {
+    finishMatch(game.winner);
+    return;
+  }
+
+  if (game.phase === "aiming") {
+    scheduleTurnTimeout();
+    startTurnTimer();
+  }
+
+  renderGame();
+  drawArena();
+}
+
+function requestRematch() {
+  if (!game.finished) return;
+
+  game.rematch.add(state.user.id);
+  sendGameEvent("rematch");
+  updateRematchText();
+  $("rematchBtn").disabled = true;
+}
+
+function updateRematchText() {
+  if (!game.finished) return;
+
+  const names = [...game.rematch]
+    .map(userId => state.players.find(player => player.user_id === userId)?.username)
+    .filter(Boolean);
+
+  $("rematchNote").textContent =
+    names.length
+      ? `${names.join(" ve ")} tekrar oynamak istiyor.`
+      : "";
+}
+
+function renderGame() {
+  const p1 = playerByNumber(1);
+  const p2 = playerByNumber(2);
+
+  $("p1Name").textContent = p1?.username || "Oyuncu 1";
+  $("p2Name").textContent = p2?.username || "Oyuncu 2";
+
+  $("p1Label").textContent = myNumber() === 1 ? "Oyuncu 1 · sen" : "Oyuncu 1";
+  $("p2Label").textContent = myNumber() === 2 ? "Oyuncu 2 · sen" : "Oyuncu 2";
+
+  renderHearts("p1Hearts", game.hp[1]);
+  renderHearts("p2Hearts", game.hp[2]);
+
+  const activePlayer = playerByNumber(game.activeNumber);
+  const mine = isMyTurn();
+
+  $("turnCard").classList.toggle("mine", mine);
+  $("turnLabel").textContent = `Atış ${Math.min(game.turnIndex + 1, MAX_TURNS)} / ${MAX_TURNS}`;
+
+  if (!game.started) {
+    $("turnName").textContent = "Hazırlanıyor";
+    $("turnTime").textContent = "—";
+    $("arenaTitle").textContent = "Oyuncular bağlanıyor.";
+    $("arenaText").textContent = "İki oyuncu oyun ekranına gelince maç başlayacak.";
+  } else if (game.phase === "aiming") {
+    $("turnName").textContent =
+      mine
+        ? "Sıra sende"
+        : `${activePlayer?.username || "Rakip"} nişan alıyor`;
+
+    $("arenaTitle").textContent =
+      mine
+        ? "Karakterini geriye çek."
+        : `${activePlayer?.username || "Rakip"} atış hazırlıyor.`;
+
+    $("arenaText").textContent =
+      mine
+        ? "Çektiğin yönün tersine fırlayacak."
+        : "Atışı diğer ekranda anlık olarak göreceksin.";
+  } else if (game.phase === "flying" || game.phase === "waiting_result") {
+    $("turnName").textContent = "Top uçuyor";
+    $("turnTime").textContent = "…";
+    $("arenaTitle").textContent = "Atış havada.";
+    $("arenaText").textContent = "Sekmeleri ve çarpışmayı izle.";
+  } else if (game.phase === "result") {
+    $("turnName").textContent = "Tur sonucu";
+    $("turnTime").textContent = "—";
+  } else if (game.finished) {
+    $("turnName").textContent = "Maç bitti";
+    $("turnTime").textContent = "—";
+  }
+
+  $("windText").textContent = windLabel(game.wind);
+  $("shotLog").textContent = game.lastLog;
+}
+
+function renderHearts(containerId, hp) {
+  const container = $(containerId);
+  container.innerHTML = "";
+
+  for (let index = 0; index < MAX_HP; index++) {
+    const span = document.createElement("span");
+    span.className = `heart${index < hp ? "" : " empty"}`;
+    span.textContent = "♥";
+    container.appendChild(span);
+  }
+}
+
+function windLabel(wind) {
+  if (wind === 0) return "Rüzgâr: yok";
+
+  const arrow = wind > 0 ? "→" : "←";
+  const strength =
+    Math.abs(wind) >= 25
+      ? "güçlü"
+      : Math.abs(wind) >= 18
+        ? "orta"
+        : "hafif";
+
+  return `Rüzgâr: ${arrow} ${strength}`;
+}
+
+function setupCanvas() {
+  canvas = $("arenaCanvas");
+  ctx = canvas.getContext("2d");
+
+  resizeCanvas();
+
+  canvas.addEventListener("pointerdown", beginAim, { passive: false });
+  canvas.addEventListener("pointermove", moveAim, { passive: false });
+  canvas.addEventListener("pointerup", releaseAim, { passive: false });
+  canvas.addEventListener("pointercancel", cancelAim);
+}
+
+function resizeCanvas() {
+  if (!canvas) return;
+
+  const rect = $("arenaShell").getBoundingClientRect();
+  dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+  canvas.width = Math.max(1, Math.round(rect.width * dpr));
+  canvas.height = Math.max(1, Math.round(rect.height * dpr));
+  canvas.style.width = rect.width + "px";
+  canvas.style.height = rect.height + "px";
+
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+  scale = Math.min(rect.width / WORLD_W, rect.height / WORLD_H);
+  offsetX = (rect.width - WORLD_W * scale) / 2;
+  offsetY = (rect.height - WORLD_H * scale) / 2;
+
+  drawArena();
+}
+
+function eventToWorld(event) {
+  const rect = canvas.getBoundingClientRect();
+
+  return {
+    x: (event.clientX - rect.left - offsetX) / scale,
+    y: (event.clientY - rect.top - offsetY) / scale
+  };
+}
+
+function beginAim(event) {
+  if (!isMyTurn() || game.shotAccepted) return;
+
+  const point = eventToWorld(event);
+  const origin = ORIGINS[game.activeNumber];
+
+  if (
+    Math.hypot(point.x - origin.x, point.y - origin.y) >
+    72
+  ) {
+    return;
+  }
+
+  event.preventDefault();
+  canvas.setPointerCapture?.(event.pointerId);
+
+  aim.dragging = true;
+  aim.pointerId = event.pointerId;
+  aim.origin = { ...origin };
+  aim.pull = { x: 0, y: 0 };
+  aim.power = 0;
+
+  updatePower(0);
+  drawArena();
+}
+
+function moveAim(event) {
+  if (
+    !aim.dragging ||
+    event.pointerId !== aim.pointerId ||
+    !isMyTurn()
+  ) {
+    return;
+  }
+
+  event.preventDefault();
+
+  const point = eventToWorld(event);
+  let dx = point.x - aim.origin.x;
+  let dy = point.y - aim.origin.y;
+
+  // Yalnızca karakterin arkasına çekilebilir.
+  if (game.activeNumber === 1) {
+    dx = Math.min(-2, dx);
+  } else {
+    dx = Math.max(2, dx);
+  }
+
+  dy = Math.max(-22, Math.min(104, dy));
+
+  const distance = Math.hypot(dx, dy);
+
+  if (distance > MAX_PULL) {
+    dx = dx / distance * MAX_PULL;
+    dy = dy / distance * MAX_PULL;
+  }
+
+  aim.pull = { x: dx, y: dy };
+  aim.power = Math.min(1, Math.hypot(dx, dy) / MAX_PULL);
+
+  updatePower(aim.power);
+  drawArena();
+}
+
+function releaseAim(event) {
+  if (
+    !aim.dragging ||
+    event.pointerId !== aim.pointerId ||
+    !isMyTurn()
+  ) {
+    return;
+  }
+
+  event.preventDefault();
+
+  const pull = { ...aim.pull };
+  const power = aim.power;
+
+  aim.dragging = false;
+  aim.pointerId = null;
+  aim.pull = { x: 0, y: 0 };
+  aim.power = 0;
+  updatePower(0);
+
+  if (power < 0.16) {
+    drawArena();
+    return;
+  }
+
+  game.shotAccepted = true;
+  game.lastLog = "Atış gönderiliyor…";
+  renderGame();
+
+  sendGameEvent("shot_request", {
+    turnIndex: game.turnIndex,
+    playerNumber: myNumber(),
+    vx: -pull.x * LAUNCH_FACTOR,
+    vy: -pull.y * LAUNCH_FACTOR
+  });
+
+  drawArena();
+}
+
+function cancelAim() {
+  aim.dragging = false;
+  aim.pointerId = null;
+  aim.pull = { x: 0, y: 0 };
+  aim.power = 0;
+  updatePower(0);
+  drawArena();
+}
+
+function updatePower(value) {
+  const percentage = Math.round(value * 100);
+
+  $("powerText").textContent = percentage + "%";
+  $("powerFill").style.width = percentage + "%";
+  $("powerFill").style.background =
+    percentage > 78
+      ? "var(--danger)"
+      : percentage > 48
+        ? "var(--yellow)"
+        : "var(--green)";
+}
+
+function drawArena() {
+  if (!ctx || !canvas) return;
+
+  const width = canvas.clientWidth;
+  const height = canvas.clientHeight;
+
+  ctx.clearRect(0, 0, width, height);
+
+  ctx.save();
+  ctx.translate(offsetX, offsetY);
+  ctx.scale(scale, scale);
+
+  drawBackground();
+  drawArenaFloor();
+  drawTower();
+  drawTrajectory();
+  drawFighter(1);
+  drawFighter(2);
+  drawProjectile();
+  drawParticles();
+
+  ctx.restore();
+}
+
+function palette() {
+  const dark = document.documentElement.dataset.theme === "dark";
+
+  return {
+    paper: dark ? "#292824" : "#fffdf4",
+    paper2: dark ? "#23221e" : "#f6efdc",
+    ink: dark ? "#f0eadd" : "#272421",
+    muted: dark ? "#bbb2a3" : "#716a60",
+    blue: dark ? "#4a8197" : "#7bb4cc",
+    pink: dark ? "#8f555e" : "#d79aa2",
+    yellow: dark ? "#a78a40" : "#e5c66d",
+    purple: dark ? "#705f96" : "#a896ce",
+    green: dark ? "#557e60" : "#8fbd9c",
+    lineBlue: dark ? "rgba(101,165,194,.17)" : "rgba(67,137,178,.22)"
+  };
+}
+
+function drawBackground() {
+  const colors = palette();
+
+  ctx.fillStyle = colors.paper;
+  ctx.fillRect(0, 0, WORLD_W, WORLD_H);
+
+  ctx.strokeStyle = colors.lineBlue;
+  ctx.lineWidth = 1;
+
+  for (let y = 35; y < WORLD_H; y += 35) {
+    ctx.beginPath();
+    ctx.moveTo(0, y);
+    ctx.lineTo(WORLD_W, y);
+    ctx.stroke();
+  }
+
+  ctx.globalAlpha = 0.09;
+  ctx.strokeStyle = colors.muted;
+
+  for (let x = 50; x < WORLD_W; x += 130) {
+    ctx.beginPath();
+    ctx.arc(x, 90 + (x % 3) * 28, 17, 0.2, Math.PI * 1.7);
+    ctx.stroke();
+  }
+
+  ctx.globalAlpha = 1;
+}
+
+function drawArenaFloor() {
+  const colors = palette();
+
+  ctx.fillStyle = colors.paper2;
+  ctx.strokeStyle = colors.ink;
+  ctx.lineWidth = 3;
+
+  roughRect(0, GROUND_Y, WORLD_W, WORLD_H - GROUND_Y);
+  ctx.fill();
+  ctx.stroke();
+
+  ctx.globalAlpha = 0.18;
+  ctx.strokeStyle = colors.muted;
+  ctx.lineWidth = 1.4;
+
+  for (let x = 25; x < WORLD_W; x += 42) {
+    ctx.beginPath();
+    ctx.moveTo(x, GROUND_Y + 21);
+    ctx.lineTo(x + 18, GROUND_Y + 18 + Math.sin(x) * 2);
+    ctx.stroke();
+  }
+
+  ctx.globalAlpha = 1;
+}
+
+function drawTower() {
+  const colors = palette();
+
+  ctx.save();
+  ctx.fillStyle = colors.paper2;
+  ctx.strokeStyle = colors.ink;
+  ctx.lineWidth = 3;
+
+  roughRect(TOWER.x, TOWER.y, TOWER.w, TOWER.h);
+  ctx.fill();
+  ctx.stroke();
+
+  ctx.globalAlpha = 0.22;
+  ctx.strokeStyle = colors.purple;
+  ctx.lineWidth = 2;
+
+  for (let y = TOWER.y + 20; y < TOWER.y + TOWER.h; y += 28) {
+    ctx.beginPath();
+    ctx.moveTo(TOWER.x + 9, y);
+    ctx.lineTo(TOWER.x + TOWER.w - 9, y + 4);
+    ctx.stroke();
+  }
+
+  ctx.globalAlpha = 1;
+  ctx.fillStyle = colors.purple;
+  ctx.font = '900 13px "Trebuchet MS", sans-serif';
+  ctx.textAlign = "center";
+  ctx.fillText("KARTON", TOWER.x + TOWER.w / 2, TOWER.y + 17);
+  ctx.restore();
+}
+
+function drawFighter(number) {
+  const colors = palette();
+  const origin = ORIGINS[number];
+  const active = game.started && !game.finished && game.activeNumber === number;
+  const hp = game.hp[number];
+
+  ctx.save();
+  ctx.translate(origin.x, origin.y);
+
+  if (active && game.phase === "aiming") {
+    ctx.globalAlpha = 0.15;
+    ctx.fillStyle = number === 1 ? colors.blue : colors.pink;
+    ctx.beginPath();
+    ctx.arc(0, 0, PLAYER_R + 13, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  ctx.globalAlpha = hp <= 0 ? 0.32 : 1;
+  ctx.fillStyle = number === 1 ? colors.blue : colors.pink;
+  ctx.strokeStyle = colors.ink;
+  ctx.lineWidth = 3;
+
+  roughRoundRect(-PLAYER_R, -PLAYER_R, PLAYER_R * 2, PLAYER_R * 2, 10);
+  ctx.fill();
+  ctx.stroke();
+
+  ctx.fillStyle = colors.ink;
+  ctx.beginPath();
+  ctx.arc(-8, -5, 2.4, 0, Math.PI * 2);
+  ctx.arc(8, -5, 2.4, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.strokeStyle = colors.ink;
+  ctx.lineWidth = 2;
+
+  ctx.beginPath();
+  ctx.arc(0, 4, 8, 0.12, Math.PI - 0.12);
+  ctx.stroke();
+
+  ctx.globalAlpha = 0.22;
+  ctx.fillStyle = colors.ink;
+  ctx.beginPath();
+  ctx.ellipse(0, PLAYER_R + 7, PLAYER_R * 0.78, 5, 0, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.restore();
+}
+
+function drawTrajectory() {
+  if (!aim.dragging || !isMyTurn()) return;
+
+  const colors = palette();
+  const origin = aim.origin;
+  const pulledX = origin.x + aim.pull.x;
+  const pulledY = origin.y + aim.pull.y;
+  const vx = -aim.pull.x * LAUNCH_FACTOR;
+  const vy = -aim.pull.y * LAUNCH_FACTOR;
+  const direction = game.activeNumber === 1 ? 1 : -1;
+  const startX = origin.x + direction * (PLAYER_R + BALL_R + 5);
+  const startY = origin.y - 20;
+
+  ctx.save();
+
+  ctx.strokeStyle = colors.ink;
+  ctx.lineWidth = 3;
+  ctx.globalAlpha = 0.7;
+
+  ctx.beginPath();
+  ctx.moveTo(origin.x - 13, origin.y - 5);
+  ctx.lineTo(pulledX, pulledY);
+  ctx.lineTo(origin.x + 13, origin.y - 5);
+  ctx.stroke();
+
+  ctx.fillStyle = colors.yellow;
+  ctx.strokeStyle = colors.ink;
+  ctx.lineWidth = 2;
+
+  ctx.beginPath();
+  ctx.arc(pulledX, pulledY, BALL_R + 2, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.stroke();
+
+  ctx.globalAlpha = 0.55;
+  ctx.fillStyle = colors.purple;
+
+  for (let index = 1; index <= 24; index++) {
+    const time = index * 0.075;
+    const x =
+      startX +
+      vx * time +
+      0.5 * game.wind * time * time;
+
+    const y =
+      startY +
+      vy * time +
+      0.5 * 390 * time * time;
+
+    if (y > GROUND_Y || x < 0 || x > WORLD_W) break;
+
+    ctx.beginPath();
+    ctx.arc(x, y, Math.max(2, 4.2 - index * 0.08), 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  ctx.restore();
+}
+
+function drawProjectile() {
+  const p = game.projectile;
+  if (!p) return;
+
+  const colors = palette();
+  const ownerColor =
+    game.activeNumber === 1 ? colors.blue : colors.pink;
+
+  if (Array.isArray(p.trail) && p.trail.length > 1) {
+    ctx.save();
+    ctx.lineCap = "round";
+
+    for (let index = 1; index < p.trail.length; index++) {
+      const a = p.trail[index - 1];
+      const b = p.trail[index];
+      ctx.globalAlpha = (index / p.trail.length) * 0.22;
+      ctx.strokeStyle = ownerColor;
+      ctx.lineWidth = 3 + index * 0.22;
+      ctx.beginPath();
+      ctx.moveTo(a.x, a.y);
+      ctx.lineTo(b.x, b.y);
+      ctx.stroke();
+    }
+
+    ctx.restore();
+  }
+
+  ctx.save();
+  ctx.translate(p.x, p.y);
+
+  ctx.globalAlpha = 0.16;
+  ctx.fillStyle = colors.ink;
+  ctx.beginPath();
+  ctx.ellipse(4, 11, p.r * 0.95, p.r * 0.34, 0, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.globalAlpha = 1;
+  ctx.fillStyle = colors.yellow;
+  ctx.strokeStyle = ownerColor;
+  ctx.lineWidth = 5;
+  ctx.beginPath();
+  ctx.arc(0, 0, p.r, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.stroke();
+
+  ctx.strokeStyle = colors.ink;
+  ctx.lineWidth = 2.2;
+  ctx.beginPath();
+  ctx.arc(0, 0, p.r - 3, 0, Math.PI * 2);
+  ctx.stroke();
+
+  ctx.fillStyle = colors.ink;
+  ctx.beginPath();
+  ctx.arc(-5, -3, 2, 0, Math.PI * 2);
+  ctx.arc(5, -3, 2, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.restore();
+}
+
+function roughRect(x, y, width, height) {
+  ctx.beginPath();
+  ctx.moveTo(x + 8, y);
+  ctx.quadraticCurveTo(x + width * 0.5, y - 1.5, x + width - 8, y);
+  ctx.quadraticCurveTo(x + width + 1, y, x + width, y + 8);
+  ctx.lineTo(x + width, y + height - 8);
+  ctx.quadraticCurveTo(x + width, y + height + 1, x + width - 8, y + height);
+  ctx.lineTo(x + 8, y + height);
+  ctx.quadraticCurveTo(x - 1, y + height, x, y + height - 8);
+  ctx.lineTo(x, y + 8);
+  ctx.quadraticCurveTo(x, y, x + 8, y);
+  ctx.closePath();
+}
+
+function roughRoundRect(x, y, width, height, radius) {
+  ctx.beginPath();
+  ctx.moveTo(x + radius, y);
+  ctx.quadraticCurveTo(x + width * 0.5, y - 1, x + width - radius, y);
+  ctx.quadraticCurveTo(x + width + 1, y, x + width, y + radius);
+  ctx.lineTo(x + width, y + height - radius);
+  ctx.quadraticCurveTo(x + width, y + height + 1, x + width - radius, y + height);
+  ctx.lineTo(x + radius, y + height);
+  ctx.quadraticCurveTo(x - 1, y + height, x, y + height - radius);
+  ctx.lineTo(x, y + radius);
+  ctx.quadraticCurveTo(x, y, x + radius, y);
+  ctx.closePath();
+}
+
+function burst(x, y, count, color) {
+  for (let index = 0; index < count; index++) {
+    particles.push({
+      x,
+      y,
+      vx: (Math.random() - 0.5) * 230,
+      vy: -50 - Math.random() * 190,
+      life: 0.5 + Math.random() * 0.4,
+      maxLife: 0.9,
+      size: 3 + Math.random() * 5,
+      color,
+      angle: Math.random() * Math.PI,
+      spin: (Math.random() - 0.5) * 8
+    });
+  }
+}
+
+function updateParticles(dt) {
+  for (const particle of particles) {
+    particle.x += particle.vx * dt;
+    particle.y += particle.vy * dt;
+    particle.vy += 430 * dt;
+    particle.life -= dt;
+    particle.angle += particle.spin * dt;
+  }
+
+  particles = particles.filter(particle => particle.life > 0);
+}
+
+function drawParticles() {
+  for (const particle of particles) {
+    ctx.save();
+    ctx.globalAlpha = Math.max(0, particle.life / particle.maxLife);
+    ctx.translate(particle.x, particle.y);
+    ctx.rotate(particle.angle);
+    ctx.fillStyle = particle.color;
+    ctx.fillRect(
+      -particle.size / 2,
+      -particle.size / 2,
+      particle.size,
+      particle.size * 0.7
+    );
+    ctx.restore();
+  }
+}
+
+async function leaveRoom() {
+  if (!state.room) return;
+
+  const confirmed = window.confirm("Odadan ayrılmak istediğine emin misin?");
+  if (!confirmed) return;
+
+  try {
+    await supabase.rpc("leave_game_room", {
+      p_room_id: state.room.id
+    });
+  } catch (error) {
+    console.warn(error);
+  }
+
+  clearInterval(state.pollTimer);
+  clearGameTimers();
+  cancelAnimationFrame(animationFrame);
+
+  if (state.channel) {
+    await supabase.removeChannel(state.channel);
+  }
+
+  state.room = null;
+  state.players = [];
+  state.channel = null;
+  state.gameReady = false;
+
+  game.started = false;
+  game.finished = false;
+
+  clearSavedRoom();
+  $("finishOverlay").classList.remove("show");
+  showScreen("home");
+}
+
+function clearSavedRoom() {
+  localStorage.removeItem(STORAGE.roomId);
+  localStorage.removeItem(STORAGE.roomCode);
+}
+
+$("createBtn").addEventListener("click", createRoom);
+$("joinBtn").addEventListener("click", joinRoom);
+$("readyBtn").addEventListener("click", toggleReady);
+
+$("refreshBtn").addEventListener("click", () => {
+  refreshRoom().catch(error => {
+    setMessage("roomMsg", friendlyError(error), true);
+  });
+});
+
+$("leaveBtn").addEventListener("click", leaveRoom);
+$("gameLeaveBtn").addEventListener("click", leaveRoom);
+$("finishLeaveBtn").addEventListener("click", leaveRoom);
+$("rematchBtn").addEventListener("click", requestRematch);
+
+$("copyBtn").addEventListener("click", async () => {
+  const code = state.room?.code || localStorage.getItem(STORAGE.roomCode);
+
+  try {
+    await navigator.clipboard.writeText(code);
+    setMessage("roomMsg", `Oda kodu kopyalandı: ${code}`);
+  } catch {
+    window.prompt("Oda kodu:", code);
+  }
+});
+
+$("themeBtn").addEventListener("click", () => {
+  applyTheme(
+    document.documentElement.dataset.theme === "dark"
+      ? "light"
+      : "dark"
+  );
+});
+
+$("backBtn").addEventListener("click", () => {
+  if (state.room) {
+    leaveRoom();
+  } else if (history.length > 1) {
+    history.back();
+  } else {
+    location.href = "index.html";
+  }
+});
+
+$("codeInput").addEventListener("input", event => {
+  event.target.value = cleanCode(event.target.value);
+});
+
+$("codeInput").addEventListener("keydown", event => {
+  if (event.key === "Enter") joinRoom();
+});
+
+$("nameInput").addEventListener("keydown", event => {
+  if (event.key === "Enter") createRoom();
+});
+
+window.addEventListener("resize", () => {
+  if (state.gameReady) resizeCanvas();
+});
+
+window.addEventListener("orientationchange", () => {
+  if (state.gameReady) {
+    setTimeout(resizeCanvas, 120);
+  }
+});
+
+document.addEventListener("visibilitychange", () => {
+  if (!document.hidden && state.gameReady) {
+    sendGameEvent("sync_request");
+  }
+});
+
+const savedTheme = localStorage.getItem(STORAGE.theme);
+const prefersDark =
+  window.matchMedia &&
+  window.matchMedia("(prefers-color-scheme: dark)").matches;
+
+applyTheme(savedTheme || (prefersDark ? "dark" : "light"));
+boot();
+</script>
+</body>
+</html>

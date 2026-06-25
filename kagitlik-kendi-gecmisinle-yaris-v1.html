@@ -1,0 +1,1256 @@
+<!doctype html>
+<html lang="tr" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+  <meta name="theme-color" content="#e9e2d2" id="themeColor">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <title>Kendi Geçmişinle Yarış — Kâğıtlık</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --desk: #e9e2d2;
+      --desk-2: #d9cfbc;
+      --paper: #fffdf4;
+      --paper-2: #f6efdc;
+      --ink: #262321;
+      --muted: #70695f;
+      --soft: #a0988c;
+      --line-blue: rgba(67, 137, 178, .22);
+      --line-red: rgba(190, 70, 78, .42);
+      --border: rgba(62, 52, 40, .18);
+      --shadow: 0 18px 42px rgba(73, 58, 37, .17), 0 4px 10px rgba(73, 58, 37, .10);
+      --yellow: #e5c66d;
+      --blue: #7bb4cc;
+      --green: #8fbd9c;
+      --pink: #d79aa2;
+      --purple: #a896ce;
+      --danger: #b9575f;
+      --scribble: "Trebuchet MS", "Arial Rounded MT Bold", ui-rounded, system-ui, sans-serif;
+      --sans: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    html[data-theme="dark"] {
+      color-scheme: dark;
+      --desk: #171819;
+      --desk-2: #23211e;
+      --paper: #292824;
+      --paper-2: #23221e;
+      --ink: #f0eadd;
+      --muted: #bbb2a3;
+      --soft: #8d8578;
+      --line-blue: rgba(101, 165, 194, .17);
+      --line-red: rgba(217, 99, 108, .34);
+      --border: rgba(255, 245, 224, .14);
+      --shadow: 0 20px 48px rgba(0, 0, 0, .40), 0 5px 12px rgba(0, 0, 0, .28);
+      --yellow: #a78a40;
+      --blue: #4a8197;
+      --green: #557e60;
+      --pink: #8f555e;
+      --purple: #705f96;
+      --danger: #d26b74;
+    }
+
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    html, body { width: 100%; min-height: 100%; overscroll-behavior: none; }
+    body {
+      margin: 0;
+      min-height: 100dvh;
+      overflow: hidden;
+      color: var(--ink);
+      font-family: var(--sans);
+      background:
+        radial-gradient(circle at 18% 8%, rgba(255,255,255,.12), transparent 28%),
+        linear-gradient(135deg, var(--desk), var(--desk-2));
+      touch-action: none;
+      transition: background .22s ease, color .22s ease;
+    }
+
+    button { font: inherit; color: inherit; }
+    .app {
+      width: min(980px, 100%);
+      height: 100dvh;
+      margin: 0 auto;
+      padding: max(10px, env(safe-area-inset-top)) 12px max(10px, env(safe-area-inset-bottom));
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr);
+      gap: 10px;
+    }
+
+    .topbar {
+      display: grid;
+      grid-template-columns: 44px minmax(0,1fr) 44px;
+      align-items: center;
+      gap: 8px;
+      min-height: 46px;
+    }
+
+    .icon-btn {
+      width: 44px;
+      height: 44px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: color-mix(in srgb, var(--paper) 84%, transparent);
+      box-shadow: 0 4px 12px rgba(0,0,0,.08);
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+    }
+    .icon-btn:active { transform: scale(.95); }
+    .icon-btn svg {
+      width: 21px;
+      height: 21px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 1.9;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .title {
+      min-width: 0;
+      text-align: center;
+    }
+    .title strong {
+      display: block;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      font: 900 clamp(17px, 3.8vw, 23px)/1.05 var(--scribble);
+      letter-spacing: -.45px;
+    }
+    .title span {
+      display: block;
+      margin-top: 3px;
+      color: var(--muted);
+      font-size: 10px;
+      font-weight: 750;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .paper {
+      position: relative;
+      min-height: 0;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      border-radius: 9px 18px 11px 15px;
+      background:
+        linear-gradient(to right, transparent 0 50px, var(--line-red) 50px 52px, transparent 52px),
+        repeating-linear-gradient(to bottom, transparent 0 34px, var(--line-blue) 34px 35px),
+        var(--paper);
+      box-shadow: var(--shadow);
+      transform: rotate(-.12deg);
+      isolation: isolate;
+    }
+    .paper::before {
+      content: "";
+      position: absolute;
+      z-index: 5;
+      top: -7px;
+      left: 50%;
+      width: 100px;
+      height: 25px;
+      transform: translateX(-50%) rotate(1.4deg);
+      background: color-mix(in srgb, var(--yellow) 58%, transparent);
+      opacity: .72;
+      box-shadow: 0 2px 4px rgba(0,0,0,.08);
+      pointer-events: none;
+    }
+    .paper::after {
+      content: "";
+      position: absolute;
+      z-index: 4;
+      width: 110px;
+      height: 110px;
+      right: -29px;
+      bottom: -34px;
+      border: 3px solid color-mix(in srgb, var(--pink) 65%, transparent);
+      border-radius: 50%;
+      opacity: .25;
+      pointer-events: none;
+    }
+
+    .hud {
+      position: absolute;
+      z-index: 8;
+      inset: 17px 17px auto 62px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: start;
+      gap: 12px;
+      pointer-events: none;
+    }
+    .score-block {
+      display: flex;
+      gap: 9px;
+      flex-wrap: wrap;
+    }
+    .note {
+      min-width: 78px;
+      padding: 8px 10px;
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      background: color-mix(in srgb, var(--paper) 83%, transparent);
+      box-shadow: 0 4px 9px rgba(0,0,0,.06);
+      transform: rotate(-1deg);
+    }
+    .note:nth-child(2) {
+      transform: rotate(1.1deg);
+      background: color-mix(in srgb, var(--blue) 22%, var(--paper));
+    }
+    .note small {
+      display: block;
+      color: var(--muted);
+      font-size: 8px;
+      font-weight: 850;
+      letter-spacing: .11em;
+      text-transform: uppercase;
+    }
+    .note strong {
+      display: block;
+      margin-top: 2px;
+      font: 900 18px var(--scribble);
+    }
+
+    .progress-card {
+      width: min(220px, 34vw);
+      padding: 8px 10px 9px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: color-mix(in srgb, var(--paper) 82%, transparent);
+      box-shadow: 0 4px 9px rgba(0,0,0,.06);
+      transform: rotate(.6deg);
+    }
+    .progress-labels {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 6px;
+      color: var(--muted);
+      font-size: 8px;
+      font-weight: 850;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+    .progress-track {
+      height: 7px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: var(--paper-2);
+    }
+    .progress-fill {
+      width: 0;
+      height: 100%;
+      border-radius: inherit;
+      background: var(--pink);
+      transition: width .08s linear;
+    }
+
+    canvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+      touch-action: none;
+    }
+
+    .tap-hint {
+      position: absolute;
+      z-index: 8;
+      left: 50%;
+      bottom: 14px;
+      transform: translateX(-50%) rotate(-1deg);
+      padding: 8px 13px;
+      border: 1px dashed var(--border);
+      border-radius: 9px;
+      color: var(--muted);
+      background: color-mix(in srgb, var(--paper) 78%, transparent);
+      font: 850 10px var(--scribble);
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      pointer-events: none;
+      opacity: .82;
+      transition: opacity .18s ease;
+    }
+    .running .tap-hint { opacity: .36; }
+
+    .screen {
+      position: absolute;
+      z-index: 20;
+      inset: 0;
+      padding: 70px 22px 25px 63px;
+      display: grid;
+      place-items: center;
+      background: color-mix(in srgb, var(--paper) 66%, transparent);
+      backdrop-filter: blur(3px);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .18s ease;
+    }
+    .screen.show {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .panel {
+      width: min(510px, 100%);
+      max-height: 100%;
+      overflow: auto;
+      padding: 27px 24px 23px;
+      border: 1px solid var(--border);
+      border-radius: 8px 17px 10px 14px;
+      background:
+        repeating-linear-gradient(to bottom, transparent 0 30px, var(--line-blue) 30px 31px),
+        var(--paper);
+      box-shadow: 0 20px 55px rgba(0,0,0,.23);
+      transform: rotate(-.35deg);
+      text-align: center;
+    }
+    .panel .stamp {
+      width: 62px;
+      height: 62px;
+      margin: 0 auto 15px;
+      display: grid;
+      place-items: center;
+      border: 2px solid color-mix(in srgb, var(--purple) 72%, var(--ink));
+      border-radius: 17px 12px 18px 11px;
+      background: color-mix(in srgb, var(--purple) 20%, transparent);
+      font: 900 27px var(--scribble);
+      transform: rotate(-4deg);
+    }
+    .panel h1, .panel h2 {
+      margin: 0;
+      font: 900 clamp(29px, 6vw, 48px)/1 var(--scribble);
+      letter-spacing: -1.4px;
+    }
+    .panel h2 { font-size: clamp(27px, 5vw, 41px); }
+    .panel p {
+      max-width: 410px;
+      margin: 14px auto 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.58;
+    }
+    .rules {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin: 20px 0;
+      text-align: left;
+    }
+    .rule {
+      min-height: 84px;
+      padding: 11px 10px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: color-mix(in srgb, var(--yellow) 18%, var(--paper));
+    }
+    .rule:nth-child(2) { background: color-mix(in srgb, var(--blue) 18%, var(--paper)); }
+    .rule:nth-child(3) { background: color-mix(in srgb, var(--green) 18%, var(--paper)); }
+    .rule strong {
+      display: block;
+      margin-bottom: 4px;
+      font: 850 12px var(--scribble);
+    }
+    .rule span {
+      color: var(--muted);
+      font-size: 10px;
+      line-height: 1.35;
+    }
+
+    .primary-btn, .secondary-btn {
+      width: 100%;
+      border-radius: 12px;
+      padding: 13px 16px;
+      font-weight: 900;
+      cursor: pointer;
+    }
+    .primary-btn {
+      border: 1px solid color-mix(in srgb, var(--green) 60%, var(--border));
+      background: color-mix(in srgb, var(--green) 40%, var(--paper));
+      box-shadow: 0 7px 15px rgba(0,0,0,.09);
+    }
+    .secondary-btn {
+      margin-top: 8px;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--muted);
+    }
+    .primary-btn:active, .secondary-btn:active { transform: scale(.985); }
+
+    .result-grid {
+      display: grid;
+      grid-template-columns: repeat(2,1fr);
+      gap: 8px;
+      margin: 18px 0;
+    }
+    .result-note {
+      padding: 12px 10px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: color-mix(in srgb, var(--blue) 18%, var(--paper));
+    }
+    .result-note:nth-child(2) { background: color-mix(in srgb, var(--yellow) 19%, var(--paper)); }
+    .result-note small {
+      display: block;
+      color: var(--muted);
+      font-size: 9px;
+      font-weight: 850;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+    .result-note strong {
+      display: block;
+      margin-top: 3px;
+      font: 900 25px var(--scribble);
+    }
+    .new-best {
+      display: none;
+      width: fit-content;
+      margin: 14px auto 0;
+      padding: 7px 11px;
+      border: 2px solid var(--danger);
+      border-radius: 6px;
+      color: var(--danger);
+      font: 900 12px var(--scribble);
+      transform: rotate(-3deg);
+    }
+    .new-best.show { display: block; }
+
+    .toast {
+      position: absolute;
+      z-index: 30;
+      top: 92px;
+      left: 50%;
+      transform: translate(-50%, -15px) rotate(-2deg);
+      padding: 10px 14px;
+      border: 2px solid var(--danger);
+      border-radius: 7px;
+      color: var(--danger);
+      background: var(--paper);
+      box-shadow: var(--shadow);
+      font: 900 13px var(--scribble);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .2s ease, transform .2s ease;
+    }
+    .toast.show {
+      opacity: 1;
+      transform: translate(-50%, 0) rotate(-2deg);
+    }
+
+    @media (max-width: 620px) {
+      .app { padding-left: 8px; padding-right: 8px; }
+      .paper {
+        background:
+          linear-gradient(to right, transparent 0 30px, var(--line-red) 30px 32px, transparent 32px),
+          repeating-linear-gradient(to bottom, transparent 0 31px, var(--line-blue) 31px 32px),
+          var(--paper);
+      }
+      .hud { inset: 15px 11px auto 39px; gap: 6px; }
+      .note { min-width: 66px; padding: 7px 8px; }
+      .note strong { font-size: 16px; }
+      .progress-card { width: 120px; padding: 7px 8px 8px; }
+      .progress-labels span:first-child { display: none; }
+      .screen { padding: 62px 12px 18px 40px; }
+      .panel { padding: 22px 17px 19px; }
+      .rules { grid-template-columns: 1fr; gap: 6px; }
+      .rule { min-height: auto; }
+      .tap-hint { bottom: 9px; font-size: 9px; }
+    }
+
+    @media (max-height: 590px) and (orientation: landscape) {
+      .app { grid-template-rows: 42px minmax(0,1fr); gap: 5px; }
+      .topbar { min-height: 42px; }
+      .icon-btn { width: 39px; height: 39px; }
+      .title span { display: none; }
+      .screen { padding-top: 40px; }
+      .panel { padding: 14px 17px; }
+      .panel .stamp { width: 43px; height: 43px; margin-bottom: 8px; font-size: 20px; }
+      .panel h1 { font-size: 27px; }
+      .panel p { margin-top: 8px; font-size: 11px; }
+      .rules { grid-template-columns: repeat(3,1fr); margin: 10px 0; }
+      .rule { min-height: 65px; padding: 8px; }
+      .result-grid { margin: 10px 0; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { transition: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <header class="topbar">
+      <button class="icon-btn" id="backBtn" aria-label="Geri dön">
+        <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+      </button>
+      <div class="title">
+        <strong>Kendi Geçmişinle Yarış</strong>
+        <span>Kâğıtlık · tek oyunculu</span>
+      </div>
+      <button class="icon-btn" id="themeBtn" aria-label="Temayı değiştir">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+      </button>
+    </header>
+
+    <section class="paper" id="paper">
+      <div class="hud" aria-live="polite">
+        <div class="score-block">
+          <div class="note">
+            <small>Mesafe</small>
+            <strong id="scoreText">0 m</strong>
+          </div>
+          <div class="note">
+            <small>En iyi</small>
+            <strong id="bestText">0 m</strong>
+          </div>
+        </div>
+        <div class="progress-card" id="progressCard">
+          <div class="progress-labels">
+            <span>Geçmişe yetiş</span>
+            <span id="progressText">0%</span>
+          </div>
+          <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+        </div>
+      </div>
+
+      <canvas id="gameCanvas" aria-label="Koşu oyunu alanı"></canvas>
+      <div class="tap-hint">Zıplamak için ekrana dokun</div>
+      <div class="toast" id="toast">Geçmişini geçtin!</div>
+
+      <div class="screen show" id="introScreen">
+        <div class="panel">
+          <div class="stamp">◌</div>
+          <h1>Geçmişini geç.</h1>
+          <p>Karakter kendiliğinden koşar. Engellerin üzerinden atla. En iyi eski koşun silik bir hayalet olarak yanında aynı zıplamaları tekrarlar.</p>
+          <div class="rules">
+            <div class="rule"><strong>1. Dokun</strong><span>Ekranın herhangi bir yerine dokunarak zıpla.</span></div>
+            <div class="rule"><strong>2. Kaçın</strong><span>Mürekkep lekelerine ve buruşturulmuş kâğıtlara çarpma.</span></div>
+            <div class="rule"><strong>3. Geç</strong><span>Eski en iyi mesafenden daha uzağa koş.</span></div>
+          </div>
+          <button class="primary-btn" id="startBtn">Koşmaya başla</button>
+        </div>
+      </div>
+
+      <div class="screen" id="gameOverScreen">
+        <div class="panel">
+          <div class="stamp">×</div>
+          <h2 id="resultTitle">Kâğıda takıldın.</h2>
+          <p id="resultText">Bir sonraki denemede eski zıplamalarını izleyip daha iyi bir yol bulabilirsin.</p>
+          <div class="new-best" id="newBestStamp">Yeni en iyi koşu</div>
+          <div class="result-grid">
+            <div class="result-note"><small>Bu koşu</small><strong id="resultScore">0 m</strong></div>
+            <div class="result-note"><small>En iyi</small><strong id="resultBest">0 m</strong></div>
+          </div>
+          <button class="primary-btn" id="restartBtn">Tekrar koş</button>
+          <button class="secondary-btn" id="menuBtn">Nasıl oynanır?</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    (() => {
+      "use strict";
+
+      const STORAGE = {
+        theme: "kagitlik-theme",
+        best: "kagitlik-ghost-best",
+        jumps: "kagitlik-ghost-best-jumps"
+      };
+
+      const paper = document.getElementById("paper");
+      const canvas = document.getElementById("gameCanvas");
+      const ctx = canvas.getContext("2d", { alpha: true });
+      const introScreen = document.getElementById("introScreen");
+      const gameOverScreen = document.getElementById("gameOverScreen");
+      const scoreText = document.getElementById("scoreText");
+      const bestText = document.getElementById("bestText");
+      const progressFill = document.getElementById("progressFill");
+      const progressText = document.getElementById("progressText");
+      const progressCard = document.getElementById("progressCard");
+      const toast = document.getElementById("toast");
+      const resultScore = document.getElementById("resultScore");
+      const resultBest = document.getElementById("resultBest");
+      const resultTitle = document.getElementById("resultTitle");
+      const resultText = document.getElementById("resultText");
+      const newBestStamp = document.getElementById("newBestStamp");
+      const themeColor = document.getElementById("themeColor");
+
+      let css = {};
+      let dpr = 1;
+      let width = 0;
+      let height = 0;
+      let groundY = 0;
+      let raf = 0;
+      let lastTime = 0;
+      let state = "intro";
+      let elapsed = 0;
+      let distance = 0;
+      let bestDistance = Math.max(0, Number(localStorage.getItem(STORAGE.best)) || 0);
+      let bestJumps = parseStoredJumps();
+      let currentJumps = [];
+      let nextGhostJump = 0;
+      let nextObstacleAt = 1.25;
+      let obstacles = [];
+      let particles = [];
+      let passedBest = false;
+      let rngState = 0x1a2b3c4d;
+      let audioContext = null;
+
+      const player = {
+        x: 92,
+        y: 0,
+        w: 34,
+        h: 44,
+        vy: 0,
+        grounded: true,
+        runPhase: 0
+      };
+
+      const ghost = {
+        x: 137,
+        y: 0,
+        w: 34,
+        h: 44,
+        vy: 0,
+        grounded: true,
+        runPhase: 0,
+        visible: false
+      };
+
+      function parseStoredJumps() {
+        try {
+          const value = JSON.parse(localStorage.getItem(STORAGE.jumps) || "[]");
+          return Array.isArray(value) ? value.filter(Number.isFinite) : [];
+        } catch {
+          return [];
+        }
+      }
+
+      function refreshPalette() {
+        const style = getComputedStyle(document.documentElement);
+        css = {
+          paper: style.getPropertyValue("--paper").trim(),
+          paper2: style.getPropertyValue("--paper-2").trim(),
+          ink: style.getPropertyValue("--ink").trim(),
+          muted: style.getPropertyValue("--muted").trim(),
+          soft: style.getPropertyValue("--soft").trim(),
+          blue: style.getPropertyValue("--blue").trim(),
+          pink: style.getPropertyValue("--pink").trim(),
+          purple: style.getPropertyValue("--purple").trim(),
+          yellow: style.getPropertyValue("--yellow").trim(),
+          danger: style.getPropertyValue("--danger").trim(),
+          lineBlue: style.getPropertyValue("--line-blue").trim(),
+          lineRed: style.getPropertyValue("--line-red").trim()
+        };
+      }
+
+      function applyTheme(theme) {
+        document.documentElement.dataset.theme = theme;
+        localStorage.setItem(STORAGE.theme, theme);
+        themeColor.content = theme === "dark" ? "#171819" : "#e9e2d2";
+        refreshPalette();
+        if (state !== "running") drawIdle();
+      }
+
+      function resize() {
+        const rect = paper.getBoundingClientRect();
+        dpr = Math.min(window.devicePixelRatio || 1, 2);
+        width = Math.max(1, rect.width);
+        height = Math.max(1, rect.height);
+        canvas.width = Math.round(width * dpr);
+        canvas.height = Math.round(height * dpr);
+        canvas.style.width = width + "px";
+        canvas.style.height = height + "px";
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        groundY = height - Math.max(66, Math.min(92, height * .16));
+        player.x = Math.max(68, Math.min(105, width * .14));
+        ghost.x = player.x + Math.max(36, Math.min(50, width * .055));
+        if (state !== "running") {
+          player.y = groundY - player.h;
+          ghost.y = groundY - ghost.h;
+          drawIdle();
+        }
+      }
+
+      function resetRng() {
+        rngState = 0x1a2b3c4d;
+      }
+
+      function random() {
+        rngState ^= rngState << 13;
+        rngState ^= rngState >>> 17;
+        rngState ^= rngState << 5;
+        return ((rngState >>> 0) / 4294967296);
+      }
+
+      function openScreen(screen) {
+        introScreen.classList.remove("show");
+        gameOverScreen.classList.remove("show");
+        if (screen) screen.classList.add("show");
+      }
+
+      function startGame() {
+        cancelAnimationFrame(raf);
+        state = "running";
+        paper.classList.add("running");
+        openScreen(null);
+        elapsed = 0;
+        distance = 0;
+        currentJumps = [];
+        nextGhostJump = 0;
+        nextObstacleAt = 1.25;
+        obstacles = [];
+        particles = [];
+        passedBest = bestDistance <= 0;
+        resetRng();
+
+        player.y = groundY - player.h;
+        player.vy = 0;
+        player.grounded = true;
+        player.runPhase = 0;
+
+        ghost.y = groundY - ghost.h;
+        ghost.vy = 0;
+        ghost.grounded = true;
+        ghost.runPhase = 0;
+        ghost.visible = bestDistance > 0 && bestJumps.length > 0;
+
+        scoreText.textContent = "0 m";
+        bestText.textContent = Math.floor(bestDistance) + " m";
+        updateProgress();
+        lastTime = performance.now();
+        unlockAudio();
+        beep(330, .035, .025);
+        raf = requestAnimationFrame(loop);
+      }
+
+      function endGame() {
+        if (state !== "running") return;
+        state = "gameover";
+        paper.classList.remove("running");
+        cancelAnimationFrame(raf);
+        burst(player.x + player.w / 2, player.y + player.h / 2, 16);
+        draw();
+
+        const finalDistance = Math.max(0, Math.floor(distance));
+        const oldBest = Math.floor(bestDistance);
+        const isNewBest = finalDistance > oldBest;
+
+        if (isNewBest) {
+          bestDistance = finalDistance;
+          bestJumps = currentJumps.slice();
+          localStorage.setItem(STORAGE.best, String(bestDistance));
+          localStorage.setItem(STORAGE.jumps, JSON.stringify(bestJumps));
+        }
+
+        bestText.textContent = Math.floor(bestDistance) + " m";
+        resultScore.textContent = finalDistance + " m";
+        resultBest.textContent = Math.floor(bestDistance) + " m";
+        newBestStamp.classList.toggle("show", isNewBest);
+
+        if (isNewBest) {
+          resultTitle.textContent = "Geçmişini geçtin.";
+          resultText.textContent = "Bu koşu artık yeni hayaletin olacak. Bir sonraki denemede kendi yeni rekoruna karşı koşacaksın.";
+        } else if (oldBest > 0 && finalDistance >= oldBest * .85) {
+          resultTitle.textContent = "Neredeyse yetiştin.";
+          resultText.textContent = "Hayaletin çok uzakta değil. Zıplama zamanlarını biraz düzeltmen yeterli.";
+        } else {
+          resultTitle.textContent = "Kâğıda takıldın.";
+          resultText.textContent = "Bir sonraki denemede eski zıplamalarını izleyip daha iyi bir ritim bulabilirsin.";
+        }
+
+        vibrate([55, 35, 85]);
+        beep(125, .12, .06);
+        setTimeout(() => openScreen(gameOverScreen), 280);
+      }
+
+      function jump(record = true) {
+        if (state !== "running" || !player.grounded) return;
+        player.vy = -Math.max(690, Math.min(860, height * 1.23));
+        player.grounded = false;
+        if (record) currentJumps.push(Math.round(elapsed * 1000));
+        burst(player.x + 11, groundY - 3, 5, true);
+        vibrate(12);
+        beep(520, .045, .018);
+      }
+
+      function ghostJump() {
+        if (!ghost.visible || !ghost.grounded) return;
+        ghost.vy = -Math.max(690, Math.min(860, height * 1.23));
+        ghost.grounded = false;
+      }
+
+      function spawnObstacle() {
+        const roll = random();
+        let kind = "ink";
+        let w = 28;
+        let h = 34;
+
+        if (roll > .66) {
+          kind = "paper";
+          w = 39;
+          h = 31;
+        } else if (roll > .36) {
+          kind = "pencil";
+          w = 22;
+          h = 46;
+        }
+
+        obstacles.push({
+          x: width + 35,
+          y: groundY - h,
+          w, h, kind,
+          angle: (random() - .5) * .35
+        });
+
+        const speed = currentSpeed();
+        const baseGap = width < 520 ? 1.38 : 1.28;
+        nextObstacleAt += baseGap + random() * .78 + Math.max(0, .22 - speed / 3000);
+
+        if (elapsed > 18 && random() > .78) {
+          nextObstacleAt -= .18;
+        }
+      }
+
+      function currentSpeed() {
+        return Math.min(590, 285 + elapsed * 5.4);
+      }
+
+      function update(dt) {
+        elapsed += dt;
+        const speed = currentSpeed();
+        distance += speed * dt / 12.5;
+
+        player.runPhase += dt * (9 + speed / 85);
+        ghost.runPhase += dt * (9 + speed / 85);
+
+        player.vy += 2350 * dt;
+        player.y += player.vy * dt;
+        if (player.y >= groundY - player.h) {
+          player.y = groundY - player.h;
+          player.vy = 0;
+          player.grounded = true;
+        }
+
+        if (ghost.visible) {
+          while (nextGhostJump < bestJumps.length && bestJumps[nextGhostJump] <= elapsed * 1000) {
+            ghostJump();
+            nextGhostJump++;
+          }
+          ghost.vy += 2350 * dt;
+          ghost.y += ghost.vy * dt;
+          if (ghost.y >= groundY - ghost.h) {
+            ghost.y = groundY - ghost.h;
+            ghost.vy = 0;
+            ghost.grounded = true;
+          }
+        }
+
+        while (elapsed >= nextObstacleAt) spawnObstacle();
+
+        for (const o of obstacles) o.x -= speed * dt;
+        obstacles = obstacles.filter(o => o.x + o.w > -30);
+
+        for (const p of particles) {
+          p.x += p.vx * dt;
+          p.y += p.vy * dt;
+          p.vy += 720 * dt;
+          p.life -= dt;
+          p.angle += p.spin * dt;
+        }
+        particles = particles.filter(p => p.life > 0);
+
+        const hitbox = {
+          x: player.x + 7,
+          y: player.y + 5,
+          w: player.w - 14,
+          h: player.h - 7
+        };
+
+        for (const o of obstacles) {
+          const padX = o.kind === "pencil" ? 4 : 3;
+          const obstacleBox = {
+            x: o.x + padX,
+            y: o.y + 3,
+            w: o.w - padX * 2,
+            h: o.h - 3
+          };
+          if (rectsOverlap(hitbox, obstacleBox)) {
+            endGame();
+            return;
+          }
+        }
+
+        const wholeDistance = Math.floor(distance);
+        scoreText.textContent = wholeDistance + " m";
+        updateProgress();
+
+        if (!passedBest && bestDistance > 0 && distance > bestDistance) {
+          passedBest = true;
+          showToast();
+          vibrate([25, 25, 45]);
+          beep(740, .06, .025);
+          setTimeout(() => beep(920, .07, .02), 75);
+        }
+      }
+
+      function updateProgress() {
+        if (bestDistance <= 0) {
+          progressCard.style.opacity = ".48";
+          progressFill.style.width = "0%";
+          progressText.textContent = "—";
+          return;
+        }
+        progressCard.style.opacity = "1";
+        const ratio = Math.min(1, distance / bestDistance);
+        progressFill.style.width = (ratio * 100).toFixed(1) + "%";
+        progressText.textContent = Math.floor(ratio * 100) + "%";
+      }
+
+      function rectsOverlap(a, b) {
+        return a.x < b.x + b.w &&
+               a.x + a.w > b.x &&
+               a.y < b.y + b.h &&
+               a.y + a.h > b.y;
+      }
+
+      function loop(now) {
+        if (state !== "running") return;
+        const dt = Math.min(.032, Math.max(.001, (now - lastTime) / 1000));
+        lastTime = now;
+        update(dt);
+        draw();
+        if (state === "running") raf = requestAnimationFrame(loop);
+      }
+
+      function drawIdle() {
+        ctx.clearRect(0, 0, width, height);
+        drawGround();
+        drawDecorations();
+        drawRunner(player, false, 0);
+        if (bestDistance > 0) {
+          ghost.visible = true;
+          ghost.y = groundY - ghost.h;
+          drawRunner(ghost, true, 0);
+        }
+      }
+
+      function draw() {
+        ctx.clearRect(0, 0, width, height);
+        drawGround();
+        drawDecorations();
+
+        for (const o of obstacles) drawObstacle(o);
+        if (ghost.visible) drawRunner(ghost, true, ghost.runPhase);
+        drawRunner(player, false, player.runPhase);
+        for (const p of particles) drawParticle(p);
+      }
+
+      function drawGround() {
+        ctx.save();
+        ctx.strokeStyle = css.ink;
+        ctx.globalAlpha = .76;
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(39, groundY + .5);
+        ctx.quadraticCurveTo(width * .34, groundY - 2, width * .58, groundY + 1);
+        ctx.quadraticCurveTo(width * .78, groundY + 3, width + 10, groundY - 1);
+        ctx.stroke();
+
+        ctx.globalAlpha = .18;
+        ctx.lineWidth = 1;
+        for (let x = 49; x < width; x += 34) {
+          ctx.beginPath();
+          ctx.moveTo(x, groundY + 8);
+          ctx.lineTo(x + 13, groundY + 6 + Math.sin(x) * 2);
+          ctx.stroke();
+        }
+        ctx.restore();
+      }
+
+      function drawDecorations() {
+        ctx.save();
+        ctx.globalAlpha = .11;
+        ctx.strokeStyle = css.muted;
+        ctx.lineWidth = 2;
+
+        const shift = state === "running" ? (distance * 3.2) % 210 : 0;
+        for (let x = width - shift; x > -220; x -= 210) {
+          ctx.beginPath();
+          ctx.arc(x, groundY + 34, 17, .1, Math.PI * 1.75);
+          ctx.stroke();
+        }
+        ctx.restore();
+      }
+
+      function drawRunner(r, isGhost, phase) {
+        const bob = r.grounded ? Math.sin(phase) * 1.5 : 0;
+        const x = r.x;
+        const y = r.y + bob;
+        const legSwing = r.grounded ? Math.sin(phase) * 7 : 2;
+
+        ctx.save();
+        ctx.globalAlpha = isGhost ? .31 : 1;
+        ctx.strokeStyle = isGhost ? css.purple : css.ink;
+        ctx.fillStyle = isGhost ? css.purple : css.paper;
+        ctx.lineWidth = isGhost ? 2 : 2.3;
+        ctx.lineCap = "round";
+        ctx.lineJoin = "round";
+
+        ctx.save();
+        ctx.translate(x + r.w / 2, y + 16);
+        ctx.rotate(isGhost ? -.035 : .025);
+        roughRoundRect(ctx, -13, -14, 27, 25, 7);
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.fillStyle = isGhost ? css.paper : css.ink;
+        ctx.beginPath();
+        ctx.arc(-5, -3, 1.7, 0, Math.PI * 2);
+        ctx.arc(6, -3, 1.7, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.strokeStyle = isGhost ? css.paper : css.ink;
+        ctx.lineWidth = 1.7;
+        ctx.beginPath();
+        ctx.arc(.5, 3, 4, .15, Math.PI - .1);
+        ctx.stroke();
+        ctx.restore();
+
+        ctx.strokeStyle = isGhost ? css.purple : css.ink;
+        ctx.lineWidth = 2.4;
+
+        ctx.beginPath();
+        ctx.moveTo(x + 11, y + 28);
+        ctx.lineTo(x + 7 - legSwing * .35, y + 42);
+        ctx.lineTo(x + 3 - legSwing * .25, y + 43);
+        ctx.moveTo(x + 24, y + 28);
+        ctx.lineTo(x + 27 + legSwing * .35, y + 42);
+        ctx.lineTo(x + 31 + legSwing * .25, y + 43);
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.moveTo(x + 5, y + 18);
+        ctx.lineTo(x - 2 - legSwing * .18, y + 24);
+        ctx.moveTo(x + 29, y + 18);
+        ctx.lineTo(x + 36 + legSwing * .18, y + 23);
+        ctx.stroke();
+
+        if (isGhost) {
+          ctx.globalAlpha = .18;
+          ctx.fillStyle = css.purple;
+          ctx.beginPath();
+          ctx.ellipse(x + r.w / 2, groundY + 3, 25, 5, 0, 0, Math.PI * 2);
+          ctx.fill();
+        } else {
+          ctx.globalAlpha = .13;
+          ctx.fillStyle = css.ink;
+          ctx.beginPath();
+          ctx.ellipse(x + r.w / 2, groundY + 3, 18, 4, 0, 0, Math.PI * 2);
+          ctx.fill();
+        }
+
+        ctx.restore();
+      }
+
+      function drawObstacle(o) {
+        ctx.save();
+        ctx.translate(o.x + o.w / 2, o.y + o.h / 2);
+        ctx.rotate(o.angle);
+        ctx.translate(-o.w / 2, -o.h / 2);
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = css.ink;
+        ctx.fillStyle = css.paper2;
+
+        if (o.kind === "ink") {
+          ctx.fillStyle = css.ink;
+          ctx.globalAlpha = .86;
+          ctx.beginPath();
+          ctx.moveTo(3, o.h);
+          ctx.bezierCurveTo(1, o.h * .55, 7, 3, o.w * .46, 5);
+          ctx.bezierCurveTo(o.w - 3, 2, o.w + 2, o.h * .52, o.w - 1, o.h);
+          ctx.closePath();
+          ctx.fill();
+
+          ctx.globalAlpha = .32;
+          ctx.beginPath();
+          ctx.arc(o.w * .18, o.h * .16, 3.5, 0, Math.PI * 2);
+          ctx.arc(o.w * .81, o.h * .08, 2.2, 0, Math.PI * 2);
+          ctx.fill();
+        } else if (o.kind === "paper") {
+          ctx.fillStyle = css.paper2;
+          ctx.beginPath();
+          ctx.moveTo(2, o.h * .35);
+          ctx.lineTo(o.w * .2, 3);
+          ctx.lineTo(o.w * .52, 8);
+          ctx.lineTo(o.w * .78, 2);
+          ctx.lineTo(o.w - 2, o.h * .34);
+          ctx.lineTo(o.w * .85, o.h - 3);
+          ctx.lineTo(o.w * .5, o.h - 7);
+          ctx.lineTo(o.w * .2, o.h - 2);
+          ctx.closePath();
+          ctx.fill();
+          ctx.stroke();
+
+          ctx.globalAlpha = .36;
+          ctx.beginPath();
+          ctx.moveTo(7, o.h * .55);
+          ctx.lineTo(o.w * .45, o.h * .38);
+          ctx.lineTo(o.w * .72, o.h * .7);
+          ctx.moveTo(o.w * .35, 7);
+          ctx.lineTo(o.w * .48, o.h - 5);
+          ctx.stroke();
+        } else {
+          ctx.fillStyle = css.yellow;
+          roughRoundRect(ctx, o.w * .27, 0, o.w * .46, o.h, 3);
+          ctx.fill();
+          ctx.stroke();
+          ctx.fillStyle = css.pink;
+          ctx.fillRect(o.w * .27, o.h * .74, o.w * .46, o.h * .18);
+          ctx.strokeRect(o.w * .27, o.h * .74, o.w * .46, o.h * .18);
+          ctx.beginPath();
+          ctx.moveTo(o.w * .27, 0);
+          ctx.lineTo(o.w * .5, -8);
+          ctx.lineTo(o.w * .73, 0);
+          ctx.closePath();
+          ctx.fillStyle = css.paper2;
+          ctx.fill();
+          ctx.stroke();
+        }
+        ctx.restore();
+      }
+
+      function roughRoundRect(context, x, y, w, h, r) {
+        context.beginPath();
+        context.moveTo(x + r, y);
+        context.quadraticCurveTo(x + w * .5, y - .8, x + w - r, y);
+        context.quadraticCurveTo(x + w + .6, y, x + w, y + r);
+        context.lineTo(x + w, y + h - r);
+        context.quadraticCurveTo(x + w, y + h + .5, x + w - r, y + h);
+        context.lineTo(x + r, y + h);
+        context.quadraticCurveTo(x - .6, y + h, x, y + h - r);
+        context.lineTo(x, y + r);
+        context.quadraticCurveTo(x, y, x + r, y);
+        context.closePath();
+      }
+
+      function burst(x, y, amount = 8, dust = false) {
+        for (let i = 0; i < amount; i++) {
+          particles.push({
+            x, y,
+            vx: (Math.random() - .5) * (dust ? 90 : 220),
+            vy: -Math.random() * (dust ? 80 : 210) - 25,
+            size: dust ? 2 + Math.random() * 2 : 3 + Math.random() * 5,
+            life: dust ? .32 : .65 + Math.random() * .35,
+            maxLife: dust ? .32 : 1,
+            angle: Math.random() * Math.PI,
+            spin: (Math.random() - .5) * 8,
+            color: Math.random() > .5 ? css.pink : css.blue
+          });
+        }
+      }
+
+      function drawParticle(p) {
+        ctx.save();
+        ctx.globalAlpha = Math.max(0, p.life / p.maxLife);
+        ctx.translate(p.x, p.y);
+        ctx.rotate(p.angle);
+        ctx.fillStyle = p.color;
+        ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size * .65);
+        ctx.restore();
+      }
+
+      function showToast() {
+        toast.classList.add("show");
+        setTimeout(() => toast.classList.remove("show"), 1300);
+      }
+
+      function vibrate(pattern) {
+        if (navigator.vibrate) navigator.vibrate(pattern);
+      }
+
+      function unlockAudio() {
+        try {
+          if (!audioContext) {
+            const AC = window.AudioContext || window.webkitAudioContext;
+            if (AC) audioContext = new AC();
+          }
+          if (audioContext && audioContext.state === "suspended") audioContext.resume();
+        } catch {}
+      }
+
+      function beep(freq, duration, volume) {
+        try {
+          unlockAudio();
+          if (!audioContext) return;
+          const oscillator = audioContext.createOscillator();
+          const gain = audioContext.createGain();
+          oscillator.type = "triangle";
+          oscillator.frequency.value = freq;
+          gain.gain.setValueAtTime(volume, audioContext.currentTime);
+          gain.gain.exponentialRampToValueAtTime(.0001, audioContext.currentTime + duration);
+          oscillator.connect(gain).connect(audioContext.destination);
+          oscillator.start();
+          oscillator.stop(audioContext.currentTime + duration);
+        } catch {}
+      }
+
+      function handleAction(event) {
+        if (event && event.cancelable) event.preventDefault();
+        if (state === "running") jump(true);
+      }
+
+      document.getElementById("startBtn").addEventListener("click", startGame);
+      document.getElementById("restartBtn").addEventListener("click", startGame);
+      document.getElementById("menuBtn").addEventListener("click", () => {
+        state = "intro";
+        openScreen(introScreen);
+        drawIdle();
+      });
+
+      canvas.addEventListener("pointerdown", handleAction, { passive: false });
+      paper.addEventListener("pointerdown", (event) => {
+        if (state === "running" && event.target === paper) handleAction(event);
+      }, { passive: false });
+
+      document.addEventListener("keydown", (event) => {
+        if (event.code === "Space" || event.code === "ArrowUp" || event.code === "KeyW") {
+          event.preventDefault();
+          if (state === "running") jump(true);
+          else if (state === "gameover") startGame();
+        }
+      });
+
+      document.getElementById("themeBtn").addEventListener("click", () => {
+        applyTheme(document.documentElement.dataset.theme === "dark" ? "light" : "dark");
+      });
+
+      document.getElementById("backBtn").addEventListener("click", () => {
+        if (history.length > 1) history.back();
+        else location.href = "index.html";
+      });
+
+      window.addEventListener("resize", resize);
+      window.addEventListener("orientationchange", () => setTimeout(resize, 120));
+      document.addEventListener("visibilitychange", () => {
+        if (document.hidden && state === "running") {
+          lastTime = performance.now();
+        }
+      });
+
+      const storedTheme = localStorage.getItem(STORAGE.theme);
+      const prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+      applyTheme(storedTheme || (prefersDark ? "dark" : "light"));
+      bestText.textContent = Math.floor(bestDistance) + " m";
+      resize();
+    })();
+  </script>
+</body>
+</html>

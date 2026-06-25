@@ -1,0 +1,560 @@
+<!doctype html>
+<html lang="tr" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+  <meta name="theme-color" content="#e9e2d2" id="themeColor">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <title>Tek Resim, Tek Tuval — Kâğıtlık Online</title>
+  <style>
+    :root{
+      color-scheme:light;
+      --desk:#e9e2d2;--desk2:#d8cdb8;--paper:#fffdf4;--paper2:#f6efdc;
+      --ink:#272421;--muted:#716a60;--soft:#9c9488;
+      --line-blue:rgba(67,137,178,.22);--line-red:rgba(190,70,78,.42);
+      --border:rgba(62,52,40,.18);--shadow:0 18px 42px rgba(73,58,37,.17),0 4px 10px rgba(73,58,37,.10);
+      --yellow:#e5c66d;--blue:#7bb4cc;--green:#8fbd9c;--pink:#d79aa2;--purple:#a896ce;--danger:#b9575f;
+      --scribble:"Trebuchet MS","Arial Rounded MT Bold",ui-rounded,system-ui,sans-serif;
+      --sans:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+    }
+    html[data-theme="dark"]{
+      color-scheme:dark;
+      --desk:#171819;--desk2:#23211e;--paper:#292824;--paper2:#23221e;
+      --ink:#f0eadd;--muted:#bbb2a3;--soft:#8d8578;
+      --line-blue:rgba(101,165,194,.17);--line-red:rgba(217,99,108,.34);
+      --border:rgba(255,245,224,.14);--shadow:0 20px 48px rgba(0,0,0,.40),0 5px 12px rgba(0,0,0,.28);
+      --yellow:#a78a40;--blue:#4a8197;--green:#557e60;--pink:#8f555e;--purple:#705f96;--danger:#d26b74;
+    }
+    *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+    html,body{margin:0;min-height:100%;overscroll-behavior:none}
+    body{
+      min-height:100dvh;overflow:hidden;color:var(--ink);font-family:var(--sans);
+      background:radial-gradient(circle at 18% 8%,rgba(255,255,255,.12),transparent 28%),linear-gradient(135deg,var(--desk),var(--desk2))
+    }
+    button,input{font:inherit;color:inherit}
+    button{cursor:pointer}
+    .app{
+      width:min(1050px,100%);height:100dvh;margin:0 auto;
+      padding:max(8px,env(safe-area-inset-top)) 8px max(8px,env(safe-area-inset-bottom));
+      display:grid;grid-template-rows:44px minmax(0,1fr);gap:7px
+    }
+    .topbar{display:grid;grid-template-columns:43px minmax(0,1fr) 43px;align-items:center;gap:8px}
+    .icon-btn{
+      width:43px;height:43px;border:1px solid var(--border);border-radius:14px;background:color-mix(in srgb,var(--paper) 84%,transparent);
+      box-shadow:0 4px 12px rgba(0,0,0,.08);display:grid;place-items:center
+    }
+    .icon-btn:active{transform:scale(.95)}
+    .icon-btn svg{width:21px;height:21px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+    .title{text-align:center;min-width:0}
+    .title strong{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font:900 clamp(16px,3.6vw,22px)/1 var(--scribble);letter-spacing:-.5px}
+    .title span{display:block;margin-top:4px;color:var(--muted);font-size:8px;font-weight:850;letter-spacing:.11em;text-transform:uppercase}
+    .paper{
+      position:relative;min-height:0;overflow:hidden;border:1px solid var(--border);border-radius:9px 18px 11px 15px;
+      background:linear-gradient(to right,transparent 0 49px,var(--line-red) 49px 51px,transparent 51px),
+      repeating-linear-gradient(to bottom,transparent 0 34px,var(--line-blue) 34px 35px),var(--paper);
+      box-shadow:var(--shadow);isolation:isolate
+    }
+    .paper::before{
+      content:"";position:absolute;z-index:8;top:-7px;left:50%;width:104px;height:25px;transform:translateX(-50%) rotate(1.4deg);
+      background:color-mix(in srgb,var(--yellow) 58%,transparent);opacity:.72;box-shadow:0 2px 4px rgba(0,0,0,.08);pointer-events:none
+    }
+    .screen{display:none;position:absolute;inset:0;z-index:2;padding:27px 26px 22px 62px;overflow:auto}
+    .screen.active{display:block;animation:appear .18s ease}
+    @keyframes appear{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+    .eyebrow{margin:0 0 9px;color:var(--muted);font-size:9px;font-weight:900;letter-spacing:.14em;text-transform:uppercase}
+    h1,h2{margin:0;font:900 clamp(31px,7vw,55px)/.98 var(--scribble);letter-spacing:-1.7px}
+    h2{font-size:clamp(27px,5.5vw,42px)}
+    .lead{max-width:600px;margin:15px 0 22px;color:var(--muted);font-size:13px;line-height:1.65}
+    .status{
+      display:flex;align-items:center;gap:8px;width:fit-content;max-width:100%;padding:8px 11px;margin-bottom:17px;
+      border:1px dashed var(--border);border-radius:9px;background:color-mix(in srgb,var(--paper) 78%,transparent);
+      color:var(--muted);font-size:10px;font-weight:800
+    }
+    .status i{width:9px;height:9px;border-radius:50%;background:var(--soft);box-shadow:0 0 0 4px color-mix(in srgb,var(--soft) 15%,transparent)}
+    .status.online i{background:var(--green);box-shadow:0 0 0 4px color-mix(in srgb,var(--green) 17%,transparent)}
+    .status.error i{background:var(--danger);box-shadow:0 0 0 4px color-mix(in srgb,var(--danger) 17%,transparent)}
+    .card{
+      padding:17px;border:1px solid var(--border);border-radius:10px 7px 13px 8px;
+      background:color-mix(in srgb,var(--paper) 84%,transparent);box-shadow:0 8px 20px rgba(0,0,0,.08)
+    }
+    .card+.card{margin-top:12px}
+    label{display:block;margin-bottom:7px;color:var(--muted);font-size:9px;font-weight:900;letter-spacing:.11em;text-transform:uppercase}
+    input{
+      width:100%;min-height:48px;padding:11px 13px;border:1px solid var(--border);border-radius:10px;outline:none;
+      background:var(--paper2);font-weight:800
+    }
+    input:focus{border-color:color-mix(in srgb,var(--blue) 70%,var(--ink));box-shadow:0 0 0 4px color-mix(in srgb,var(--blue) 15%,transparent)}
+    .code-input{text-transform:uppercase;text-align:center;letter-spacing:.22em;font:900 21px var(--scribble)}
+    .btn{
+      min-height:47px;padding:11px 14px;border:1px solid var(--border);border-radius:12px 9px 13px 10px;
+      background:var(--paper);box-shadow:0 6px 14px rgba(0,0,0,.07);font-weight:900
+    }
+    .btn:active:not(:disabled){transform:scale(.98)}
+    .btn:disabled{opacity:.42;cursor:not-allowed}
+    .btn.primary{background:color-mix(in srgb,var(--green) 38%,var(--paper));border-color:color-mix(in srgb,var(--green) 55%,var(--border))}
+    .btn.blue{background:color-mix(in srgb,var(--blue) 27%,var(--paper));border-color:color-mix(in srgb,var(--blue) 48%,var(--border))}
+    .btn.danger{color:var(--danger);background:color-mix(in srgb,var(--pink) 14%,var(--paper));border-color:color-mix(in srgb,var(--danger) 40%,var(--border))}
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:11px}
+    .message{display:none;margin-top:12px;padding:10px 12px;border:1px dashed var(--border);border-radius:9px;background:color-mix(in srgb,var(--yellow) 14%,var(--paper));color:var(--muted);font-size:11px;line-height:1.5}
+    .message.show{display:block}.message.error{color:var(--danger);border-color:color-mix(in srgb,var(--danger) 45%,var(--border))}
+
+    .room-head{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:start}
+    .code-note{
+      min-width:150px;padding:10px 12px;border:2px solid color-mix(in srgb,var(--purple) 65%,var(--ink));border-radius:7px;
+      background:color-mix(in srgb,var(--purple) 14%,var(--paper));text-align:center;transform:rotate(1.2deg)
+    }
+    .code-note small{display:block;color:var(--muted);font-size:8px;font-weight:900;letter-spacing:.11em;text-transform:uppercase}
+    .code-note strong{display:block;margin-top:4px;font:900 23px var(--scribble);letter-spacing:.12em}
+    .players{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin:16px 0}
+    .player{min-height:119px;padding:14px;border:1px solid var(--border);border-radius:10px 7px 13px 8px;background:color-mix(in srgb,var(--paper) 82%,transparent);box-shadow:0 7px 17px rgba(0,0,0,.06)}
+    .player.empty{opacity:.53;border-style:dashed}.player:nth-child(2){transform:rotate(.35deg)}
+    .player small{color:var(--muted);font-size:8px;font-weight:900;letter-spacing:.1em;text-transform:uppercase}
+    .player strong{display:block;margin-top:10px;font:900 19px var(--scribble);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .pstate{display:flex;align-items:center;gap:7px;margin-top:11px;color:var(--muted);font-size:10px;font-weight:800}
+    .pstate i{width:11px;height:11px;border:2px solid var(--soft);border-radius:50%}.player.ready .pstate i{border-color:var(--green);background:var(--green);box-shadow:0 0 0 4px color-mix(in srgb,var(--green) 15%,transparent)}
+    .room-actions{display:grid;grid-template-columns:1.35fr 1fr 1fr;gap:8px}
+    .diag{margin-top:15px;padding:10px 12px;border:1px dashed var(--border);border-radius:9px;background:color-mix(in srgb,var(--paper2) 72%,transparent);color:var(--muted);font-size:9px;line-height:1.55}
+    .diag code{color:var(--ink);font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+
+    #game{padding:13px 14px 11px 59px;overflow:hidden}
+    .game-layout{height:100%;display:grid;grid-template-rows:auto minmax(0,1fr) auto;gap:8px}
+    .game-hud{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:9px;align-items:start}
+    .prompt-note{padding:9px 12px;border:1px solid var(--border);border-radius:7px 11px 8px 10px;background:color-mix(in srgb,var(--yellow) 22%,var(--paper));box-shadow:0 4px 10px rgba(0,0,0,.06);transform:rotate(-.35deg)}
+    .prompt-note small{display:block;color:var(--muted);font-size:8px;font-weight:900;letter-spacing:.1em;text-transform:uppercase}
+    .prompt-note strong{display:block;margin-top:3px;font:900 clamp(16px,3vw,23px) var(--scribble);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .turn-card{min-width:170px;padding:8px 10px;border:2px solid color-mix(in srgb,var(--blue) 55%,var(--border));border-radius:8px;background:color-mix(in srgb,var(--paper) 84%,transparent);text-align:center}
+    .turn-card.mine{border-color:color-mix(in srgb,var(--green) 72%,var(--ink));background:color-mix(in srgb,var(--green) 17%,var(--paper))}
+    .turn-card small{display:block;color:var(--muted);font-size:8px;font-weight:900;letter-spacing:.1em;text-transform:uppercase}
+    .turn-card strong{display:block;margin-top:3px;font:900 16px var(--scribble)}
+    .turn-meta{display:flex;justify-content:center;align-items:center;gap:8px;margin-top:5px}
+    .timer{font:900 18px var(--scribble);color:var(--danger)}
+    .turn-dots{display:flex;gap:4px}.turn-dots i{width:8px;height:8px;border-radius:50%;background:color-mix(in srgb,var(--soft) 40%,transparent);border:1px solid var(--border)}
+    .turn-dots i.done{background:var(--green)}.turn-dots i.current{background:var(--pink);transform:scale(1.2)}
+    .canvas-shell{
+      position:relative;min-height:0;border:1px solid var(--border);border-radius:11px 8px 14px 9px;overflow:hidden;
+      background:var(--paper);box-shadow:0 11px 25px rgba(0,0,0,.10)
+    }
+    #drawCanvas{display:block;width:100%;height:100%;touch-action:none;cursor:crosshair}
+    .canvas-blocker{
+      position:absolute;inset:0;display:none;place-items:center;padding:18px;background:color-mix(in srgb,var(--paper) 40%,transparent);
+      backdrop-filter:blur(1.5px);text-align:center;pointer-events:auto
+    }
+    .canvas-blocker.show{display:grid}
+    .wait-card{max-width:360px;padding:15px;border:1px dashed var(--border);border-radius:10px;background:color-mix(in srgb,var(--paper) 87%,transparent);box-shadow:0 9px 22px rgba(0,0,0,.10)}
+    .wait-card strong{display:block;font:900 20px var(--scribble)}.wait-card span{display:block;margin-top:6px;color:var(--muted);font-size:11px;line-height:1.45}
+    .tools{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:center}
+    .palette-wrap{display:flex;align-items:center;gap:7px;min-width:0;overflow-x:auto;padding:2px 1px 5px;scrollbar-width:none}.palette-wrap::-webkit-scrollbar{display:none}
+    .color-btn{width:35px;height:35px;flex:0 0 auto;border:3px solid var(--paper);outline:1px solid var(--border);border-radius:50%;background:var(--c)}
+    .color-btn.active{outline:3px solid var(--ink);transform:scale(.92)}
+    .size-btn{min-width:48px;height:37px;border:1px solid var(--border);border-radius:10px;background:var(--paper);font-weight:900}.size-btn.active{background:color-mix(in srgb,var(--blue) 22%,var(--paper))}
+    .tool-actions{display:flex;gap:7px}
+    .small-btn{height:39px;padding:0 11px;border:1px solid var(--border);border-radius:10px;background:var(--paper);font-weight:900;font-size:10px}
+    .small-btn.end{background:color-mix(in srgb,var(--green) 28%,var(--paper))}
+    .finish-overlay{
+      position:absolute;inset:0;z-index:7;display:none;place-items:center;padding:18px;background:color-mix(in srgb,var(--paper) 62%,transparent);backdrop-filter:blur(4px)
+    }
+    .finish-overlay.show{display:grid}
+    .finish-card{width:min(470px,100%);padding:22px;border:1px solid var(--border);border-radius:10px 16px 11px 14px;background:var(--paper);box-shadow:0 20px 55px rgba(0,0,0,.23);text-align:center}
+    .finish-card .stamp{width:61px;height:61px;margin:0 auto 14px;display:grid;place-items:center;border:2px solid color-mix(in srgb,var(--purple) 68%,var(--ink));border-radius:17px 12px 18px 11px;background:color-mix(in srgb,var(--purple) 18%,var(--paper));font:900 24px var(--scribble);transform:rotate(-4deg)}
+    .finish-card p{color:var(--muted);font-size:12px;line-height:1.55}
+    .finish-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px}
+    .rematch-note{margin-top:10px;color:var(--muted);font-size:10px}
+
+    @media(max-width:650px){
+      .app{padding-left:5px;padding-right:5px}
+      .paper{background:linear-gradient(to right,transparent 0 29px,var(--line-red) 29px 31px,transparent 31px),repeating-linear-gradient(to bottom,transparent 0 31px,var(--line-blue) 31px 32px),var(--paper)}
+      .screen{padding:27px 11px 18px 39px}
+      .room-head{grid-template-columns:1fr}.code-note{width:100%;transform:none}
+      .players{gap:6px}.player{min-height:111px;padding:11px}.player strong{font-size:16px}
+      .room-actions{grid-template-columns:1fr 1fr}.room-actions .ready{grid-column:1/-1}
+      #game{padding:10px 7px 8px 37px}
+      .game-hud{grid-template-columns:minmax(0,1fr) 135px;gap:5px}
+      .prompt-note{padding:7px 9px}.prompt-note strong{font-size:14px}
+      .turn-card{min-width:0;padding:6px}.turn-card strong{font-size:12px}.timer{font-size:15px}
+      .tools{grid-template-columns:1fr;gap:4px}.tool-actions{justify-content:space-between}
+      .color-btn{width:32px;height:32px}.size-btn{height:34px}
+      .small-btn{flex:1}
+    }
+    @media(max-height:610px) and (orientation:landscape){
+      .app{grid-template-rows:39px minmax(0,1fr);gap:4px}.topbar{height:39px}.icon-btn{width:38px;height:38px}.title span{display:none}
+      #game{padding-top:7px}.game-layout{gap:4px}.tools{grid-template-columns:minmax(0,1fr) auto}.color-btn{width:29px;height:29px}.size-btn{height:31px}.small-btn{height:33px}
+    }
+    @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+  </style>
+</head>
+<body>
+<main class="app">
+  <header class="topbar">
+    <button class="icon-btn" id="backBtn" aria-label="Geri dön"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button>
+    <div class="title"><strong>Tek Resim, Tek Tuval</strong><span>Kâğıtlık Online · iki kişilik</span></div>
+    <button class="icon-btn" id="themeBtn" aria-label="Temayı değiştir"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg></button>
+  </header>
+
+  <section class="paper">
+    <section class="screen active" id="home">
+      <p class="eyebrow">Sırayla çiz · birlikte tamamla</p>
+      <h1>Tek bir resim,<br>iki farklı akıl.</h1>
+      <p class="lead">Oda oluştur veya arkadaşının koduyla katıl. Altı kısa tur boyunca sırayla aynı resme eklemeler yapacaksınız.</p>
+      <div class="status" id="homeStatus"><i></i><span id="homeStatusText">Bağlantı hazırlanıyor…</span></div>
+      <div class="card">
+        <label for="nameInput">Adın veya kullanıcı adın</label>
+        <input id="nameInput" maxlength="22" autocomplete="nickname" placeholder="Mesela: Ahmet">
+        <div class="row"><button class="btn primary" id="createBtn" style="grid-column:1/-1" disabled>Yeni oda oluştur</button></div>
+      </div>
+      <div class="card">
+        <label for="codeInput">Oda koduyla katıl</label>
+        <input class="code-input" id="codeInput" maxlength="6" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="ABC234">
+        <div class="row"><button class="btn blue" id="joinBtn" style="grid-column:1/-1" disabled>Odaya katıl</button></div>
+      </div>
+      <div class="message" id="homeMsg"></div>
+    </section>
+
+    <section class="screen" id="room">
+      <div class="room-head">
+        <div><p class="eyebrow">Ortak çizim odası</p><h2 id="roomTitle">Oyuncu bekleniyor.</h2><p class="lead" id="roomLead">Kodu diğer oyuncuya gönder.</p></div>
+        <button class="code-note" id="copyBtn"><small>Oda kodu · kopyala</small><strong id="roomCode">------</strong></button>
+      </div>
+      <div class="status" id="roomStatus"><i></i><span id="roomStatusText">Canlı bağlantı kuruluyor…</span></div>
+      <div class="players" id="players"></div>
+      <div class="room-actions">
+        <button class="btn primary ready" id="readyBtn">Hazırım</button>
+        <button class="btn blue" id="refreshBtn">Yenile</button>
+        <button class="btn danger" id="leaveBtn">Odadan ayrıl</button>
+      </div>
+      <div class="message" id="roomMsg"></div>
+      <div class="diag">Kullanıcı: <code id="diagUser">—</code><br>Oda: <code id="diagRoom">—</code><br>Realtime: <code id="diagRt">bağlanıyor</code></div>
+    </section>
+
+    <section class="screen" id="game">
+      <div class="game-layout">
+        <div class="game-hud">
+          <div class="prompt-note"><small>Çizim konusu</small><strong id="promptText">Hazırlanıyor…</strong></div>
+          <div class="turn-card" id="turnCard">
+            <small id="turnLabel">Oyuncular bağlanıyor</small><strong id="turnName">Bekle</strong>
+            <div class="turn-meta"><span class="timer" id="timer">—</span><span class="turn-dots" id="turnDots"></span></div>
+          </div>
+        </div>
+        <div class="canvas-shell" id="canvasShell">
+          <canvas id="drawCanvas"></canvas>
+          <div class="canvas-blocker show" id="blocker"><div class="wait-card"><strong id="blockTitle">Diğer oyuncu bekleniyor.</strong><span id="blockText">İkiniz de oyun ekranına bağlanınca çizim başlayacak.</span></div></div>
+          <div class="finish-overlay" id="finishOverlay">
+            <div class="finish-card">
+              <div class="stamp">✣</div><h2>Ortak resim tamamlandı.</h2>
+              <p id="finishText">İkinizin çizgileri tek bir kâğıtta birleşti.</p>
+              <div class="finish-actions"><button class="btn blue" id="saveBtn">Resmi kaydet</button><button class="btn primary" id="rematchBtn">Tekrar çiz</button></div>
+              <button class="btn danger" id="gameLeaveBtn" style="width:100%;margin-top:8px">Odadan ayrıl</button>
+              <div class="rematch-note" id="rematchNote"></div>
+            </div>
+          </div>
+        </div>
+        <div class="tools">
+          <div class="palette-wrap" id="palette">
+            <button class="color-btn active" style="--c:#252321" data-color="#252321" aria-label="Siyah"></button>
+            <button class="color-btn" style="--c:#d05e68" data-color="#d05e68" aria-label="Pembe"></button>
+            <button class="color-btn" style="--c:#508eaa" data-color="#508eaa" aria-label="Mavi"></button>
+            <button class="color-btn" style="--c:#5d966c" data-color="#5d966c" aria-label="Yeşil"></button>
+            <button class="color-btn" style="--c:#8a70b4" data-color="#8a70b4" aria-label="Mor"></button>
+            <button class="color-btn" style="--c:#d19b47" data-color="#d19b47" aria-label="Turuncu"></button>
+            <button class="size-btn active" data-size="4">İnce</button>
+            <button class="size-btn" data-size="8">Kalın</button>
+          </div>
+          <div class="tool-actions"><button class="small-btn" id="undoBtn">Geri al</button><button class="small-btn end" id="endTurnBtn">Sırayı ver</button></div>
+        </div>
+      </div>
+    </section>
+  </section>
+</main>
+
+<script type="module">
+import{createClient}from"https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
+const URL="https://rffiqjndhwuwryxjrhdk.supabase.co",KEY="sb_publishable_XKlA4dG_h2dyYizi6MsbKQ_A-biuHKG";
+const sb=createClient(URL,KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:false}});
+const $=id=>document.getElementById(id);
+const ST={theme:"kagitlik-theme",name:"kagitlik-name",rid:"kagitlik-canvas-room-id",rcode:"kagitlik-canvas-room-code"};
+const PROMPTS=["Uçan bir ev","Uzayda piknik","Robot kedi","Denizin altında okul","Ay'da kamp","Dev bir çiçeğin üstündeki şehir","Karton bir uzay gemisi","Bulutların üstünde tren","Müzik çalan orman","Geleceğin odası"];
+const COLORS={1:"#508eaa",2:"#d05e68"};
+const TURN_MS=15000,TOTAL_TURNS=6;
+const state={user:null,room:null,players:[],channel:null,poll:null,refreshTimer:null,busy:false,presence:{},host:false,gameReady:false};
+const game={sessionId:null,started:false,finished:false,prompt:"",turnIndex:0,activeNumber:1,turnEndsAt:0,strokes:[],strokeMap:new Map(),drawing:false,currentStroke:null,pending:[],flushTimer:null,hostTimer:null,timerRaf:null,advancing:false,rematch:new Set(),color:"#252321",width:4};
+let ctx,canvasRect,dpr=1,drawQueued=false;
+
+function screen(id){["home","room","game"].forEach(x=>$(x).classList.toggle("active",x===id))}
+function theme(t){document.documentElement.dataset.theme=t;localStorage.setItem(ST.theme,t);$("themeColor").content=t==="dark"?"#171819":"#e9e2d2";requestDraw()}
+function msg(id,text="",err=false){const e=$(id);e.textContent=text;e.classList.toggle("show",!!text);e.classList.toggle("error",err)}
+function nice(e){const s=e?.message||String(e);if(/Failed to fetch/i.test(s))return"Supabase'e ulaşılamadı.";if(/anonymous sign-ins are disabled/i.test(s))return"Anonim giriş Supabase'te kapalı.";if(/Oda bulunamadı/i.test(s))return"Oda bulunamadı veya artık açık değil.";if(/Bu oda dolu/i.test(s))return"Bu oda zaten iki oyuncuyla dolu.";return s}
+function esc(v){const d=document.createElement("div");d.textContent=String(v??"");return d.innerHTML}
+function cleanCode(v){return String(v||"").toUpperCase().replace(/[^A-Z2-9]/g,"").slice(0,6)}
+function vibrate(p){if(navigator.vibrate)navigator.vibrate(p)}
+function currentPlayer(){return state.players.find(p=>p.user_id===state.user?.id)}
+function playerByNumber(n){return state.players.find(p=>p.player_number===n)}
+function myNumber(){return currentPlayer()?.player_number||0}
+function isMyTurn(){return game.started&&!game.finished&&myNumber()===game.activeNumber}
+function setBusy(v){state.busy=v;["createBtn","joinBtn","readyBtn","refreshBtn","leaveBtn"].forEach(id=>$(id).disabled=v);if(!v)renderRoom()}
+function username(){const n=$("nameInput").value.trim().replace(/\s+/g," ");if(n.length<2||n.length>22)throw Error("Kullanıcı adı 2 ile 22 karakter arasında olmalı.");localStorage.setItem(ST.name,n);$("nameInput").value=n;return n}
+async function ensureSession(){const{data,error}=await sb.auth.getSession();if(error)throw error;if(data.session?.user){state.user=data.session.user;return}const r=await sb.auth.signInAnonymously();if(r.error)throw r.error;state.user=r.data.user}
+
+async function boot(){
+  screen("home");
+  $("homeStatus").classList.remove("online","error");
+  $("homeStatusText").textContent="Bağlantı hazırlanıyor…";
+  $("createBtn").disabled=true;
+  $("joinBtn").disabled=true;
+  msg("homeMsg");
+  try{
+    await ensureSession();
+    $("diagUser").textContent=state.user.id.slice(0,8)+"…";
+    $("nameInput").value=localStorage.getItem(ST.name)||"";
+    $("homeStatus").classList.add("online");
+    $("homeStatusText").textContent="Supabase bağlantısı hazır.";
+    $("createBtn").disabled=false;
+    $("joinBtn").disabled=false;
+    const rid=localStorage.getItem(ST.rid),rcode=localStorage.getItem(ST.rcode);
+    if(rid&&rcode){try{await enterRoom(rid,rcode);return}catch(e){console.warn(e);clearSaved()}}
+  }catch(e){
+    $("homeStatus").classList.add("error");
+    $("homeStatusText").textContent="Bağlantı kurulamadı.";
+    msg("homeMsg",nice(e)+" Sayfayı yenileyip tekrar dene.",true);
+  }
+}
+async function createRoom(){
+  if(state.busy)return;msg("homeMsg");
+  try{setBusy(true);const{data,error}=await sb.rpc("create_game_room",{p_username:username(),p_game_type:"shared_canvas"});if(error)throw error;const r=Array.isArray(data)?data[0]:data;await enterRoom(r.room_id,r.room_code)}
+  catch(e){msg("homeMsg",nice(e),true)}finally{setBusy(false)}
+}
+async function joinRoom(){
+  if(state.busy)return;msg("homeMsg");
+  try{const c=cleanCode($("codeInput").value);$("codeInput").value=c;if(c.length!==6)throw Error("Oda kodu 6 karakter olmalı.");setBusy(true);const{data,error}=await sb.rpc("join_game_room",{p_code:c,p_username:username()});if(error)throw error;const r=Array.isArray(data)?data[0]:data;await enterRoom(r.room_id,r.room_code)}
+  catch(e){msg("homeMsg",nice(e),true)}finally{setBusy(false)}
+}
+async function enterRoom(id,code){
+  state.room={id,code,status:"waiting"};localStorage.setItem(ST.rid,id);localStorage.setItem(ST.rcode,code);$("diagRoom").textContent=id.slice(0,8)+"…";
+  screen("room");await refreshRoom();await subscribeRoom();clearInterval(state.poll);
+  state.poll=setInterval(()=>{if(state.room&&!document.hidden)refreshRoom().catch(()=>{})},4000);
+  if(state.room.status==="playing")enterGame()
+}
+async function refreshRoom(){
+  if(!state.room)return;const id=state.room.id;
+  const[a,b]=await Promise.all([
+    sb.from("rooms").select("id,code,host_id,status,game_type").eq("id",id).maybeSingle(),
+    sb.from("room_players").select("room_id,user_id,username,player_number,ready").eq("room_id",id).order("player_number")
+  ]);
+  if(a.error)throw a.error;if(b.error)throw b.error;if(!a.data)throw Error("Oda bulunamadı veya artık açık değil.");
+  state.room=a.data;state.players=b.data||[];state.host=myNumber()===1;renderRoom();
+  if(state.room.status==="playing")enterGame()
+}
+function scheduleRefresh(){clearTimeout(state.refreshTimer);state.refreshTimer=setTimeout(()=>refreshRoom().catch(e=>msg("roomMsg",nice(e),true)),100)}
+async function subscribeRoom(){
+  if(state.channel)await sb.removeChannel(state.channel);
+  const id=state.room.id;
+  state.channel=sb.channel("canvas-"+id,{config:{broadcast:{self:true},presence:{key:state.user.id}}})
+    .on("postgres_changes",{event:"*",schema:"public",table:"rooms",filter:`id=eq.${id}`},scheduleRefresh)
+    .on("postgres_changes",{event:"*",schema:"public",table:"room_players",filter:`room_id=eq.${id}`},scheduleRefresh)
+    .on("broadcast",{event:"canvas"},({payload})=>handleEvent(payload))
+    .on("presence",{event:"sync"},()=>{state.presence=state.channel.presenceState();maybeStart();updateRematch()})
+    .subscribe(async st=>{
+      $("diagRt").textContent=st;$("roomStatus").classList.toggle("online",st==="SUBSCRIBED");$("roomStatus").classList.toggle("error",["CHANNEL_ERROR","TIMED_OUT","CLOSED"].includes(st));
+      $("roomStatusText").textContent=st==="SUBSCRIBED"?"Canlı bağlantı kuruldu.":"Realtime: "+st;
+      if(st==="SUBSCRIBED"&&state.gameReady)await trackGame()
+    })
+}
+function renderRoom(){
+  if(!state.room)return;$("roomCode").textContent=state.room.code||localStorage.getItem(ST.rcode)||"------";
+  const playing=state.room.status==="playing";
+  $("roomTitle").textContent=playing?"İki oyuncu da hazır.":state.players.length<2?"Oyuncu bekleniyor.":"Hazır olmayı bekliyoruz.";
+  $("roomLead").textContent=playing?"Ortak tuval açılıyor…":state.players.length<2?"Kodu diğer oyuncuya gönder.":"İkiniz de Hazırım düğmesine basın.";
+  $("players").innerHTML="";
+  for(let n=1;n<=2;n++){
+    const p=state.players.find(x=>x.player_number===n),el=document.createElement("article");
+    if(!p){el.className="player empty";el.innerHTML=`<small>Oyuncu ${n}</small><strong>Bekleniyor…</strong><div class="pstate"><i></i>Henüz katılmadı</div>`}
+    else{el.className="player"+(p.ready?" ready":"");el.innerHTML=`<small>Oyuncu ${n}${p.user_id===state.user?.id?" · sen":""}</small><strong>${esc(p.username)}</strong><div class="pstate"><i></i>${p.ready?"Hazır":"Hazır değil"}</div>`}
+    $("players").appendChild(el)
+  }
+  const me=currentPlayer();$("readyBtn").textContent=me?.ready?"Hazır değilim":"Hazırım";$("readyBtn").disabled=state.busy||!me||playing||state.players.length<2
+}
+async function toggleReady(){
+  const me=currentPlayer();if(!me||state.busy)return;
+  try{setBusy(true);const{error}=await sb.rpc("set_room_ready",{p_room_id:state.room.id,p_ready:!me.ready});if(error)throw error;await refreshRoom()}
+  catch(e){msg("roomMsg",nice(e),true)}finally{setBusy(false)}
+}
+async function enterGame(){
+  if(!state.room||state.gameReady)return;state.gameReady=true;screen("game");resizeCanvas();renderTurn();await trackGame();maybeStart()
+}
+async function trackGame(){if(state.channel)await state.channel.track({user_id:state.user.id,screen:"game",player_number:myNumber(),at:Date.now()})}
+function presentGameUsers(){const ids=new Set();for(const arr of Object.values(state.presence||{}))for(const p of arr)if(p.screen==="game")ids.add(p.user_id);return ids}
+function maybeStart(){
+  if(!state.host||state.room?.status!=="playing"||game.started)return;
+  if(presentGameUsers().size<2)return;
+  setTimeout(()=>{if(state.host&&!game.started&&presentGameUsers().size>=2)hostStartSession()},500)
+}
+function send(type,data={}){return state.channel.send({type:"broadcast",event:"canvas",payload:{type,sender:state.user.id,sessionId:game.sessionId,...data}})}
+function hostStartSession(){
+  if(game.started)return;
+  const sessionId=crypto.randomUUID(),prompt=PROMPTS[Math.floor(Math.random()*PROMPTS.length)],startsAt=Date.now()+700;
+  send("session_start",{sessionId,prompt,totalTurns:TOTAL_TURNS,turnIndex:0,activeNumber:1,turnEndsAt:startsAt+TURN_MS})
+}
+function resetGameData(){
+  clearTimeout(game.hostTimer);cancelAnimationFrame(game.timerRaf);game.strokes=[];game.strokeMap=new Map();game.drawing=false;game.currentStroke=null;game.pending=[];game.rematch=new Set();game.finished=false;game.advancing=false;requestDraw()
+}
+function handleEvent(p){
+  if(!p?.type)return;
+  if(p.type==="session_start"){
+    game.sessionId=p.sessionId;resetGameData();game.started=true;game.prompt=p.prompt;game.turnIndex=p.turnIndex;game.activeNumber=p.activeNumber;game.turnEndsAt=p.turnEndsAt;
+    $("promptText").textContent=game.prompt;$("finishOverlay").classList.remove("show");scheduleHostTurn();renderTurn();return
+  }
+  if(p.sessionId&&game.sessionId&&p.sessionId!==game.sessionId)return;
+  if(p.type==="turn_start"){
+    game.turnIndex=p.turnIndex;game.activeNumber=p.activeNumber;game.turnEndsAt=p.turnEndsAt;game.advancing=false;scheduleHostTurn();renderTurn();return
+  }
+  if(p.type==="turn_done"){if(state.host&&game.started&&!game.finished&&p.turnIndex===game.turnIndex)hostAdvance();return}
+  if(p.type==="stroke_begin"){
+    if(p.sender===state.user.id)return;
+    const s=p.stroke;if(!s||game.strokeMap.has(s.id))return;game.strokes.push(s);game.strokeMap.set(s.id,s);requestDraw();return
+  }
+  if(p.type==="stroke_points"){
+    if(p.sender===state.user.id)return;const s=game.strokeMap.get(p.id);if(!s)return;s.points.push(...(p.points||[]));requestDraw();return
+  }
+  if(p.type==="stroke_end"){requestDraw();return}
+  if(p.type==="undo"){
+    removeStroke(p.id);return
+  }
+  if(p.type==="sync_request"){if(state.host&&game.started)send("sync_state",{target:p.sender,state:serialState()});return}
+  if(p.type==="sync_state"){
+    if(p.target!==state.user.id||!p.state)return;applySync(p.state);return
+  }
+  if(p.type==="finish"){finishGame();return}
+  if(p.type==="rematch"){
+    game.rematch.add(p.sender);updateRematch();
+    if(state.host&&game.rematch.size>=2)hostStartSession();
+  }
+}
+function serialState(){return{sessionId:game.sessionId,prompt:game.prompt,started:game.started,finished:game.finished,turnIndex:game.turnIndex,activeNumber:game.activeNumber,turnEndsAt:game.turnEndsAt,strokes:game.strokes}}
+function applySync(s){
+  game.sessionId=s.sessionId;game.prompt=s.prompt;game.started=s.started;game.finished=s.finished;game.turnIndex=s.turnIndex;game.activeNumber=s.activeNumber;game.turnEndsAt=s.turnEndsAt;
+  game.strokes=s.strokes||[];game.strokeMap=new Map(game.strokes.map(x=>[x.id,x]));$("promptText").textContent=game.prompt;renderTurn();requestDraw();if(game.finished)finishGame();else scheduleHostTurn()
+}
+function scheduleHostTurn(){
+  clearTimeout(game.hostTimer);if(!state.host||!game.started||game.finished)return;
+  const wait=Math.max(0,game.turnEndsAt-Date.now()+60);game.hostTimer=setTimeout(hostAdvance,wait)
+}
+function hostAdvance(){
+  if(!state.host||game.advancing||game.finished)return;game.advancing=true;
+  const next=game.turnIndex+1;
+  if(next>=TOTAL_TURNS){send("finish");return}
+  send("turn_start",{turnIndex:next,activeNumber:(next%2)+1,turnEndsAt:Date.now()+TURN_MS})
+}
+function renderTurn(){
+  if(!game.started){
+    $("blocker").classList.add("show");$("blockTitle").textContent="Diğer oyuncu bekleniyor.";$("blockText").textContent="İkiniz de oyun ekranına bağlanınca çizim başlayacak.";
+    $("turnLabel").textContent="Oyuncular bağlanıyor";$("turnName").textContent="Bekle";$("timer").textContent="—";renderDots();updateTools();return
+  }
+  const p=playerByNumber(game.activeNumber),mine=isMyTurn();
+  $("turnCard").classList.toggle("mine",mine);$("turnLabel").textContent=`Tur ${game.turnIndex+1} / ${TOTAL_TURNS}`;$("turnName").textContent=mine?"Sıra sende":`${p?.username||"Diğer oyuncu"} çiziyor`;
+  $("blocker").classList.toggle("show",!mine||game.finished);
+  if(!game.finished){
+    $("blockTitle").textContent=mine?"Çizmeye başla.":`${p?.username||"Diğer oyuncu"} çiziyor.`;
+    $("blockText").textContent=mine?"Parmağınla tuvale çiz. Süren bitmeden sırayı verebilirsin.":"Çizgiler diğer ekrandan anlık olarak geliyor.";
+  }
+  renderDots();updateTools();startTimerRaf()
+}
+function renderDots(){
+  $("turnDots").innerHTML="";
+  for(let i=0;i<TOTAL_TURNS;i++){const d=document.createElement("i");if(i<game.turnIndex)d.className="done";else if(i===game.turnIndex&&game.started&&!game.finished)d.className="current";$("turnDots").appendChild(d)}
+}
+function startTimerRaf(){
+  cancelAnimationFrame(game.timerRaf);
+  const tick=()=>{if(!game.started||game.finished)return;const left=Math.max(0,game.turnEndsAt-Date.now());$("timer").textContent=(left/1000).toFixed(1)+"s";game.timerRaf=requestAnimationFrame(tick)};tick()
+}
+function updateTools(){
+  const can=isMyTurn()&&!game.finished;
+  $("undoBtn").disabled=!can||!lastOwnStroke();$("endTurnBtn").disabled=!can;
+  document.querySelectorAll(".color-btn,.size-btn").forEach(b=>b.disabled=!can)
+}
+function lastOwnStroke(){for(let i=game.strokes.length-1;i>=0;i--)if(game.strokes[i].userId===state.user?.id&&game.strokes[i].turnIndex===game.turnIndex)return game.strokes[i];return null}
+function removeStroke(id){const i=game.strokes.findIndex(s=>s.id===id);if(i>=0)game.strokes.splice(i,1);game.strokeMap.delete(id);requestDraw();updateTools()}
+function undo(){const s=lastOwnStroke();if(!s)return;removeStroke(s.id);send("undo",{id:s.id});vibrate(10)}
+function endTurn(){if(!isMyTurn())return;flushPoints();send("turn_done",{turnIndex:game.turnIndex})}
+function finishGame(){
+  game.finished=true;game.started=true;clearTimeout(game.hostTimer);cancelAnimationFrame(game.timerRaf);$("timer").textContent="Bitti";$("finishOverlay").classList.add("show");$("blocker").classList.remove("show");
+  $("finishText").textContent=`“${game.prompt}” konusu, ${game.strokes.length} çizgiyle tamamlandı.`;renderDots();updateTools();vibrate([25,25,60])
+}
+function updateRematch(){
+  if(!game.finished)return;
+  const names=[...game.rematch].map(id=>state.players.find(p=>p.user_id===id)?.username).filter(Boolean);
+  $("rematchNote").textContent=names.length?`${names.join(" ve ")} tekrar çizmek istiyor.`:"";
+}
+function requestRematch(){if(!game.finished)return;game.rematch.add(state.user.id);send("rematch");updateRematch();$("rematchBtn").disabled=true}
+
+function resizeCanvas(){
+  const c=$("drawCanvas"),r=$("canvasShell").getBoundingClientRect();dpr=Math.min(devicePixelRatio||1,2);c.width=Math.max(1,Math.round(r.width*dpr));c.height=Math.max(1,Math.round(r.height*dpr));c.style.width=r.width+"px";c.style.height=r.height+"px";ctx=c.getContext("2d");ctx.setTransform(dpr,0,0,dpr,0,0);canvasRect=c.getBoundingClientRect();requestDraw()
+}
+function pointFromEvent(e){const r=$("drawCanvas").getBoundingClientRect();return{x:+((e.clientX-r.left)/r.width).toFixed(4),y:+((e.clientY-r.top)/r.height).toFixed(4)}}
+function beginStroke(e){
+  if(!isMyTurn()||game.finished)return;e.preventDefault();$("drawCanvas").setPointerCapture?.(e.pointerId);
+  const p=pointFromEvent(e),s={id:crypto.randomUUID(),userId:state.user.id,playerNumber:myNumber(),turnIndex:game.turnIndex,color:game.color,width:game.width,points:[p]};
+  game.drawing=true;game.currentStroke=s;game.pending=[];game.strokes.push(s);game.strokeMap.set(s.id,s);send("stroke_begin",{stroke:s});requestDraw();updateTools()
+}
+function moveStroke(e){
+  if(!game.drawing||!game.currentStroke)return;e.preventDefault();const p=pointFromEvent(e),pts=game.currentStroke.points,last=pts[pts.length-1];
+  const r=$("drawCanvas").getBoundingClientRect(),dist=Math.hypot((p.x-last.x)*r.width,(p.y-last.y)*r.height);if(dist<2.4)return;
+  pts.push(p);game.pending.push(p);scheduleFlush();requestDraw()
+}
+function endStroke(e){if(!game.drawing)return;e?.preventDefault();game.drawing=false;flushPoints();send("stroke_end",{id:game.currentStroke.id});game.currentStroke=null;updateTools()}
+function scheduleFlush(){if(game.flushTimer)return;game.flushTimer=setTimeout(flushPoints,34)}
+function flushPoints(){
+  clearTimeout(game.flushTimer);game.flushTimer=null;if(!game.currentStroke||!game.pending.length)return;
+  const batch=game.pending.splice(0);send("stroke_points",{id:game.currentStroke.id,points:batch})
+}
+function requestDraw(){if(drawQueued)return;drawQueued=true;requestAnimationFrame(()=>{drawQueued=false;drawCanvas()})}
+function drawCanvas(){
+  if(!ctx)return;const c=$("drawCanvas"),w=c.clientWidth,h=c.clientHeight;
+  ctx.clearRect(0,0,w,h);const dark=document.documentElement.dataset.theme==="dark";
+  ctx.fillStyle=dark?"#292824":"#fffdf4";ctx.fillRect(0,0,w,h);
+  ctx.strokeStyle=dark?"rgba(101,165,194,.17)":"rgba(67,137,178,.22)";ctx.lineWidth=1;
+  for(let y=31;y<h;y+=31){ctx.beginPath();ctx.moveTo(0,y+.5);ctx.lineTo(w,y+.5);ctx.stroke()}
+  ctx.strokeStyle=dark?"rgba(217,99,108,.34)":"rgba(190,70,78,.42)";ctx.beginPath();ctx.moveTo(Math.min(38,w*.08),0);ctx.lineTo(Math.min(38,w*.08),h);ctx.stroke();
+  ctx.lineCap="round";ctx.lineJoin="round";
+  for(const s of game.strokes){
+    if(!s.points?.length)continue;ctx.strokeStyle=s.color;ctx.lineWidth=s.width;ctx.globalAlpha=s.playerNumber===1?.94:.88;
+    ctx.beginPath();ctx.moveTo(s.points[0].x*w,s.points[0].y*h);
+    if(s.points.length===1){ctx.lineTo(s.points[0].x*w+.1,s.points[0].y*h+.1)}
+    else for(let i=1;i<s.points.length;i++){const p=s.points[i];ctx.lineTo(p.x*w,p.y*h)}
+    ctx.stroke()
+  }
+  ctx.globalAlpha=1
+}
+function saveImage(){
+  const out=document.createElement("canvas"),ow=1400,oh=900;out.width=ow;out.height=oh;const x=out.getContext("2d");
+  x.fillStyle="#fffdf4";x.fillRect(0,0,ow,oh);x.strokeStyle="rgba(67,137,178,.22)";x.lineWidth=2;
+  for(let y=75;y<oh;y+=50){x.beginPath();x.moveTo(0,y);x.lineTo(ow,y);x.stroke()}
+  x.strokeStyle="rgba(190,70,78,.42)";x.beginPath();x.moveTo(85,0);x.lineTo(85,oh);x.stroke();
+  x.fillStyle="#252321";x.font='900 38px "Trebuchet MS",sans-serif';x.fillText(game.prompt,115,58);
+  x.lineCap="round";x.lineJoin="round";
+  for(const s of game.strokes){if(!s.points?.length)continue;x.strokeStyle=s.color;x.lineWidth=s.width*1.6;x.beginPath();x.moveTo(s.points[0].x*ow,s.points[0].y*oh);for(let i=1;i<s.points.length;i++)x.lineTo(s.points[i].x*ow,s.points[i].y*oh);x.stroke()}
+  const a=document.createElement("a");a.download="tek-resim-tek-tuval.png";a.href=out.toDataURL("image/png");a.click()
+}
+
+async function leaveRoom(){
+  if(!state.room)return;if(!confirm("Odadan ayrılmak istediğine emin misin?"))return;
+  try{await sb.rpc("leave_game_room",{p_room_id:state.room.id})}catch(e){console.warn(e)}
+  clearInterval(state.poll);clearTimeout(game.hostTimer);cancelAnimationFrame(game.timerRaf);if(state.channel)await sb.removeChannel(state.channel);
+  state.room=null;state.players=[];state.channel=null;state.gameReady=false;game.started=false;clearSaved();screen("home")
+}
+function clearSaved(){localStorage.removeItem(ST.rid);localStorage.removeItem(ST.rcode)}
+
+$("createBtn").onclick=createRoom;$("joinBtn").onclick=joinRoom;$("readyBtn").onclick=toggleReady;
+$("refreshBtn").onclick=()=>refreshRoom().catch(e=>msg("roomMsg",nice(e),true));$("leaveBtn").onclick=leaveRoom;$("gameLeaveBtn").onclick=leaveRoom;
+$("copyBtn").onclick=async()=>{const c=state.room?.code||localStorage.getItem(ST.rcode);try{await navigator.clipboard.writeText(c);msg("roomMsg","Oda kodu kopyalandı: "+c)}catch{prompt("Oda kodu:",c)}};
+$("themeBtn").onclick=()=>theme(document.documentElement.dataset.theme==="dark"?"light":"dark");
+$("backBtn").onclick=()=>state.room?leaveRoom():(history.length>1?history.back():location.href="index.html");
+$("codeInput").oninput=e=>e.target.value=cleanCode(e.target.value);$("codeInput").onkeydown=e=>{if(e.key==="Enter")joinRoom()};
+$("nameInput").onkeydown=e=>{if(e.key==="Enter")createRoom()};
+$("undoBtn").onclick=undo;$("endTurnBtn").onclick=endTurn;$("saveBtn").onclick=saveImage;$("rematchBtn").onclick=requestRematch;
+document.querySelectorAll(".color-btn").forEach(b=>b.onclick=()=>{document.querySelectorAll(".color-btn").forEach(x=>x.classList.remove("active"));b.classList.add("active");game.color=b.dataset.color});
+document.querySelectorAll(".size-btn").forEach(b=>b.onclick=()=>{document.querySelectorAll(".size-btn").forEach(x=>x.classList.remove("active"));b.classList.add("active");game.width=Number(b.dataset.size)});
+$("drawCanvas").addEventListener("pointerdown",beginStroke,{passive:false});$("drawCanvas").addEventListener("pointermove",moveStroke,{passive:false});$("drawCanvas").addEventListener("pointerup",endStroke,{passive:false});$("drawCanvas").addEventListener("pointercancel",endStroke);
+window.addEventListener("resize",()=>{if(state.gameReady)resizeCanvas()});document.addEventListener("visibilitychange",()=>{if(!document.hidden&&state.gameReady){resizeCanvas();send("sync_request")}});
+const savedTheme=localStorage.getItem(ST.theme),prefersDark=matchMedia?.("(prefers-color-scheme: dark)")?.matches;theme(savedTheme||(prefersDark?"dark":"light"));boot();
+</script>
+</body>
+</html>

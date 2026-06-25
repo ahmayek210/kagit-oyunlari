@@ -1,0 +1,735 @@
+<!doctype html>
+<html lang="tr" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#e9e2d2" id="themeColor">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <title>Kâğıtlık</title>
+
+  <style>
+    :root{
+      color-scheme:light;
+      --desk:#e9e2d2;--desk2:#d8cdb8;--paper:#fffdf4;--paper2:#f6efdc;
+      --ink:#272421;--muted:#716a60;--soft:#9c9488;
+      --line-blue:rgba(67,137,178,.22);--line-red:rgba(190,70,78,.42);
+      --border:rgba(62,52,40,.18);
+      --shadow:0 18px 42px rgba(73,58,37,.17),0 4px 10px rgba(73,58,37,.10);
+      --shadow-hover:0 23px 52px rgba(73,58,37,.22),0 7px 16px rgba(73,58,37,.13);
+      --yellow:#e5c66d;--blue:#7bb4cc;--green:#8fbd9c;--pink:#d79aa2;--purple:#a896ce;--orange:#dba26d;
+      --danger:#b9575f;
+      --scribble:"Trebuchet MS","Arial Rounded MT Bold",ui-rounded,system-ui,sans-serif;
+      --sans:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+    }
+
+    html[data-theme="dark"]{
+      color-scheme:dark;
+      --desk:#171819;--desk2:#23211e;--paper:#292824;--paper2:#23221e;
+      --ink:#f0eadd;--muted:#bbb2a3;--soft:#8d8578;
+      --line-blue:rgba(101,165,194,.17);--line-red:rgba(217,99,108,.34);
+      --border:rgba(255,245,224,.14);
+      --shadow:0 20px 48px rgba(0,0,0,.40),0 5px 12px rgba(0,0,0,.28);
+      --shadow-hover:0 26px 58px rgba(0,0,0,.52),0 8px 18px rgba(0,0,0,.34);
+      --yellow:#a78a40;--blue:#4a8197;--green:#557e60;--pink:#8f555e;--purple:#705f96;--orange:#93653f;
+      --danger:#d26b74;
+    }
+
+    *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+    html{min-height:100%;-webkit-text-size-adjust:100%}
+    body{
+      margin:0;min-height:100dvh;color:var(--ink);font-family:var(--sans);
+      background:
+        radial-gradient(circle at 18% 8%,rgba(255,255,255,.12),transparent 28%),
+        linear-gradient(135deg,var(--desk),var(--desk2));
+      transition:background .22s ease,color .22s ease
+    }
+    button,input{font:inherit;color:inherit}
+    button{cursor:pointer}
+
+    .app{
+      width:min(1160px,100%);
+      margin:0 auto;
+      padding:max(13px,env(safe-area-inset-top)) clamp(12px,3vw,30px) max(35px,env(safe-area-inset-bottom))
+    }
+
+    .topbar{
+      position:sticky;top:0;z-index:30;
+      display:flex;align-items:center;justify-content:space-between;gap:12px;
+      padding:8px 0 13px;
+      backdrop-filter:blur(17px)
+    }
+    .topbar::before{
+      content:"";position:absolute;inset:0 -40px;z-index:-1;
+      background:linear-gradient(to bottom,color-mix(in srgb,var(--desk) 86%,transparent),transparent);
+      pointer-events:none
+    }
+    .brand{display:flex;align-items:center;gap:10px;min-width:0}
+    .brand-paper{
+      position:relative;width:42px;height:42px;flex:0 0 auto;
+      border:1px solid var(--border);border-radius:5px;background:var(--paper);
+      box-shadow:var(--shadow);transform:rotate(-3deg)
+    }
+    .brand-paper::before{
+      content:"";position:absolute;left:8px;right:6px;top:14px;height:2px;
+      background:var(--line-blue);box-shadow:0 7px 0 var(--line-blue),0 14px 0 var(--line-blue)
+    }
+    .brand-paper::after{
+      content:"";position:absolute;left:10px;top:0;bottom:0;width:2px;background:var(--line-red)
+    }
+    .brand strong{
+      display:block;font:900 21px/1 var(--scribble);letter-spacing:-.5px;
+      white-space:nowrap;overflow:hidden;text-overflow:ellipsis
+    }
+    .brand span{display:block;margin-top:4px;color:var(--muted);font-size:11px}
+
+    .top-actions{display:flex;gap:7px}
+    .icon-btn{
+      width:42px;height:42px;border:1px solid var(--border);border-radius:14px;
+      background:color-mix(in srgb,var(--paper) 84%,transparent);
+      box-shadow:0 4px 12px rgba(0,0,0,.08);display:grid;place-items:center
+    }
+    .icon-btn:active{transform:scale(.95)}
+    .icon-btn svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+
+    .paper-stage{
+      position:relative;min-height:calc(100dvh - 86px);overflow:hidden;
+      padding:clamp(29px,5vw,50px) clamp(18px,5vw,48px) 38px;
+      border:1px solid var(--border);border-radius:9px 18px 11px 15px;
+      background:
+        linear-gradient(to right,transparent 0 55px,var(--line-red) 55px 57px,transparent 57px),
+        repeating-linear-gradient(to bottom,transparent 0 34px,var(--line-blue) 34px 35px),
+        var(--paper);
+      box-shadow:var(--shadow)
+    }
+    .paper-stage::before{
+      content:"";position:absolute;top:-7px;left:50%;width:108px;height:27px;
+      transform:translateX(-50%) rotate(1.7deg);
+      background:color-mix(in srgb,var(--yellow) 58%,transparent);
+      opacity:.72;box-shadow:0 2px 4px rgba(0,0,0,.08)
+    }
+    .paper-stage::after{
+      content:"";position:absolute;right:-37px;bottom:-44px;width:145px;height:145px;
+      border:3px solid color-mix(in srgb,var(--pink) 62%,transparent);border-radius:50%;opacity:.24
+    }
+
+    .view{display:none;position:relative;z-index:2;animation:viewIn .2s ease}
+    .view.active{display:block}
+    @keyframes viewIn{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}
+
+    .eyebrow{
+      margin:0 0 10px;color:var(--muted);font-size:9px;font-weight:900;
+      letter-spacing:.15em;text-transform:uppercase
+    }
+    h1,h2{
+      margin:0;font:900 clamp(34px,7vw,68px)/.97 var(--scribble);
+      letter-spacing:-2px
+    }
+    h2{font-size:clamp(29px,5.4vw,46px)}
+    .lead{
+      max-width:680px;margin:17px 0 0;color:var(--muted);
+      font-size:clamp(13px,2vw,16px);line-height:1.65
+    }
+
+    .welcome-head{
+      min-height:210px;display:flex;flex-direction:column;justify-content:center;
+      padding-right:min(12vw,130px)
+    }
+    .welcome-head h1 span{position:relative;white-space:nowrap}
+    .welcome-head h1 span::after{
+      content:"";position:absolute;left:0;right:0;bottom:-5px;height:7px;
+      border-bottom:3px solid var(--pink);border-radius:50%;transform:rotate(-1deg)
+    }
+
+    .mode-grid{
+      display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-top:28px
+    }
+    .mode-card{
+      --accent:var(--blue);
+      position:relative;min-height:245px;padding:25px 23px 20px;overflow:hidden;
+      border:1px solid var(--border);border-radius:8px 15px 9px 13px;
+      background:
+        linear-gradient(to right,transparent 0 27px,color-mix(in srgb,var(--accent) 25%,transparent) 27px 29px,transparent 29px),
+        repeating-linear-gradient(to bottom,transparent 0 29px,var(--line-blue) 29px 30px),
+        var(--paper);
+      box-shadow:var(--shadow);text-align:left;
+      transition:transform .18s ease,box-shadow .18s ease
+    }
+    .mode-card:nth-child(1){transform:rotate(-.45deg)}
+    .mode-card:nth-child(2){transform:rotate(.4deg)}
+    .mode-card:hover{transform:translateY(-6px) rotate(0);box-shadow:var(--shadow-hover)}
+    .mode-card:active{transform:scale(.985)}
+    .mode-card::before{
+      content:"";position:absolute;top:-5px;left:50%;width:84px;height:21px;
+      transform:translateX(-50%) rotate(-2deg);
+      background:color-mix(in srgb,var(--accent) 55%,transparent);opacity:.72
+    }
+    .mode-number{
+      width:67px;height:67px;display:grid;place-items:center;
+      border:3px solid color-mix(in srgb,var(--accent) 73%,var(--ink));
+      border-radius:20px 14px 21px 13px;
+      background:color-mix(in srgb,var(--accent) 20%,transparent);
+      font:900 31px var(--scribble);transform:rotate(-3deg)
+    }
+    .mode-card h3{margin:20px 0 8px;font:900 clamp(23px,4vw,34px)/1 var(--scribble)}
+    .mode-card p{margin:0;color:var(--muted);font-size:13px;line-height:1.55}
+    .mode-footer{
+      display:flex;align-items:center;justify-content:space-between;gap:9px;margin-top:20px
+    }
+    .mode-count{font-size:11px;font-weight:850;color:var(--muted)}
+    .arrow{
+      width:39px;height:39px;display:grid;place-items:center;border:1px solid var(--border);
+      border-radius:50%;background:color-mix(in srgb,var(--accent) 21%,var(--paper));
+      font:900 20px var(--scribble)
+    }
+
+    .games-head{
+      display:flex;align-items:flex-end;justify-content:space-between;gap:14px;
+      margin-bottom:21px
+    }
+    .games-head p{margin:7px 0 0;color:var(--muted);font-size:12px}
+    .back-mode{
+      flex:0 0 auto;min-height:42px;padding:9px 12px;border:1px solid var(--border);
+      border-radius:11px;background:color-mix(in srgb,var(--paper) 83%,transparent);
+      box-shadow:0 4px 11px rgba(0,0,0,.07);font-weight:850
+    }
+
+    .game-grid{
+      display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px
+    }
+    .game-card{
+      --accent:var(--yellow);
+      position:relative;min-height:245px;padding:22px 20px 18px;overflow:hidden;
+      border:1px solid var(--border);border-radius:7px 14px 8px 12px;
+      background:
+        linear-gradient(to right,transparent 0 27px,color-mix(in srgb,var(--accent) 24%,transparent) 27px 29px,transparent 29px),
+        repeating-linear-gradient(to bottom,transparent 0 28px,var(--line-blue) 28px 29px),
+        var(--paper);
+      box-shadow:var(--shadow);text-align:left;
+      transition:transform .18s ease,box-shadow .18s ease
+    }
+    .game-card:nth-child(3n+1){transform:rotate(-.42deg)}
+    .game-card:nth-child(3n+2){transform:rotate(.34deg)}
+    .game-card:nth-child(3n){transform:rotate(-.12deg)}
+    .game-card:hover{transform:translateY(-6px) rotate(0);box-shadow:var(--shadow-hover)}
+    .game-card:active{transform:scale(.985)}
+    .game-card::before{
+      content:"";position:absolute;top:-5px;left:50%;width:76px;height:20px;
+      transform:translateX(-50%) rotate(-2deg);
+      background:color-mix(in srgb,var(--accent) 53%,transparent);opacity:.72
+    }
+    .game-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+    .doodle{
+      width:49px;height:49px;display:grid;place-items:center;
+      border:2px solid color-mix(in srgb,var(--accent) 76%,var(--ink));
+      border-radius:14px 9px 15px 8px;
+      background:color-mix(in srgb,var(--accent) 20%,transparent);
+      font:900 23px var(--scribble);transform:rotate(-3deg)
+    }
+    .badge{
+      padding:6px 8px;border:1px dashed var(--border);border-radius:7px;
+      background:color-mix(in srgb,var(--paper) 78%,transparent);
+      color:var(--muted);font-size:9px;font-weight:900;letter-spacing:.08em;text-transform:uppercase
+    }
+    .game-card h3{margin:18px 0 8px;font:900 21px/1.1 var(--scribble);letter-spacing:-.5px}
+    .game-card p{margin:0;color:var(--muted);font-size:12px;line-height:1.55}
+    .game-footer{
+      display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:19px
+    }
+    .game-meta{font-size:10px;font-weight:850;color:var(--muted)}
+    .play-note{
+      padding:6px 9px;border:2px solid color-mix(in srgb,var(--green) 70%,var(--ink));
+      border-radius:6px;background:color-mix(in srgb,var(--green) 12%,transparent);
+      font:900 10px var(--scribble);transform:rotate(-3deg)
+    }
+
+    .empty{
+      display:none;padding:40px;border:1px dashed var(--border);border-radius:12px;
+      color:var(--muted);text-align:center
+    }
+
+    .overlay{
+      position:fixed;inset:0;z-index:100;display:grid;place-items:center;padding:18px;
+      background:rgba(18,17,15,.55);backdrop-filter:blur(9px);
+      opacity:0;pointer-events:none;transition:opacity .2s ease
+    }
+    .overlay.open{opacity:1;pointer-events:auto}
+    .modal{
+      width:min(520px,100%);padding:31px 29px 27px;
+      border:1px solid var(--border);border-radius:9px 17px 10px 14px;
+      background:
+        linear-gradient(to right,transparent 0 38px,var(--line-red) 38px 40px,transparent 40px),
+        repeating-linear-gradient(to bottom,transparent 0 31px,var(--line-blue) 31px 32px),
+        var(--paper);
+      box-shadow:0 28px 80px rgba(0,0,0,.36);
+      transform:translateY(17px) rotate(-.4deg);transition:transform .22s ease
+    }
+    .overlay.open .modal{transform:translateY(0) rotate(-.4deg)}
+    .modal h2{font-size:34px}
+    .modal p{margin:13px 0;color:var(--muted);font-size:13px;line-height:1.6}
+    .name-input{
+      width:100%;margin:6px 0 8px;padding:12px 5px 9px;
+      border:0;border-bottom:2px solid var(--ink);border-radius:0;outline:none;
+      background:transparent;font:900 22px var(--scribble)
+    }
+    .name-input::placeholder{color:var(--soft)}
+    .error{min-height:18px;margin:0 0 7px!important;color:var(--danger)!important;font-size:11px!important}
+    .primary-btn{
+      width:100%;min-height:49px;border:1px solid color-mix(in srgb,var(--green) 55%,var(--border));
+      border-radius:12px;background:color-mix(in srgb,var(--green) 39%,var(--paper));
+      box-shadow:0 6px 14px rgba(0,0,0,.09);font-weight:900
+    }
+    .primary-btn:active{transform:scale(.985)}
+
+    .profile-note{
+      margin-top:15px;padding:10px 12px;border:1px dashed var(--border);border-radius:9px;
+      background:color-mix(in srgb,var(--blue) 10%,var(--paper));
+      color:var(--muted);font-size:10px;line-height:1.5
+    }
+
+    @media(max-width:860px){
+      .game-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+    }
+
+    @media(max-width:590px){
+      .app{padding-left:7px;padding-right:7px}
+      .brand span{display:none}
+      .paper-stage{
+        padding:31px 13px 28px 39px;
+        background:
+          linear-gradient(to right,transparent 0 29px,var(--line-red) 29px 31px,transparent 31px),
+          repeating-linear-gradient(to bottom,transparent 0 31px,var(--line-blue) 31px 32px),
+          var(--paper)
+      }
+      .welcome-head{min-height:180px;padding-right:0}
+      .welcome-head h1{font-size:43px}
+      .mode-grid{grid-template-columns:1fr;gap:12px}
+      .mode-card{min-height:205px;padding:22px 18px 17px}
+      .mode-number{width:58px;height:58px;font-size:27px}
+      .games-head{align-items:flex-start}
+      .games-head h2{font-size:30px}
+      .back-mode{font-size:11px}
+      .game-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+      .game-card{min-height:226px;padding:18px 13px 14px}
+      .game-card h3{font-size:16px;margin-top:15px}
+      .game-card p{
+        font-size:11px;display:-webkit-box;-webkit-line-clamp:4;
+        -webkit-box-orient:vertical;overflow:hidden
+      }
+      .doodle{width:41px;height:41px;font-size:19px}
+      .badge{font-size:7px;padding:5px}
+      .game-meta,.play-note{font-size:8px}
+    }
+
+    @media(max-width:360px){
+      .game-grid{grid-template-columns:1fr}
+      .game-card{min-height:205px}
+    }
+
+    @media(prefers-reduced-motion:reduce){
+      *,*::before,*::after{animation:none!important;transition:none!important}
+    }
+  </style>
+</head>
+
+<body>
+<main class="app">
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-paper" aria-hidden="true"></div>
+      <div>
+        <strong>Kâğıtlık</strong>
+        <span id="brandSubtitle">oyun kâğıtlarını seç</span>
+      </div>
+    </div>
+
+    <div class="top-actions">
+      <button class="icon-btn" id="profileBtn" aria-label="Kullanıcı adını değiştir" title="Kullanıcı adı">
+        <svg viewBox="0 0 24 24"><path d="M20 21a8 8 0 0 0-16 0"/><circle cx="12" cy="7" r="4"/></svg>
+      </button>
+
+      <button class="icon-btn" id="themeBtn" aria-label="Temayı değiştir" title="Tema">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <section class="paper-stage">
+    <section class="view active" id="modeView">
+      <div class="welcome-head">
+        <p class="eyebrow">Kâğıtlık oyun masası</p>
+        <h1 id="welcomeTitle">Merhaba.<br><span>Nasıl oynuyoruz?</span></h1>
+        <p class="lead">
+          Önce oyuncu sayısını seç. Sonraki ekranda yalnızca o kategoriye ait oyun kâğıtları görünecek.
+        </p>
+      </div>
+
+      <div class="mode-grid">
+        <button class="mode-card" data-mode="single" style="--accent:var(--blue)">
+          <div class="mode-number">1</div>
+          <h3>Tek oyunculu</h3>
+          <p>Kendi hızında ilerle, bulmacaları çöz, çiz ve geçmişteki hareketlerinle yarış.</p>
+          <div class="mode-footer">
+            <span class="mode-count">4 oyun hazır</span>
+            <span class="arrow">→</span>
+          </div>
+        </button>
+
+        <button class="mode-card" data-mode="multi" style="--accent:var(--pink)">
+          <div class="mode-number">2</div>
+          <h3>İki oyunculu</h3>
+          <p>Oda kodu oluştur, arkadaşınla bağlan ve aynı kâğıtta rekabet et veya birlikte üret.</p>
+          <div class="mode-footer">
+            <span class="mode-count">5 oyun hazır</span>
+            <span class="arrow">→</span>
+          </div>
+        </button>
+      </div>
+    </section>
+
+    <section class="view" id="gamesView">
+      <div class="games-head">
+        <div>
+          <p class="eyebrow" id="gamesEyebrow">Oyun kâğıtları</p>
+          <h2 id="gamesTitle">Oyun seç.</h2>
+          <p id="gamesSubtitle">Bir karta dokunduğunda ilgili HTML dosyası açılır.</p>
+        </div>
+
+        <button class="back-mode" id="backModeBtn">← Oyuncu sayısını değiştir</button>
+      </div>
+
+      <div class="game-grid" id="gameGrid"></div>
+      <div class="empty" id="emptyState">Bu kategoride henüz oyun bulunmuyor.</div>
+    </section>
+  </section>
+</main>
+
+<div class="overlay" id="nameOverlay" aria-hidden="true">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="nameTitle">
+    <p class="eyebrow">İlk olarak</p>
+    <h2 id="nameTitle">Sana ne diyelim?</h2>
+    <p>
+      Adını veya burada kullanacağın kullanıcı adını yaz. Bu ad iki oyunculu oyunlardaki isim alanına otomatik olarak gelecek.
+    </p>
+
+    <input class="name-input" id="nameInput" maxlength="22" autocomplete="nickname" placeholder="Mesela: Ahmet">
+    <p class="error" id="nameError"></p>
+
+    <button class="primary-btn" id="saveNameBtn">Adımı kaydet</button>
+
+    <div class="profile-note">
+      İsim yalnızca bu cihazın tarayıcısında saklanır. Bütün oyunlar aynı <code>kagitlik-name</code> kaydını kullanır.
+    </div>
+  </div>
+</div>
+
+<script>
+  const games = [
+    {
+      id: "ghost",
+      category: "single",
+      title: "Kendi Geçmişinle Yarış",
+      icon: "◌",
+      description: "Önceki koşunun hayaleti aynı hareketleri tekrarlar. Bu kez daha uzağa git.",
+      meta: "Koşu · zamanlama",
+      accent: "purple",
+      file: "kagitlik-kendi-gecmisinle-yaris-v1.html"
+    },
+    {
+      id: "rulebreak",
+      category: "single",
+      title: "Kurallar Her Tur Bozuluyor",
+      icon: "↔",
+      description: "Her bölümde oyunun başka bir kuralı değişir: ters kontrol, buz, karanlık ve daha fazlası.",
+      meta: "Bulmaca · 8 bölüm",
+      accent: "yellow",
+      file: "kagitlik-kurallar-her-tur-bozuluyor-v1.html"
+    },
+    {
+      id: "detective",
+      category: "single",
+      title: "Bir Ekranlık Dedektif",
+      icon: "⌕",
+      description: "Olay yerini incele, ifadeleri karşılaştır ve doğru şüpheliyi suçla.",
+      meta: "Dedektif · gözlem",
+      accent: "blue",
+      file: "kagitlik-bir-ekranlik-dedektif-v1.html"
+    },
+    {
+      id: "drawlevel",
+      category: "single",
+      title: "Bölümünü Kendin Çiz",
+      icon: "✎",
+      description: "Sınırlı mürekkeple yollar çiz; karakteri engellerin üzerinden hedefe ulaştır.",
+      meta: "Çizim · fizik",
+      accent: "green",
+      file: "kagitlik-bolumunu-kendin-ciz-v2.html"
+    },
+
+    {
+      id: "pixel",
+      category: "multi",
+      title: "Pixel Hafıza",
+      icon: "▦",
+      description: "Kısa süre görünen deseni hatırla ve rakibinden daha doğru, daha hızlı tamamla.",
+      meta: "Online · 3 raund",
+      accent: "blue",
+      file: "kagitlik-pixel-hafiza-online-v1.html"
+    },
+    {
+      id: "canvas",
+      category: "multi",
+      title: "Tek Resim, Tek Tuval",
+      icon: "✣",
+      description: "Aynı tuvale sırayla çiz; altı turun sonunda ortak ve garip bir resim oluştur.",
+      meta: "Online · ortak çizim",
+      accent: "yellow",
+      file: "kagitlik-tek-resim-tek-tuval-online-v2.html"
+    },
+    {
+      id: "pulse",
+      category: "multi",
+      title: "Grid Pulse",
+      icon: "⊞",
+      description: "Parlayan kareyi ilk bul. Tepki süreleri yerel ölçülür ve on iki tur karşılaştırılır.",
+      meta: "Online · refleks",
+      accent: "pink",
+      file: "kagitlik-grid-pulse-online-v1.html"
+    },
+    {
+      id: "slingshot",
+      category: "multi",
+      title: "Slingshot Arena",
+      icon: "➶",
+      description: "Karakterini geriye çekip bırak; topu sektirerek rakibin canını azalt.",
+      meta: "Online · sıra tabanlı",
+      accent: "orange",
+      file: "kagitlik-slingshot-arena-online-v2.html"
+    },
+    {
+      id: "deflect",
+      category: "multi",
+      title: "Deflect",
+      icon: "↔",
+      description: "Kalkanını yukarı-aşağı sürükle, topu rakibin arkasına geçir ve ilk beş sayıyı al.",
+      meta: "Online · gerçek zamanlı",
+      accent: "purple",
+      file: "kagitlik-deflect-online-v1.html"
+    }
+  ];
+
+  const accentMap = {
+    yellow: "var(--yellow)",
+    blue: "var(--blue)",
+    green: "var(--green)",
+    pink: "var(--pink)",
+    purple: "var(--purple)",
+    orange: "var(--orange)"
+  };
+
+  const modeView = document.getElementById("modeView");
+  const gamesView = document.getElementById("gamesView");
+  const gameGrid = document.getElementById("gameGrid");
+  const emptyState = document.getElementById("emptyState");
+  const nameOverlay = document.getElementById("nameOverlay");
+  const nameInput = document.getElementById("nameInput");
+  const nameError = document.getElementById("nameError");
+  const themeColor = document.getElementById("themeColor");
+
+  let currentMode = null;
+
+  function openOverlay(element) {
+    element.classList.add("open");
+    element.setAttribute("aria-hidden", "false");
+    document.body.style.overflow = "hidden";
+  }
+
+  function closeOverlay(element) {
+    element.classList.remove("open");
+    element.setAttribute("aria-hidden", "true");
+    document.body.style.overflow = "";
+  }
+
+  function savedName() {
+    return localStorage.getItem("kagitlik-name") || "";
+  }
+
+  function updateGreeting() {
+    const name = savedName();
+    document.getElementById("welcomeTitle").innerHTML =
+      name
+        ? `Merhaba, ${escapeHtml(name)}.<br><span>Nasıl oynuyoruz?</span>`
+        : `Merhaba.<br><span>Nasıl oynuyoruz?</span>`;
+
+    document.getElementById("brandSubtitle").textContent =
+      name ? `${name} için oyun kâğıtları` : "oyun kâğıtlarını seç";
+  }
+
+  function escapeHtml(value) {
+    const div = document.createElement("div");
+    div.textContent = String(value ?? "");
+    return div.innerHTML;
+  }
+
+  function saveName() {
+    const value = nameInput.value.trim().replace(/\s+/g, " ");
+
+    if (value.length < 2) {
+      nameError.textContent = "En az iki karakter yazmalısın.";
+      nameInput.focus();
+      return;
+    }
+
+    if (value.length > 22) {
+      nameError.textContent = "En fazla 22 karakter kullanabilirsin.";
+      nameInput.focus();
+      return;
+    }
+
+    localStorage.setItem("kagitlik-name", value);
+    nameError.textContent = "";
+    updateGreeting();
+    closeOverlay(nameOverlay);
+    showModeSelection();
+  }
+
+  function showModeSelection() {
+    currentMode = null;
+    gamesView.classList.remove("active");
+    modeView.classList.add("active");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  function showGames(mode) {
+    currentMode = mode;
+
+    const selectedGames = games.filter(game => game.category === mode);
+
+    gameGrid.innerHTML = "";
+    emptyState.style.display = selectedGames.length ? "none" : "block";
+
+    const isSingle = mode === "single";
+
+    document.getElementById("gamesEyebrow").textContent =
+      isSingle ? "Tek oyunculu oyunlar" : "İki oyunculu online oyunlar";
+
+    document.getElementById("gamesTitle").textContent =
+      isSingle ? "Kendi kâğıdını seç." : "Birlikte oynayacağınız kâğıdı seçin.";
+
+    document.getElementById("gamesSubtitle").textContent =
+      isSingle
+        ? "Bir karta dokunduğunda oyun aynı sekmede açılır."
+        : "Oyun açılınca biriniz oda oluşturur, diğeriniz kodla katılır.";
+
+    for (const game of selectedGames) {
+      const card = document.createElement("button");
+      card.type = "button";
+      card.className = "game-card";
+      card.style.setProperty("--accent", accentMap[game.accent]);
+      card.setAttribute("aria-label", `${game.title} oyununu aç`);
+
+      card.innerHTML = `
+        <div class="game-top">
+          <div class="doodle">${game.icon}</div>
+          <span class="badge">${isSingle ? "1 oyuncu" : "2 oyuncu"}</span>
+        </div>
+
+        <h3>${game.title}</h3>
+        <p>${game.description}</p>
+
+        <div class="game-footer">
+          <span class="game-meta">${game.meta}</span>
+          <span class="play-note">Oyunu aç</span>
+        </div>
+      `;
+
+      card.addEventListener("click", () => {
+        window.location.href = game.file;
+      });
+
+      gameGrid.appendChild(card);
+    }
+
+    modeView.classList.remove("active");
+    gamesView.classList.add("active");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  function applyTheme(theme) {
+    document.documentElement.dataset.theme = theme;
+    localStorage.setItem("kagitlik-theme", theme);
+
+    themeColor.setAttribute(
+      "content",
+      theme === "dark" ? "#171819" : "#e9e2d2"
+    );
+
+    document.getElementById("themeBtn").setAttribute(
+      "aria-label",
+      theme === "dark" ? "Açık temaya geç" : "Karanlık temaya geç"
+    );
+  }
+
+  document.querySelectorAll(".mode-card").forEach(card => {
+    card.addEventListener("click", () => {
+      showGames(card.dataset.mode);
+    });
+  });
+
+  document.getElementById("backModeBtn").addEventListener("click", showModeSelection);
+
+  document.getElementById("profileBtn").addEventListener("click", () => {
+    nameInput.value = savedName();
+    nameError.textContent = "";
+    openOverlay(nameOverlay);
+    setTimeout(() => nameInput.focus(), 100);
+  });
+
+  document.getElementById("saveNameBtn").addEventListener("click", saveName);
+
+  nameInput.addEventListener("keydown", event => {
+    if (event.key === "Enter") saveName();
+  });
+
+  document.getElementById("themeBtn").addEventListener("click", () => {
+    applyTheme(
+      document.documentElement.dataset.theme === "dark"
+        ? "light"
+        : "dark"
+    );
+  });
+
+  nameOverlay.addEventListener("click", event => {
+    if (event.target === nameOverlay && savedName()) {
+      closeOverlay(nameOverlay);
+    }
+  });
+
+  document.addEventListener("keydown", event => {
+    if (
+      event.key === "Escape" &&
+      nameOverlay.classList.contains("open") &&
+      savedName()
+    ) {
+      closeOverlay(nameOverlay);
+    }
+  });
+
+  const storedTheme = localStorage.getItem("kagitlik-theme");
+  const prefersDark =
+    window.matchMedia &&
+    window.matchMedia("(prefers-color-scheme: dark)").matches;
+
+  applyTheme(storedTheme || (prefersDark ? "dark" : "light"));
+  updateGreeting();
+  showModeSelection();
+
+  if (!savedName()) {
+    setTimeout(() => {
+      openOverlay(nameOverlay);
+      nameInput.focus();
+    }, 180);
+  }
+</script>
+</body>
+</html>

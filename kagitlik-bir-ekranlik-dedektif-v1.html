@@ -1,0 +1,995 @@
+<!doctype html>
+<html lang="tr" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+  <meta name="theme-color" content="#e9e2d2" id="themeColor">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <title>Bir Ekranlık Dedektif — Kâğıtlık</title>
+  <style>
+    :root{
+      color-scheme:light;
+      --desk:#e9e2d2;--desk-2:#d9cfbc;--paper:#fffdf4;--paper-2:#f6efdc;
+      --ink:#262321;--muted:#70695f;--soft:#a0988c;
+      --line-blue:rgba(67,137,178,.22);--line-red:rgba(190,70,78,.42);
+      --border:rgba(62,52,40,.18);--shadow:0 18px 42px rgba(73,58,37,.17),0 4px 10px rgba(73,58,37,.10);
+      --yellow:#e5c66d;--blue:#7bb4cc;--green:#8fbd9c;--pink:#d79aa2;--purple:#a896ce;
+      --danger:#b9575f;--scribble:"Trebuchet MS","Arial Rounded MT Bold",ui-rounded,system-ui,sans-serif;
+      --sans:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+    }
+    html[data-theme="dark"]{
+      color-scheme:dark;
+      --desk:#171819;--desk-2:#23211e;--paper:#292824;--paper-2:#23221e;
+      --ink:#f0eadd;--muted:#bbb2a3;--soft:#8d8578;
+      --line-blue:rgba(101,165,194,.17);--line-red:rgba(217,99,108,.34);
+      --border:rgba(255,245,224,.14);--shadow:0 20px 48px rgba(0,0,0,.40),0 5px 12px rgba(0,0,0,.28);
+      --yellow:#a78a40;--blue:#4a8197;--green:#557e60;--pink:#8f555e;--purple:#705f96;--danger:#d26b74;
+    }
+
+    *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+    html,body{width:100%;min-height:100%;overscroll-behavior:none}
+    body{
+      margin:0;min-height:100dvh;overflow:hidden;color:var(--ink);font-family:var(--sans);
+      background:radial-gradient(circle at 18% 8%,rgba(255,255,255,.12),transparent 28%),linear-gradient(135deg,var(--desk),var(--desk-2));
+      transition:background .22s ease,color .22s ease;
+    }
+    button{font:inherit;color:inherit}
+    .app{
+      width:min(1040px,100%);height:100dvh;margin:0 auto;
+      padding:max(10px,env(safe-area-inset-top)) 10px max(10px,env(safe-area-inset-bottom));
+      display:grid;grid-template-rows:auto minmax(0,1fr);gap:9px;
+    }
+    .topbar{display:grid;grid-template-columns:44px minmax(0,1fr) 44px;align-items:center;gap:8px;min-height:46px}
+    .icon-btn{
+      width:44px;height:44px;border:1px solid var(--border);border-radius:14px;
+      background:color-mix(in srgb,var(--paper) 84%,transparent);box-shadow:0 4px 12px rgba(0,0,0,.08);
+      display:grid;place-items:center;cursor:pointer;
+    }
+    .icon-btn:active{transform:scale(.95)}
+    .icon-btn svg{width:21px;height:21px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+    .title{min-width:0;text-align:center}
+    .title strong{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font:900 clamp(16px,3.8vw,22px)/1.05 var(--scribble);letter-spacing:-.45px}
+    .title span{display:block;margin-top:3px;color:var(--muted);font-size:9px;font-weight:800;letter-spacing:.09em;text-transform:uppercase}
+
+    .paper{
+      position:relative;min-height:0;overflow:hidden;border:1px solid var(--border);border-radius:9px 18px 11px 15px;
+      background:linear-gradient(to right,transparent 0 50px,var(--line-red) 50px 52px,transparent 52px),
+      repeating-linear-gradient(to bottom,transparent 0 34px,var(--line-blue) 34px 35px),var(--paper);
+      box-shadow:var(--shadow);transform:rotate(-.12deg);isolation:isolate;
+    }
+    .paper::before{
+      content:"";position:absolute;z-index:6;top:-7px;left:50%;width:100px;height:25px;transform:translateX(-50%) rotate(1.4deg);
+      background:color-mix(in srgb,var(--yellow) 58%,transparent);opacity:.72;box-shadow:0 2px 4px rgba(0,0,0,.08);pointer-events:none;
+    }
+    .paper::after{
+      content:"";position:absolute;z-index:4;width:110px;height:110px;right:-29px;bottom:-34px;
+      border:3px solid color-mix(in srgb,var(--pink) 65%,transparent);border-radius:50%;opacity:.22;pointer-events:none;
+    }
+
+    .game-layout{
+      position:absolute;inset:0;padding:17px 14px 12px 61px;
+      display:grid;grid-template-rows:auto minmax(0,1fr) auto auto;gap:9px;
+    }
+    .hud{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:start;gap:10px;position:relative;z-index:5}
+    .hud-notes{display:flex;flex-wrap:wrap;gap:8px}
+    .note{
+      min-width:79px;padding:8px 10px;border:1px solid var(--border);border-radius:5px;
+      background:color-mix(in srgb,var(--paper) 84%,transparent);box-shadow:0 4px 9px rgba(0,0,0,.06);transform:rotate(-1deg);
+    }
+    .note:nth-child(2){transform:rotate(1deg);background:color-mix(in srgb,var(--blue) 21%,var(--paper))}
+    .note small{display:block;color:var(--muted);font-size:8px;font-weight:850;letter-spacing:.1em;text-transform:uppercase}
+    .note strong{display:block;margin-top:2px;font:900 17px var(--scribble)}
+    .case-chip{
+      max-width:255px;padding:9px 12px;border:2px solid color-mix(in srgb,var(--purple) 67%,var(--ink));border-radius:7px;
+      color:color-mix(in srgb,var(--purple) 68%,var(--ink));background:color-mix(in srgb,var(--paper) 85%,transparent);
+      box-shadow:0 5px 12px rgba(0,0,0,.07);font:900 11px/1.25 var(--scribble);text-align:center;transform:rotate(1.2deg);
+    }
+
+    .scene-wrap{min-height:0;display:grid;place-items:center;position:relative}
+    .scene{
+      position:relative;width:min(100%,760px);height:100%;min-height:250px;max-height:520px;
+      border:1px solid var(--border);border-radius:12px 8px 15px 9px;overflow:hidden;
+      background:color-mix(in srgb,var(--paper-2) 72%,var(--paper));box-shadow:0 12px 27px rgba(0,0,0,.11);transform:rotate(.1deg);
+    }
+    .scene svg{position:absolute;inset:0;width:100%;height:100%;display:block}
+    .scene .wall{fill:color-mix(in srgb,var(--paper-2) 78%,var(--paper))}
+    .scene .floor{fill:color-mix(in srgb,var(--yellow) 13%,var(--paper))}
+    .scene .line{fill:none;stroke:var(--ink);stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;opacity:.78}
+    .scene .thin{fill:none;stroke:var(--muted);stroke-width:1.4;stroke-linecap:round;stroke-linejoin:round;opacity:.48}
+    .scene .fill-blue{fill:color-mix(in srgb,var(--blue) 30%,var(--paper))}
+    .scene .fill-pink{fill:color-mix(in srgb,var(--pink) 28%,var(--paper))}
+    .scene .fill-green{fill:color-mix(in srgb,var(--green) 28%,var(--paper))}
+    .scene .fill-yellow{fill:color-mix(in srgb,var(--yellow) 33%,var(--paper))}
+    .scene .fill-purple{fill:color-mix(in srgb,var(--purple) 28%,var(--paper))}
+    .scene-label{
+      position:absolute;left:12px;bottom:10px;z-index:4;padding:7px 10px;border:1px dashed var(--border);border-radius:8px;
+      background:color-mix(in srgb,var(--paper) 82%,transparent);color:var(--muted);
+      font:850 9px var(--scribble);letter-spacing:.08em;text-transform:uppercase;pointer-events:none;
+    }
+    .hotspot{
+      --accent:var(--pink);position:absolute;z-index:5;width:38px;height:38px;border:2px solid color-mix(in srgb,var(--accent) 70%,var(--ink));
+      border-radius:50%;background:color-mix(in srgb,var(--paper) 75%,transparent);box-shadow:0 4px 12px rgba(0,0,0,.12);
+      display:grid;place-items:center;cursor:pointer;font:900 17px var(--scribble);transform:translate(-50%,-50%) rotate(-4deg);
+      transition:transform .16s ease,opacity .16s ease,background .16s ease;
+    }
+    .hotspot:active{transform:translate(-50%,-50%) scale(.9) rotate(-4deg)}
+    .hotspot.found{background:color-mix(in srgb,var(--green) 33%,var(--paper));border-color:color-mix(in srgb,var(--green) 70%,var(--ink))}
+    .hotspot.found::after{
+      content:"✓";position:absolute;right:-5px;top:-7px;color:var(--green);font:900 15px var(--scribble);transform:rotate(7deg)
+    }
+    .hotspot.hint{animation:pulse 1s ease-in-out infinite}
+    @keyframes pulse{
+      0%,100%{box-shadow:0 4px 12px rgba(0,0,0,.12),0 0 0 0 color-mix(in srgb,var(--yellow) 52%,transparent)}
+      50%{box-shadow:0 4px 12px rgba(0,0,0,.12),0 0 0 10px transparent}
+    }
+
+    .suspects{
+      display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;position:relative;z-index:5;
+    }
+    .suspect{
+      min-width:0;padding:9px 10px;border:1px solid var(--border);border-radius:8px 6px 10px 7px;
+      background:color-mix(in srgb,var(--paper) 82%,transparent);box-shadow:0 4px 10px rgba(0,0,0,.06);
+      display:grid;grid-template-columns:34px minmax(0,1fr);align-items:center;gap:8px;text-align:left;cursor:pointer;
+    }
+    .suspect:nth-child(2){transform:rotate(.5deg)} .suspect:nth-child(3){transform:rotate(-.45deg)}
+    .suspect:active{transform:scale(.98)}
+    .avatar{
+      width:34px;height:34px;border:2px solid color-mix(in srgb,var(--purple) 60%,var(--ink));border-radius:11px 8px 12px 7px;
+      display:grid;place-items:center;background:color-mix(in srgb,var(--purple) 17%,var(--paper));font:900 14px var(--scribble)
+    }
+    .suspect strong{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font:850 12px var(--scribble)}
+    .suspect span{display:block;margin-top:2px;color:var(--muted);font-size:9px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+    .actions{display:grid;grid-template-columns:1fr 1fr 1.25fr;gap:8px;position:relative;z-index:5}
+    .action-btn{
+      min-height:43px;border:1px solid var(--border);border-radius:11px 8px 12px 9px;
+      background:color-mix(in srgb,var(--paper) 83%,transparent);box-shadow:0 5px 11px rgba(0,0,0,.07);
+      cursor:pointer;font-weight:900;font-size:11px;
+    }
+    .action-btn.primary{background:color-mix(in srgb,var(--pink) 25%,var(--paper));border-color:color-mix(in srgb,var(--pink) 45%,var(--border))}
+    .action-btn:disabled{opacity:.42;cursor:not-allowed}
+    .action-btn:active:not(:disabled){transform:scale(.97)}
+
+    .screen{
+      position:absolute;z-index:20;inset:0;padding:66px 18px 20px 63px;display:grid;place-items:center;
+      background:color-mix(in srgb,var(--paper) 66%,transparent);backdrop-filter:blur(3px);
+      opacity:0;pointer-events:none;transition:opacity .18s ease;
+    }
+    .screen.show{opacity:1;pointer-events:auto}
+    .panel{
+      width:min(590px,100%);max-height:100%;overflow:auto;padding:27px 24px 23px;border:1px solid var(--border);
+      border-radius:8px 17px 10px 14px;background:repeating-linear-gradient(to bottom,transparent 0 30px,var(--line-blue) 30px 31px),var(--paper);
+      box-shadow:0 20px 55px rgba(0,0,0,.23);transform:rotate(-.35deg);text-align:center;
+    }
+    .stamp{
+      width:62px;height:62px;margin:0 auto 15px;display:grid;place-items:center;
+      border:2px solid color-mix(in srgb,var(--purple) 72%,var(--ink));border-radius:17px 12px 18px 11px;
+      background:color-mix(in srgb,var(--purple) 20%,transparent);font:900 24px var(--scribble);transform:rotate(-4deg);
+    }
+    .panel h1,.panel h2{margin:0;font:900 clamp(29px,6vw,48px)/1 var(--scribble);letter-spacing:-1.4px}
+    .panel h2{font-size:clamp(27px,5vw,41px)}
+    .panel p{max-width:455px;margin:14px auto 0;color:var(--muted);font-size:13px;line-height:1.58}
+    .briefing{
+      margin:20px 0;padding:15px;border:2px dashed color-mix(in srgb,var(--purple) 60%,var(--border));
+      border-radius:10px 7px 12px 8px;background:color-mix(in srgb,var(--purple) 12%,var(--paper));text-align:left;
+    }
+    .briefing small{display:block;color:var(--purple);font-size:9px;font-weight:900;letter-spacing:.13em;text-transform:uppercase}
+    .briefing strong{display:block;margin-top:6px;font:900 20px/1.1 var(--scribble)}
+    .briefing span{display:block;margin-top:7px;color:var(--muted);font-size:12px;line-height:1.5}
+    .primary-btn,.secondary-btn{
+      width:100%;border-radius:12px;padding:13px 16px;font-weight:900;cursor:pointer;
+    }
+    .primary-btn{
+      border:1px solid color-mix(in srgb,var(--green) 60%,var(--border));
+      background:color-mix(in srgb,var(--green) 40%,var(--paper));box-shadow:0 7px 15px rgba(0,0,0,.09);
+    }
+    .secondary-btn{margin-top:8px;border:1px solid var(--border);background:transparent;color:var(--muted)}
+    .primary-btn:active,.secondary-btn:active{transform:scale(.985)}
+
+    .case-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:18px 0}
+    .case-card{
+      position:relative;min-height:96px;padding:12px;border:1px solid var(--border);border-radius:9px 7px 11px 8px;
+      background:color-mix(in srgb,var(--paper-2) 76%,var(--paper));text-align:left;cursor:pointer;
+    }
+    .case-card:nth-child(2n){transform:rotate(.55deg)} .case-card:nth-child(2n+1){transform:rotate(-.45deg)}
+    .case-card.locked{opacity:.42;cursor:not-allowed}
+    .case-card.done::after{content:"✓";position:absolute;right:9px;top:7px;color:var(--green);font:900 18px var(--scribble);transform:rotate(-8deg)}
+    .case-card small{display:block;color:var(--muted);font-size:8px;font-weight:850;letter-spacing:.09em;text-transform:uppercase}
+    .case-card strong{display:block;margin-top:5px;padding-right:18px;font:850 14px/1.2 var(--scribble)}
+    .case-card span{display:block;margin-top:5px;color:var(--muted);font-size:10px;line-height:1.35}
+
+    .sheet-wrap{align-items:end;padding:0}
+    .sheet{
+      width:min(720px,100%);max-height:84dvh;overflow:auto;padding:20px 20px calc(22px + env(safe-area-inset-bottom));
+      border-radius:24px 24px 0 0;border:1px solid var(--border);border-bottom:0;background:var(--paper);
+      box-shadow:0 -20px 70px rgba(0,0,0,.28);transform:translateY(100%);transition:transform .25s ease;text-align:left;
+    }
+    .screen.show .sheet{transform:translateY(0)}
+    .sheet-handle{width:48px;height:5px;border-radius:999px;background:var(--border);margin:0 auto 18px}
+    .clue-mark{
+      width:54px;height:54px;display:grid;place-items:center;border:2px solid color-mix(in srgb,var(--blue) 64%,var(--ink));
+      border-radius:16px 11px 17px 10px;background:color-mix(in srgb,var(--blue) 18%,var(--paper));font:900 22px var(--scribble);transform:rotate(-4deg)
+    }
+    .sheet h2{margin:15px 0 7px;font:900 28px/1.08 var(--scribble)}
+    .sheet p{margin:0;color:var(--muted);font-size:13px;line-height:1.62}
+    .observation{
+      margin:17px 0;padding:13px 14px;border:1px dashed var(--border);border-radius:10px;
+      background:color-mix(in srgb,var(--yellow) 16%,var(--paper));font:800 13px/1.5 var(--scribble)
+    }
+    .close-sheet{width:100%;border:1px solid var(--border);border-radius:12px;padding:12px;background:transparent;cursor:pointer;font-weight:850}
+
+    .notebook-list{display:grid;gap:8px;margin:18px 0;text-align:left}
+    .notebook-item{
+      padding:11px 12px;border:1px solid var(--border);border-radius:9px;background:color-mix(in srgb,var(--paper-2) 70%,var(--paper))
+    }
+    .notebook-item strong{display:block;font:850 12px var(--scribble)}
+    .notebook-item span{display:block;margin-top:4px;color:var(--muted);font-size:10px;line-height:1.45}
+    .notebook-empty{padding:22px 12px;color:var(--muted);border:1px dashed var(--border);border-radius:10px;text-align:center;font-size:12px}
+
+    .accuse-list{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:18px 0}
+    .accuse-card{
+      padding:13px 9px;border:1px solid var(--border);border-radius:10px 7px 12px 8px;
+      background:color-mix(in srgb,var(--paper-2) 74%,var(--paper));cursor:pointer;text-align:center;
+    }
+    .accuse-card.selected{outline:3px solid color-mix(in srgb,var(--pink) 55%,transparent);background:color-mix(in srgb,var(--pink) 18%,var(--paper))}
+    .accuse-card .avatar{margin:0 auto 8px;width:44px;height:44px;font-size:17px}
+    .accuse-card strong{display:block;font:850 13px var(--scribble)}
+    .accuse-card span{display:block;margin-top:5px;color:var(--muted);font-size:9px;line-height:1.35}
+
+    .result-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:18px 0}
+    .result-note{
+      padding:12px 9px;border:1px solid var(--border);border-radius:8px;background:color-mix(in srgb,var(--blue) 18%,var(--paper))
+    }
+    .result-note:nth-child(2){background:color-mix(in srgb,var(--yellow) 19%,var(--paper))}
+    .result-note:nth-child(3){background:color-mix(in srgb,var(--green) 18%,var(--paper))}
+    .result-note small{display:block;color:var(--muted);font-size:8px;font-weight:850;letter-spacing:.08em;text-transform:uppercase}
+    .result-note strong{display:block;margin-top:3px;font:900 21px var(--scribble)}
+    .stars{margin:14px 0 0;font:900 27px var(--scribble);letter-spacing:5px;color:var(--yellow);text-shadow:0 1px 0 var(--ink)}
+    .solution{
+      margin:17px 0;padding:14px;border:1px dashed var(--border);border-radius:10px;background:color-mix(in srgb,var(--green) 13%,var(--paper));text-align:left
+    }
+    .solution strong{display:block;font:900 14px var(--scribble)}
+    .solution span{display:block;margin-top:6px;color:var(--muted);font-size:11px;line-height:1.55}
+
+    .toast{
+      position:absolute;z-index:30;top:86px;left:50%;transform:translate(-50%,-15px) rotate(-2deg);
+      padding:9px 13px;border:2px solid var(--danger);border-radius:7px;color:var(--danger);background:var(--paper);
+      box-shadow:var(--shadow);font:900 12px var(--scribble);opacity:0;pointer-events:none;transition:opacity .2s ease,transform .2s ease;
+    }
+    .toast.show{opacity:1;transform:translate(-50%,0) rotate(-2deg)}
+
+    @media(max-width:680px){
+      .app{padding-left:7px;padding-right:7px}
+      .paper{background:linear-gradient(to right,transparent 0 30px,var(--line-red) 30px 32px,transparent 32px),
+        repeating-linear-gradient(to bottom,transparent 0 31px,var(--line-blue) 31px 32px),var(--paper)}
+      .game-layout{padding:13px 8px 9px 39px;gap:6px}
+      .note{min-width:64px;padding:6px 8px}.note strong{font-size:15px}
+      .case-chip{max-width:140px;padding:7px 8px;font-size:9px}
+      .scene{min-height:220px}
+      .hotspot{width:35px;height:35px;font-size:15px}
+      .suspects{gap:5px}
+      .suspect{grid-template-columns:29px minmax(0,1fr);gap:6px;padding:7px}
+      .avatar{width:29px;height:29px;font-size:12px}
+      .suspect strong{font-size:10px}.suspect span{font-size:8px}
+      .actions{gap:5px}.action-btn{font-size:9px;min-height:40px}
+      .screen{padding:59px 9px 14px 40px}
+      .panel{padding:21px 16px 18px}
+      .case-list{grid-template-columns:1fr}
+      .accuse-list{gap:5px}
+      .accuse-card{padding:10px 6px}.accuse-card strong{font-size:11px}
+      .result-grid{gap:5px}.result-note strong{font-size:18px}
+    }
+
+    @media(max-height:650px) and (orientation:landscape){
+      .app{grid-template-rows:42px minmax(0,1fr);gap:5px}.topbar{min-height:42px}.icon-btn{width:39px;height:39px}.title span{display:none}
+      .game-layout{grid-template-columns:minmax(0,1fr) 230px;grid-template-rows:auto minmax(0,1fr) auto;padding:9px 11px 8px 52px}
+      .hud{grid-column:1/-1}.scene-wrap{grid-column:1;grid-row:2/4}.suspects{grid-column:2;grid-row:2;grid-template-columns:1fr;align-content:center}
+      .actions{grid-column:2;grid-row:3;grid-template-columns:1fr 1fr}.actions .primary{grid-column:1/-1}
+      .scene{height:100%;max-height:none}.screen{padding-top:42px}.panel{padding:14px 17px}
+      .stamp{width:43px;height:43px;margin-bottom:8px;font-size:19px}.panel p{margin-top:8px;font-size:11px}
+      .briefing{margin:10px 0;padding:10px}.case-list{grid-template-columns:repeat(3,1fr);margin:10px 0}
+    }
+
+    @media(prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important;animation:none!important}}
+  </style>
+</head>
+<body>
+  <main class="app">
+    <header class="topbar">
+      <button class="icon-btn" id="backBtn" aria-label="Geri dön">
+        <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+      </button>
+      <div class="title">
+        <strong>Bir Ekranlık Dedektif</strong>
+        <span>Kâğıtlık · tek oyunculu</span>
+      </div>
+      <button class="icon-btn" id="themeBtn" aria-label="Temayı değiştir">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+      </button>
+    </header>
+
+    <section class="paper" id="paper">
+      <div class="game-layout">
+        <div class="hud">
+          <div class="hud-notes">
+            <div class="note"><small>Dava</small><strong id="caseText">1 / 6</strong></div>
+            <div class="note"><small>Kanıt</small><strong id="clueText">0 / 5</strong></div>
+          </div>
+          <div class="case-chip" id="caseChip">Kayıp Anahtar</div>
+        </div>
+
+        <div class="scene-wrap">
+          <div class="scene" id="scene">
+            <div id="sceneArt"></div>
+            <div id="hotspots"></div>
+            <div class="scene-label" id="sceneLabel">Çalışma odası · 18:40</div>
+          </div>
+        </div>
+
+        <div class="suspects" id="suspects"></div>
+
+        <div class="actions">
+          <button class="action-btn" id="notebookBtn">Not defteri</button>
+          <button class="action-btn" id="hintBtn">İpucu</button>
+          <button class="action-btn primary" id="accuseBtn" disabled>Suçlama yap</button>
+        </div>
+      </div>
+
+      <div class="toast" id="toast">Önce biraz daha kanıt bul.</div>
+
+      <div class="screen show" id="menuScreen">
+        <div class="panel">
+          <div class="stamp">⌕</div>
+          <h1>Her şey tek odada.</h1>
+          <p>Odayı incele, şüphelilerin ifadelerini dinle ve çelişen kanıtları birleştir. Yanlış kişiyi suçlamak puanını düşürür.</p>
+          <div class="briefing">
+            <small>Dedektif notu</small>
+            <strong>Bakmak yetmez; bağlantı kur.</strong>
+            <span>Parlayan işaretlere dokunarak nesneleri incele. Şüpheli kartlarına basarak ifadelerini oku. En az üç kanıt bulduktan sonra suçlama yapabilirsin.</span>
+          </div>
+          <button class="primary-btn" id="continueBtn">Dava 1'i aç</button>
+          <button class="secondary-btn" id="casesBtn">Dava dosyalarını göster</button>
+        </div>
+      </div>
+
+      <div class="screen" id="casesScreen">
+        <div class="panel">
+          <div class="stamp">6</div>
+          <h2>Dava dosyaları</h2>
+          <p>Çözülen davaları yeniden inceleyebilirsin. Yeni dosyalar sırayla açılır.</p>
+          <div class="case-list" id="caseList"></div>
+          <button class="secondary-btn" id="closeCasesBtn">Geri dön</button>
+        </div>
+      </div>
+
+      <div class="screen" id="briefingScreen">
+        <div class="panel">
+          <div class="stamp" id="briefStamp">1</div>
+          <h2 id="briefTitle">Kayıp Anahtar</h2>
+          <p id="briefIntro"></p>
+          <div class="briefing">
+            <small>Görev</small>
+            <strong id="briefQuestion"></strong>
+            <span id="briefLocation"></span>
+          </div>
+          <button class="primary-btn" id="startCaseBtn">Odayı incele</button>
+          <button class="secondary-btn" id="briefCasesBtn">Başka dava seç</button>
+        </div>
+      </div>
+
+      <div class="screen sheet-wrap" id="detailScreen">
+        <article class="sheet">
+          <div class="sheet-handle"></div>
+          <div class="clue-mark" id="detailMark">?</div>
+          <h2 id="detailTitle">Kanıt</h2>
+          <p id="detailSubtitle"></p>
+          <div class="observation" id="detailObservation"></div>
+          <button class="close-sheet" id="closeDetailBtn">Notu kapat</button>
+        </article>
+      </div>
+
+      <div class="screen sheet-wrap" id="notebookScreen">
+        <article class="sheet">
+          <div class="sheet-handle"></div>
+          <div class="clue-mark">≡</div>
+          <h2>Dedektif notları</h2>
+          <p>Şimdiye kadar bulduğun kanıtlar burada tutuluyor.</p>
+          <div class="notebook-list" id="notebookList"></div>
+          <button class="close-sheet" id="closeNotebookBtn">Defteri kapat</button>
+        </article>
+      </div>
+
+      <div class="screen" id="accuseScreen">
+        <div class="panel">
+          <div class="stamp">!</div>
+          <h2>Kimi suçluyorsun?</h2>
+          <p>İfadeleri ve bulduğun kanıtları birlikte düşün. Birini seçip suçlamayı doğrula.</p>
+          <div class="accuse-list" id="accuseList"></div>
+          <button class="primary-btn" id="confirmAccuseBtn" disabled>Suçlamayı doğrula</button>
+          <button class="secondary-btn" id="cancelAccuseBtn">Odaya dön</button>
+        </div>
+      </div>
+
+      <div class="screen" id="resultScreen">
+        <div class="panel">
+          <div class="stamp" id="resultStamp">✓</div>
+          <h2 id="resultTitle">Dava çözüldü.</h2>
+          <p id="resultText"></p>
+          <div class="stars" id="resultStars">★★★</div>
+          <div class="result-grid">
+            <div class="result-note"><small>Kanıt</small><strong id="resultClues">5/5</strong></div>
+            <div class="result-note"><small>Hata</small><strong id="resultMistakes">0</strong></div>
+            <div class="result-note"><small>İpucu</small><strong id="resultHints">0</strong></div>
+          </div>
+          <div class="solution">
+            <strong>Çözüm</strong>
+            <span id="solutionText"></span>
+          </div>
+          <button class="primary-btn" id="nextCaseBtn">Sonraki dava</button>
+          <button class="secondary-btn" id="replayCaseBtn">Davayı tekrar incele</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    (() => {
+      "use strict";
+
+      const STORAGE = {
+        theme:"kagitlik-theme",
+        unlocked:"kagitlik-detective-unlocked",
+        completed:"kagitlik-detective-completed"
+      };
+
+      const cases = [
+        {
+          title:"Kayıp Anahtar",
+          intro:"Çalışma odasının tek anahtarı akşam toplantısından hemen önce kayboldu. Odaya yalnızca üç kişi girdi.",
+          question:"Anahtarı kim sakladı?",
+          location:"Çalışma odası · 18:40",
+          room:"study",
+          culprit:0,
+          solution:"Selin pencereye yaklaşmadığını söyledi. Ancak mandaldaki sarı ip onun sökülmüş atkısıyla eşleşiyor ve anahtar tam pencere yanındaki saksının toprağında bulundu. İfadesi kanıtlarla çelişiyor.",
+          suspects:[
+            {name:"Selin",initial:"S",statement:"Pencerenin yanına hiç yaklaşmadım. Dosyayı bırakıp hemen çıktım."},
+            {name:"Mert",initial:"M",statement:"Anahtarı masanın üzerinde gördüm ama elime almadım."},
+            {name:"Bora",initial:"B",statement:"Yağmur başlayınca perdeyi kapattım. Başka hiçbir şeye dokunmadım."}
+          ],
+          clues:[
+            {id:"plant",mark:"⌁",title:"Saksı",subtitle:"Pencerenin yanındaki bitki",observation:"Toprak yeni karıştırılmış. Anahtar, yüzeyin hemen altında duruyor.",core:true,x:84,y:61},
+            {id:"thread",mark:"≈",title:"Sarı ip",subtitle:"Pencere mandalı",observation:"Mandala takılmış kısa bir sarı yün parçası var.",core:true,x:76,y:25},
+            {id:"scarf",mark:"⌇",title:"Sökülmüş atkı",subtitle:"Askılığın altı",observation:"Selin'in sarı atkısının ucunda yeni bir sökülme var.",core:true,x:17,y:34},
+            {id:"desk",mark:"□",title:"Masa izi",subtitle:"Çalışma masasının üstü",observation:"Tozun içinde anahtar biçimli boşluk var. Anahtar bir süre önce gerçekten burada durmuş.",core:false,x:49,y:57},
+            {id:"shoe",mark:"∿",title:"Islak ayak izi",subtitle:"Pencerenin önü",observation:"İz Bora'nın büyük botundan daha küçük. Tek başına kime ait olduğu belli değil.",core:false,x:67,y:78}
+          ]
+        },
+        {
+          title:"Kırık Kupa",
+          intro:"Mutfaktaki özel kupa parçalanmış. Herkes kediyi suçluyor ama odadaki izler farklı bir hikâye anlatıyor.",
+          question:"Kupayı kim kırdı?",
+          location:"Küçük mutfak · 12:15",
+          room:"kitchen",
+          culprit:1,
+          solution:"Duru kediyi suçladı. Fakat pati izleri masaya ulaşmıyor. Kupanın kulpu Duru'nun çantasının altında ve kahve lekesi onun not kâğıdına kadar uzanıyor. Kupayı düşüren kişi Duru.",
+          suspects:[
+            {name:"Eren",initial:"E",statement:"Kırılma sesini koridordan duydum. O sırada içeri yeni giriyordum."},
+            {name:"Duru",initial:"D",statement:"Kedi masaya çıktı. Kupayı kesin o devirdi."},
+            {name:"Can",initial:"C",statement:"Ben yalnızca çayı ocağa koydum. Kupaya dokunmadım."}
+          ],
+          clues:[
+            {id:"paw",mark:"••",title:"Pati izleri",subtitle:"Mutfak zemini",observation:"Pati izleri kapının yanında bitiyor; masaya kadar ulaşmıyor.",core:true,x:17,y:76},
+            {id:"handle",mark:"C",title:"Kupa kulpu",subtitle:"Duru'nun çantasının altı",observation:"Kırık kupanın kulpu çantanın hemen altında kalmış.",core:true,x:77,y:69},
+            {id:"stain",mark:"~",title:"Kahve lekesi",subtitle:"Masadan sandalyeye uzanan iz",observation:"Leke, Duru'nun üzerinde adı yazan not kâğıdına kadar devam ediyor.",core:true,x:58,y:56},
+            {id:"broom",mark:"Y",title:"Süpürge",subtitle:"Dolabın yanı",observation:"Süpürge kullanılmamış; üzerinde yeni cam tozu yok.",core:false,x:91,y:41},
+            {id:"kettle",mark:"○",title:"Çaydanlık",subtitle:"Ocak",observation:"Su hâlâ sıcak. Can'ın çayı ocağa koyduğuna dair ifadesi doğru görünüyor.",core:false,x:32,y:38}
+          ]
+        },
+        {
+          title:"Silinen Taslak",
+          intro:"Ortak projedeki taslak dosyası sunumdan yarım saat önce silindi. Bilgisayar kapatılmamış ve odada üç kişi vardı.",
+          question:"Dosyayı kim sildi?",
+          location:"Tasarım ofisi · 18:32",
+          room:"office",
+          culprit:2,
+          solution:"Nisa bilgisayarı kullanmadığını söyledi. Ancak oturum kaydı 18:27'de onun hesabını gösteriyor ve çöp kutusundaki dosya adı, masadaki Nisa imzalı notla aynı. Elektrik kesintisi de yaşanmamış.",
+          suspects:[
+            {name:"Leyla",initial:"L",statement:"Dosyayı 18:20'de açık gördüm. Sonra toplantı odasına geçtim."},
+            {name:"Arda",initial:"A",statement:"Elektrikler gidince bilgisayar kapanmış olabilir."},
+            {name:"Nisa",initial:"N",statement:"Bilgisayarı bugün hiç kullanmadım. Sadece çizim masasında çalıştım."}
+          ],
+          clues:[
+            {id:"login",mark:"@",title:"Oturum kaydı",subtitle:"Bilgisayar ekranı",observation:"Son etkin hesap: Nisa. Saat 18:27.",core:true,x:50,y:34},
+            {id:"trash",mark:"×",title:"Çöp kutusu",subtitle:"Masanın altındaki dijital kayıt",observation:"Silinen dosyanın adı: SON_TASLAK_NISA.psd.",core:true,x:59,y:66},
+            {id:"power",mark:"⌁",title:"Güç göstergesi",subtitle:"Duvar panosu",observation:"Kesinti kaydı yok. Elektrik 18:00–19:00 arasında sürekli açık kalmış.",core:true,x:88,y:28},
+            {id:"note",mark:"N",title:"İmzalı not",subtitle:"Çizim masasının üstü",observation:"Nisa'nın el yazısıyla aynı dosya adı yazılmış.",core:false,x:24,y:59},
+            {id:"clock",mark:"◷",title:"Duvar saati",subtitle:"Ofis duvarı",observation:"Saat doğru çalışıyor. Zaman ifadeleriyle çelişen bir şey görünmüyor.",core:false,x:16,y:24}
+          ]
+        },
+        {
+          title:"Yer Değiştiren Tablo",
+          intro:"Galerideki küçük tablo gece boyunca başka bir çiviye taşınmış. Alarm çalışmadığı için olay odanın içindeki izlerden çözülmeli.",
+          question:"Tabloyu kim taşıdı?",
+          location:"Mini galeri · 21:05",
+          room:"gallery",
+          culprit:0,
+          solution:"Ali duvara dokunmadığını söyledi. Buna rağmen kolundaki beyaz boya duvardaki taze çizikle aynı ve sandalye üzerindeki ayakkabı izi Ali'nin taban deseniyle eşleşiyor. Tabloyu taşıyan Ali.",
+          suspects:[
+            {name:"Ali",initial:"A",statement:"Duvara hiç dokunmadım. Salona yalnızca ışıkları kapatmak için girdim."},
+            {name:"Elif",initial:"E",statement:"Pencere açıktı, ben kapattım. Tablo zaten eğri duruyordu."},
+            {name:"Cem",initial:"C",statement:"Sandalyeyi yerinden oynatmadım. Kapının yanında durdum."}
+          ],
+          clues:[
+            {id:"paint",mark:"∕",title:"Beyaz boya",subtitle:"Ali'nin ceket kolu",observation:"Kolda yeni bir beyaz boya çizgisi var.",core:true,x:18,y:68},
+            {id:"scratch",mark:"≠",title:"Duvar çizği",subtitle:"Eski çivinin yanı",observation:"Taze sıyrılan boyanın rengi Ali'nin kolundaki iz ile aynı.",core:true,x:54,y:27},
+            {id:"foot",mark:"⌑",title:"Ayakkabı izi",subtitle:"Sandalye oturağı",observation:"Taban deseni Ali'nin kare desenli ayakkabısıyla eşleşiyor.",core:true,x:66,y:67},
+            {id:"window",mark:"□",title:"Açık pencere",subtitle:"Galerinin sağ duvarı",observation:"Pencere mandalında yalnızca Elif'in parmak izi var; kapattığına dair ifadesi tutarlı.",core:false,x:87,y:31},
+            {id:"nail",mark:"·",title:"Düşmüş çivi",subtitle:"Halının kenarı",observation:"Eski çivi yerde. Tablo gerçekten başka bir noktaya taşınmış.",core:false,x:47,y:79}
+          ]
+        },
+        {
+          title:"Çalınan Tasarım",
+          intro:"Atölyedeki robot tasarımı gizlice yazdırılıp dışarı çıkarılmış. Orijinal dosya hâlâ yerinde, fakat bir kopya eksik.",
+          question:"Tasarımı kim kopyaladı?",
+          location:"Prototip atölyesi · 16:50",
+          room:"workshop",
+          culprit:1,
+          solution:"Kerem yazıcıyı kullanmadığını söyledi. Yazdırma kuyruğunda onun kullanıcı adı var, sağ elinde aynı mavi toner izi bulunuyor ve çantasındaki kat izi çıkan kâğıtla eşleşiyor.",
+          suspects:[
+            {name:"Sude",initial:"S",statement:"Yazıcı bozuktu. Ben yalnızca lehim masasını kullandım."},
+            {name:"Kerem",initial:"K",statement:"Yazıcıya hiç dokunmadım. Çantamı alıp çıktım."},
+            {name:"Ozan",initial:"O",statement:"Dosyayı ekranda gördüm ama kopyalamadım."}
+          ],
+          clues:[
+            {id:"queue",mark:"≡",title:"Yazdırma kuyruğu",subtitle:"Yazıcının küçük ekranı",observation:"Son iş: ROBOT_V7.pdf — kullanıcı: KEREM.",core:true,x:77,y:45},
+            {id:"toner",mark:"●",title:"Mavi toner",subtitle:"Kerem'in sağ eli",observation:"Parmak uçlarında taze mavi toner izi var.",core:true,x:49,y:75},
+            {id:"fold",mark:"⌁",title:"Kat izi",subtitle:"Kerem'in çantası",observation:"Çantadaki dikdörtgen kat izi, yazıcıdan çıkan A4 kâğıtla aynı ölçüde.",core:true,x:65,y:73},
+            {id:"solder",mark:"∿",title:"Lehim dumanı",subtitle:"Lehim masası",observation:"Sude'nin kullandığını söylediği havya hâlâ sıcak.",core:false,x:20,y:49},
+            {id:"screen",mark:"□",title:"Açık dosya",subtitle:"Bilgisayar ekranı",observation:"Dosya yalnızca görüntülenmiş. Ozan'ın baktığı doğru olabilir.",core:false,x:40,y:32}
+          ]
+        },
+        {
+          title:"Kilitli Arşiv",
+          intro:"Arşiv dolabındaki mühürlü zarf açılmış, fakat kapı dışarıdan kilitli kalmış. İçerideki üç görevlinin ifadelerinden biri imkânsız.",
+          question:"Zarfı kim açtı?",
+          location:"Arşiv odası · 22:10",
+          room:"archive",
+          culprit:2,
+          solution:"Deniz üst rafa ulaşmadığını söyledi. Ancak taburede onun üçgen taban izi, üst rafta ceketinden kopan mor düğme ve açılan zarfın mumunda eldivenindeki lif bulunuyor. Diğer ifadeler odadaki kayıtlarla uyumlu.",
+          suspects:[
+            {name:"Mira",initial:"M",statement:"Dosya defterini masaya bıraktım ve kapının yanında bekledim."},
+            {name:"Aras",initial:"A",statement:"Alt çekmeceleri saydım. Üst raflara hiç bakmadım."},
+            {name:"Deniz",initial:"D",statement:"Tabureyi kullanmadım; üst rafa zaten yetişemem."}
+          ],
+          clues:[
+            {id:"stool",mark:"△",title:"Tabure izi",subtitle:"Ahşap taburenin üstü",observation:"Üçgen taban izi Deniz'in ayakkabısıyla aynı.",core:true,x:61,y:72},
+            {id:"button",mark:"●",title:"Mor düğme",subtitle:"Üst rafın köşesi",observation:"Deniz'in ceketinde bir düğme eksik. Bulunan düğme aynı renkte ve biçimde.",core:true,x:75,y:23},
+            {id:"fiber",mark:"≈",title:"Eldiven lifi",subtitle:"Zarfın kırık mumu",observation:"Mumda mor eldivenden kalmış ince lifler var. Deniz mor eldiven takıyor.",core:true,x:83,y:47},
+            {id:"ledger",mark:"≡",title:"Dosya defteri",subtitle:"Masanın üstü",observation:"Mira'nın imzası kapı nöbeti saatleriyle eşleşiyor.",core:false,x:30,y:56},
+            {id:"drawer",mark:"□",title:"Alt çekmeceler",subtitle:"Dolabın sol altı",observation:"Çekmece sayım işaretleri Aras'ın kalemiyle aynı renkte.",core:false,x:17,y:68}
+          ]
+        }
+      ];
+
+      const paper = document.getElementById("paper");
+      const menuScreen = document.getElementById("menuScreen");
+      const casesScreen = document.getElementById("casesScreen");
+      const briefingScreen = document.getElementById("briefingScreen");
+      const detailScreen = document.getElementById("detailScreen");
+      const notebookScreen = document.getElementById("notebookScreen");
+      const accuseScreen = document.getElementById("accuseScreen");
+      const resultScreen = document.getElementById("resultScreen");
+      const themeColor = document.getElementById("themeColor");
+
+      let currentCase = 0;
+      let unlocked = clamp(Number(localStorage.getItem(STORAGE.unlocked)) || 1,1,cases.length);
+      let completed = parseCompleted();
+      let found = new Set();
+      let mistakes = 0;
+      let hints = 0;
+      let selectedSuspect = null;
+      let state = "menu";
+
+      function parseCompleted(){
+        try{
+          const value = JSON.parse(localStorage.getItem(STORAGE.completed) || "[]");
+          return Array.isArray(value) ? value.filter(Number.isInteger) : [];
+        }catch{return []}
+      }
+      function clamp(value,min,max){return Math.max(min,Math.min(max,Math.floor(value)))}
+
+      function applyTheme(theme){
+        document.documentElement.dataset.theme = theme;
+        localStorage.setItem(STORAGE.theme,theme);
+        themeColor.content = theme === "dark" ? "#171819" : "#e9e2d2";
+      }
+
+      function openScreen(screen){
+        [menuScreen,casesScreen,briefingScreen,detailScreen,notebookScreen,accuseScreen,resultScreen]
+          .forEach(el=>el.classList.remove("show"));
+        if(screen) screen.classList.add("show");
+      }
+
+      function showMenu(){
+        state="menu";
+        const continueIndex = Math.max(0,Math.min(unlocked,cases.length)-1);
+        const finishedAll = completed.includes(cases.length-1);
+        document.getElementById("continueBtn").textContent =
+          finishedAll ? "Son davayı tekrar aç" : `Dava ${continueIndex+1}'i aç`;
+        openScreen(menuScreen);
+      }
+
+      function showCases(){
+        state="cases";
+        renderCaseList();
+        openScreen(casesScreen);
+      }
+
+      function renderCaseList(){
+        const list=document.getElementById("caseList");
+        list.innerHTML="";
+        cases.forEach((item,index)=>{
+          const button=document.createElement("button");
+          const locked=index+1>unlocked;
+          const done=completed.includes(index);
+          button.type="button";
+          button.className="case-card"+(locked?" locked":"")+(done?" done":"");
+          button.disabled=locked;
+          button.innerHTML=`<small>Dava ${index+1}</small><strong>${item.title}</strong><span>${item.question}</span>`;
+          button.addEventListener("click",()=>showBriefing(index));
+          list.appendChild(button);
+        });
+      }
+
+      function showBriefing(index){
+        currentCase=clamp(index,0,cases.length-1);
+        const item=cases[currentCase];
+        state="briefing";
+        document.getElementById("briefStamp").textContent=String(currentCase+1);
+        document.getElementById("briefTitle").textContent=item.title;
+        document.getElementById("briefIntro").textContent=item.intro;
+        document.getElementById("briefQuestion").textContent=item.question;
+        document.getElementById("briefLocation").textContent=item.location;
+        document.getElementById("startCaseBtn").textContent=`Dava ${currentCase+1}'i incele`;
+        openScreen(briefingScreen);
+      }
+
+      function startCase(){
+        found=new Set();
+        mistakes=0;
+        hints=0;
+        selectedSuspect=null;
+        state="playing";
+        renderCase();
+        openScreen(null);
+        vibrate(15);
+        beep(390,.045,.02);
+      }
+
+      function renderCase(){
+        const item=cases[currentCase];
+        document.getElementById("caseText").textContent=`${currentCase+1} / ${cases.length}`;
+        document.getElementById("clueText").textContent=`${found.size} / ${item.clues.length}`;
+        document.getElementById("caseChip").textContent=item.title;
+        document.getElementById("sceneLabel").textContent=item.location;
+        document.getElementById("sceneArt").innerHTML=sceneSVG(item.room);
+        renderHotspots();
+        renderSuspects();
+        updateActions();
+      }
+
+      function renderHotspots(){
+        const item=cases[currentCase];
+        const host=document.getElementById("hotspots");
+        host.innerHTML="";
+        item.clues.forEach((clue,index)=>{
+          const button=document.createElement("button");
+          button.type="button";
+          button.className="hotspot"+(found.has(clue.id)?" found":"");
+          button.style.left=clue.x+"%";
+          button.style.top=clue.y+"%";
+          button.style.setProperty("--accent",[ "var(--pink)","var(--blue)","var(--yellow)","var(--green)","var(--purple)" ][index%5]);
+          button.textContent=clue.mark;
+          button.setAttribute("aria-label",clue.title+" kanıtını incele");
+          button.dataset.clueId=clue.id;
+          button.addEventListener("click",()=>inspectClue(clue));
+          host.appendChild(button);
+        });
+      }
+
+      function renderSuspects(){
+        const host=document.getElementById("suspects");
+        host.innerHTML="";
+        cases[currentCase].suspects.forEach((suspect,index)=>{
+          const button=document.createElement("button");
+          button.type="button";
+          button.className="suspect";
+          button.innerHTML=`<span class="avatar">${suspect.initial}</span><span><strong>${suspect.name}</strong><span>İfadesini oku</span></span>`;
+          button.addEventListener("click",()=>inspectSuspect(suspect,index));
+          host.appendChild(button);
+        });
+      }
+
+      function inspectClue(clue){
+        const first=!found.has(clue.id);
+        found.add(clue.id);
+        if(first){
+          vibrate(10);
+          beep(clue.core?620:460,.04,.018);
+        }
+        document.getElementById("detailMark").textContent=clue.mark;
+        document.getElementById("detailTitle").textContent=clue.title;
+        document.getElementById("detailSubtitle").textContent=clue.subtitle;
+        document.getElementById("detailObservation").textContent=clue.observation;
+        renderCase();
+        state="detail";
+        openScreen(detailScreen);
+      }
+
+      function inspectSuspect(suspect,index){
+        document.getElementById("detailMark").textContent=suspect.initial;
+        document.getElementById("detailTitle").textContent=suspect.name;
+        document.getElementById("detailSubtitle").textContent="Şüpheli ifadesi";
+        document.getElementById("detailObservation").textContent="“"+suspect.statement+"”";
+        state="detail";
+        openScreen(detailScreen);
+      }
+
+      function closeDetail(){
+        state="playing";
+        openScreen(null);
+      }
+
+      function showNotebook(){
+        const item=cases[currentCase];
+        const list=document.getElementById("notebookList");
+        list.innerHTML="";
+        const clues=item.clues.filter(clue=>found.has(clue.id));
+        if(!clues.length){
+          list.innerHTML='<div class="notebook-empty">Henüz hiçbir kanıt bulmadın.</div>';
+        }else{
+          clues.forEach(clue=>{
+            const row=document.createElement("div");
+            row.className="notebook-item";
+            row.innerHTML=`<strong>${clue.title}</strong><span>${clue.observation}</span>`;
+            list.appendChild(row);
+          });
+        }
+        state="notebook";
+        openScreen(notebookScreen);
+      }
+
+      function updateActions(){
+        const item=cases[currentCase];
+        document.getElementById("clueText").textContent=`${found.size} / ${item.clues.length}`;
+        document.getElementById("accuseBtn").disabled=found.size<3;
+        document.getElementById("hintBtn").disabled=found.size===item.clues.length;
+      }
+
+      function useHint(){
+        if(state!=="playing") return;
+        const item=cases[currentCase];
+        const target=item.clues.find(clue=>clue.core&&!found.has(clue.id)) || item.clues.find(clue=>!found.has(clue.id));
+        if(!target){
+          showToast("Bütün kanıtları zaten buldun.");
+          return;
+        }
+        hints++;
+        document.querySelectorAll(".hotspot").forEach(el=>el.classList.remove("hint"));
+        const el=document.querySelector(`[data-clue-id="${target.id}"]`);
+        if(el){
+          el.classList.add("hint");
+          setTimeout(()=>el.classList.remove("hint"),4500);
+        }
+        showToast("Önemli bir nokta işaretlendi.");
+        vibrate([12,30,12]);
+        beep(760,.05,.018);
+      }
+
+      function showAccuse(){
+        if(found.size<3){
+          showToast("Önce en az üç kanıt bul.");
+          return;
+        }
+        selectedSuspect=null;
+        const host=document.getElementById("accuseList");
+        host.innerHTML="";
+        cases[currentCase].suspects.forEach((suspect,index)=>{
+          const button=document.createElement("button");
+          button.type="button";
+          button.className="accuse-card";
+          button.innerHTML=`<span class="avatar">${suspect.initial}</span><strong>${suspect.name}</strong><span>${suspect.statement}</span>`;
+          button.addEventListener("click",()=>{
+            selectedSuspect=index;
+            document.querySelectorAll(".accuse-card").forEach(el=>el.classList.remove("selected"));
+            button.classList.add("selected");
+            document.getElementById("confirmAccuseBtn").disabled=false;
+          });
+          host.appendChild(button);
+        });
+        document.getElementById("confirmAccuseBtn").disabled=true;
+        state="accuse";
+        openScreen(accuseScreen);
+      }
+
+      function confirmAccusation(){
+        if(selectedSuspect===null) return;
+        const item=cases[currentCase];
+        if(selectedSuspect===item.culprit){
+          solveCase();
+        }else{
+          mistakes++;
+          const name=item.suspects[selectedSuspect].name;
+          selectedSuspect=null;
+          state="playing";
+          openScreen(null);
+          showToast(`${name} için kanıtlar yetmiyor.`);
+          vibrate([45,25,65]);
+          beep(130,.09,.035);
+        }
+      }
+
+      function solveCase(){
+        const item=cases[currentCase];
+        state="result";
+
+        if(!completed.includes(currentCase)){
+          completed.push(currentCase);
+          completed.sort((a,b)=>a-b);
+          localStorage.setItem(STORAGE.completed,JSON.stringify(completed));
+        }
+        if(currentCase+1<cases.length){
+          unlocked=Math.max(unlocked,currentCase+2);
+          localStorage.setItem(STORAGE.unlocked,String(unlocked));
+        }
+
+        const stars=Math.max(1,3-Math.min(2,mistakes+(hints>0?1:0)));
+        document.getElementById("resultStamp").textContent="✓";
+        document.getElementById("resultTitle").textContent=currentCase===cases.length-1?"Bütün davalar çözüldü.":"Dava çözüldü.";
+        document.getElementById("resultText").textContent=`Doğru şüpheli: ${item.suspects[item.culprit].name}.`;
+        document.getElementById("resultStars").textContent="★".repeat(stars)+"☆".repeat(3-stars);
+        document.getElementById("resultClues").textContent=`${found.size}/${item.clues.length}`;
+        document.getElementById("resultMistakes").textContent=String(mistakes);
+        document.getElementById("resultHints").textContent=String(hints);
+        document.getElementById("solutionText").textContent=item.solution;
+        document.getElementById("nextCaseBtn").textContent=
+          currentCase===cases.length-1?"Dava dosyalarına dön":`Dava ${currentCase+2}'yi aç`;
+
+        vibrate([35,25,70]);
+        beep(640,.06,.025);
+        setTimeout(()=>beep(860,.08,.02),75);
+        openScreen(resultScreen);
+      }
+
+      function nextCase(){
+        if(currentCase>=cases.length-1) showCases();
+        else showBriefing(currentCase+1);
+      }
+
+      function showToast(message){
+        const toast=document.getElementById("toast");
+        toast.textContent=message;
+        toast.classList.add("show");
+        clearTimeout(showToast.timer);
+        showToast.timer=setTimeout(()=>toast.classList.remove("show"),1300);
+      }
+
+      function sceneSVG(type){
+        const baseStart=`<svg viewBox="0 0 800 470" preserveAspectRatio="none" aria-hidden="true">
+          <path class="wall" d="M0 0H800V330H0Z"/><path class="floor" d="M0 330H800V470H0Z"/>
+          <path class="line" d="M0 330H800"/><path class="thin" d="M80 375H735M125 420H690"/>`;
+        const end=`</svg>`;
+
+        const rooms={
+          study:`${baseStart}
+            <rect class="fill-blue" x="575" y="55" width="145" height="135" rx="8"/><path class="line" d="M575 55h145v135H575zM647 55v135M575 122h145"/>
+            <path class="line" d="M120 110v235M95 345h105M102 110h89"/><path class="thin" d="M120 150h70M120 197h70M120 244h70"/>
+            <path class="fill-yellow" d="M270 250h270v36H270z"/><path class="line" d="M270 250h270v36H270zM302 286v82M508 286v82"/>
+            <rect class="fill-purple" x="334" y="178" width="132" height="68" rx="7"/><path class="line" d="M334 178h132v68H334zM360 213h80"/>
+            <path class="fill-green" d="M650 284q25-55 50 0v39h-50z"/><path class="line" d="M650 284q25-55 50 0v39h-50zM675 284v-47"/>
+            <path class="thin" d="M230 360q45-35 90 0M550 385q60-40 120 0"/>
+          ${end}`,
+          kitchen:`${baseStart}
+            <path class="fill-yellow" d="M110 228h250v60H110z"/><path class="line" d="M110 228h250v60H110zM135 288v82M330 288v82"/>
+            <path class="fill-blue" d="M480 105h205v198H480z"/><path class="line" d="M480 105h205v198H480zM480 180h205M545 105v198M620 105v198"/>
+            <path class="line" d="M160 140h170M170 140v88M320 140v88"/><circle class="fill-pink" cx="223" cy="204" r="18"/><path class="line" d="M205 204h36"/>
+            <path class="fill-green" d="M60 330h95v75H60z"/><path class="line" d="M60 330h95v75H60zM80 350h55"/>
+            <path class="thin" d="M385 345q60-40 120 0M570 390q55-30 110 0"/>
+          ${end}`,
+          office:`${baseStart}
+            <rect class="fill-blue" x="320" y="115" width="170" height="105" rx="8"/><path class="line" d="M320 115h170v105H320zM350 190h110"/>
+            <path class="fill-yellow" d="M220 245h365v40H220z"/><path class="line" d="M220 245h365v40H220zM255 285v88M548 285v88"/>
+            <path class="line" d="M90 105h120v218H90zM90 165h120M90 225h120"/>
+            <circle class="fill-pink" cx="690" cy="95" r="43"/><path class="line" d="M690 52v86M647 95h86"/>
+            <path class="fill-purple" d="M635 250h92v118h-92z"/><path class="line" d="M635 250h92v118h-92zM650 275h62M650 303h62"/>
+            <path class="thin" d="M255 410h280M405 286v50"/>
+          ${end}`,
+          gallery:`${baseStart}
+            <rect class="fill-pink" x="310" y="75" width="175" height="128" rx="3"/><path class="line" d="M310 75h175v128H310zM330 180l50-65 35 35 45-55"/>
+            <rect class="fill-blue" x="95" y="90" width="125" height="105" rx="3"/><path class="line" d="M95 90h125v105H95zM120 168l35-44 38 32"/>
+            <rect class="fill-green" x="590" y="82" width="120" height="118" rx="3"/><path class="line" d="M590 82h120v118H590zM610 175l35-53 40 41"/>
+            <path class="fill-yellow" d="M475 300h110v42H475z"/><path class="line" d="M475 300h110v42H475zM495 342v55M565 342v55"/>
+            <path class="line" d="M250 350q150-60 300 0M230 370q170 65 340 0"/>
+            <path class="thin" d="M45 320h120M650 320h105"/>
+          ${end}`,
+          workshop:`${baseStart}
+            <rect class="fill-blue" x="295" y="80" width="180" height="120" rx="8"/><path class="line" d="M295 80h180v120H295zM325 168h120"/>
+            <path class="fill-yellow" d="M110 235h365v42H110z"/><path class="line" d="M110 235h365v42H110zM145 277v93M440 277v93"/>
+            <path class="fill-purple" d="M570 175h145v145H570z"/><path class="line" d="M570 175h145v145H570zM585 210h115M585 250h115"/>
+            <path class="line" d="M175 145l20-40 20 40M195 105v130"/>
+            <path class="fill-green" d="M40 325h120v72H40z"/><path class="line" d="M40 325h120v72H40zM60 345h80M60 370h55"/>
+            <path class="thin" d="M495 360q55-35 110 0M240 405h290"/>
+          ${end}`,
+          archive:`${baseStart}
+            <path class="fill-yellow" d="M60 65h210v300H60z"/><path class="line" d="M60 65h210v300H60zM60 125h210M60 190h210M60 255h210M165 65v300"/>
+            <path class="fill-purple" d="M510 70h230v295H510z"/><path class="line" d="M510 70h230v295H510zM510 140h230M510 210h230M510 280h230M625 70v295"/>
+            <path class="fill-blue" d="M290 250h190v42H290z"/><path class="line" d="M290 250h190v42H290zM318 292v78M452 292v78"/>
+            <path class="fill-green" d="M430 330h85v45H430z"/><path class="line" d="M430 330h85v45H430z"/>
+            <path class="thin" d="M300 110h160M350 90v115M325 410h180"/>
+          ${end}`
+        };
+        return rooms[type] || rooms.study;
+      }
+
+      function vibrate(pattern){if(navigator.vibrate) navigator.vibrate(pattern)}
+      let audioContext=null;
+      function unlockAudio(){
+        try{
+          if(!audioContext){const AC=window.AudioContext||window.webkitAudioContext;if(AC) audioContext=new AC()}
+          if(audioContext?.state==="suspended") audioContext.resume();
+        }catch{}
+      }
+      function beep(freq,duration,volume){
+        try{
+          unlockAudio();if(!audioContext)return;
+          const oscillator=audioContext.createOscillator();const gain=audioContext.createGain();
+          oscillator.type="triangle";oscillator.frequency.value=freq;
+          gain.gain.setValueAtTime(volume,audioContext.currentTime);
+          gain.gain.exponentialRampToValueAtTime(.0001,audioContext.currentTime+duration);
+          oscillator.connect(gain).connect(audioContext.destination);
+          oscillator.start();oscillator.stop(audioContext.currentTime+duration);
+        }catch{}
+      }
+
+      document.getElementById("continueBtn").addEventListener("click",()=>{
+        const index=Math.max(0,Math.min(unlocked,cases.length)-1);
+        showBriefing(index);
+      });
+      document.getElementById("casesBtn").addEventListener("click",showCases);
+      document.getElementById("closeCasesBtn").addEventListener("click",showMenu);
+      document.getElementById("briefCasesBtn").addEventListener("click",showCases);
+      document.getElementById("startCaseBtn").addEventListener("click",startCase);
+      document.getElementById("closeDetailBtn").addEventListener("click",closeDetail);
+      document.getElementById("notebookBtn").addEventListener("click",showNotebook);
+      document.getElementById("closeNotebookBtn").addEventListener("click",()=>{state="playing";openScreen(null)});
+      document.getElementById("hintBtn").addEventListener("click",useHint);
+      document.getElementById("accuseBtn").addEventListener("click",showAccuse);
+      document.getElementById("cancelAccuseBtn").addEventListener("click",()=>{state="playing";openScreen(null)});
+      document.getElementById("confirmAccuseBtn").addEventListener("click",confirmAccusation);
+      document.getElementById("nextCaseBtn").addEventListener("click",nextCase);
+      document.getElementById("replayCaseBtn").addEventListener("click",startCase);
+
+      document.getElementById("themeBtn").addEventListener("click",()=>{
+        applyTheme(document.documentElement.dataset.theme==="dark"?"light":"dark");
+      });
+
+      document.getElementById("backBtn").addEventListener("click",()=>{
+        if(["playing","detail","notebook","accuse","result","briefing","cases"].includes(state)){
+          showMenu();
+        }else if(history.length>1){
+          history.back();
+        }else{
+          location.href="index.html";
+        }
+      });
+
+      const storedTheme=localStorage.getItem(STORAGE.theme);
+      const prefersDark=window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches;
+      applyTheme(storedTheme||(prefersDark?"dark":"light"));
+      renderCase();
+      showMenu();
+    })();
+  </script>
+</body>
+</html>
