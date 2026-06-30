@@ -569,6 +569,165 @@
             {id:"ledger",mark:"≡",title:"Dosya defteri",subtitle:"Masanın üstü",observation:"Mira'nın imzası kapı nöbeti saatleriyle eşleşiyor.",core:false,x:30,y:56},
             {id:"drawer",mark:"□",title:"Alt çekmeceler",subtitle:"Dolabın sol altı",observation:"Çekmece sayım işaretleri Aras'ın kalemiyle aynı renkte.",core:false,x:17,y:68}
           ]
+        },{
+                "title": "Islanan Defter",
+                "intro": "Sınıf defteri teneffüste ıslanmış. Masada üç kişi vardı ve pencere yalnız kısa süre açık kaldı.",
+                "question": "Defteri kim ıslattı?",
+                "location": "Sınıf · 10:25",
+                "room": "study",
+                "culprit": 1,
+                "solution": "Ece pencereye yaklaşmadığını söyledi. Ancak şişesinin kapağı pencere önünde, defterdeki su lekesi onun mavi kapak izini taşıyor ve sıra üzerindeki peçete yeni kullanılmış. Defteri ıslatan Ece.",
+                "suspects": [
+                        {
+                                "name": "Mina",
+                                "initial": "M",
+                                "statement": "Ben tahtanın yanındaydım; deftere dokunmadım."
+                        },
+                        {
+                                "name": "Ece",
+                                "initial": "E",
+                                "statement": "Pencereye hiç yaklaşmadım. Suyum da çantamdaydı."
+                        },
+                        {
+                                "name": "Tuna",
+                                "initial": "T",
+                                "statement": "Pencereyi ben kapattım ama masaya yaklaşmadım."
+                        }
+                ],
+                "clues": [
+                        {
+                                "id": "cap",
+                                "mark": "○",
+                                "title": "Mavi kapak",
+                                "subtitle": "Pencere önü",
+                                "observation": "Kapak Ece'nin matarasındaki kapakla aynı renkte ve ölçüde.",
+                                "core": true,
+                                "x": 76,
+                                "y": 28
+                        },
+                        {
+                                "id": "stain",
+                                "mark": "~",
+                                "title": "Su lekesi",
+                                "subtitle": "Defter sayfası",
+                                "observation": "Lekenin kenarında mavi plastik izleri var.",
+                                "core": true,
+                                "x": 48,
+                                "y": 58
+                        },
+                        {
+                                "id": "tissue",
+                                "mark": "□",
+                                "title": "Islak peçete",
+                                "subtitle": "Ece'nin sırası",
+                                "observation": "Peçete yeni kullanılmış ve defter suyuyla aynı kokuyor.",
+                                "core": true,
+                                "x": 28,
+                                "y": 72
+                        },
+                        {
+                                "id": "window",
+                                "mark": "|",
+                                "title": "Pencere",
+                                "subtitle": "Sınıf duvarı",
+                                "observation": "Pencere kısa süre açık kalmış; Tuna'nın kapattığı doğru olabilir.",
+                                "core": false,
+                                "x": 86,
+                                "y": 34
+                        },
+                        {
+                                "id": "chalk",
+                                "mark": "·",
+                                "title": "Tebeşir",
+                                "subtitle": "Tahta önü",
+                                "observation": "Mina'nın elinde kuru tebeşir tozu var.",
+                                "core": false,
+                                "x": 18,
+                                "y": 41
+                        }
+                ]
+        },{
+                "title": "Değiştirilen Afiş",
+                "intro": "Kulüp panosundaki afiş gizlice değiştirilmiş. Yeni afişteki bant ve çizik hangi elde olduğunu belli ediyor.",
+                "question": "Afişi kim değiştirdi?",
+                "location": "Kulüp panosu · 15:10",
+                "room": "gallery",
+                "culprit": 2,
+                "solution": "Poyraz afişe dokunmadığını söyledi. Fakat sağ elinde taze bant izi var, panodaki çizik onun metal cetveliyle aynı yükseklikte ve eski afiş onun dolabında katlanmış bulundu.",
+                "suspects": [
+                        {
+                                "name": "Lal",
+                                "initial": "L",
+                                "statement": "Ben sadece toplantı saatini okudum."
+                        },
+                        {
+                                "name": "Ada",
+                                "initial": "A",
+                                "statement": "Bant arıyordum ama panoya yaklaşmadım."
+                        },
+                        {
+                                "name": "Poyraz",
+                                "initial": "P",
+                                "statement": "Afişe dokunmadım; cetvelimi bile çıkarmadım."
+                        },
+                        {
+                                "name": "Emir",
+                                "initial": "E",
+                                "statement": "Panonun ışığını açıp kapattım, hepsi bu."
+                        }
+                ],
+                "clues": [
+                        {
+                                "id": "tape",
+                                "mark": "=",
+                                "title": "Bant izi",
+                                "subtitle": "Poyraz'ın sağ eli",
+                                "observation": "Parmaklarında panodaki bantla aynı yapışkan iz var.",
+                                "core": true,
+                                "x": 64,
+                                "y": 67
+                        },
+                        {
+                                "id": "scratch",
+                                "mark": "/",
+                                "title": "Metal çizik",
+                                "subtitle": "Pano kenarı",
+                                "observation": "Çizik Poyraz'ın cetvelinin köşesiyle aynı genişlikte.",
+                                "core": true,
+                                "x": 53,
+                                "y": 31
+                        },
+                        {
+                                "id": "old",
+                                "mark": "A",
+                                "title": "Eski afiş",
+                                "subtitle": "Dolap içi",
+                                "observation": "Eski afiş Poyraz'ın dolabında katlanmış duruyor.",
+                                "core": true,
+                                "x": 22,
+                                "y": 72
+                        },
+                        {
+                                "id": "lamp",
+                                "mark": "○",
+                                "title": "Pano ışığı",
+                                "subtitle": "Üst köşe",
+                                "observation": "Emir'in ışıkla ilgili ifadesi tutarlı.",
+                                "core": false,
+                                "x": 85,
+                                "y": 22
+                        },
+                        {
+                                "id": "box",
+                                "mark": "□",
+                                "title": "Bant kutusu",
+                                "subtitle": "Masa",
+                                "observation": "Ada'nın bant aradığı doğru; kutu açık bırakılmış.",
+                                "core": false,
+                                "x": 36,
+                                "y": 59
+                        }
+                ]
         }
       ];
 

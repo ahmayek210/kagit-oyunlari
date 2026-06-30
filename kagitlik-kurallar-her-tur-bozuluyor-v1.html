@@ -681,86 +681,762 @@
       };
 
       const levels = [
-        {
-          title:"Kurallar yerinde.",
-          intro:"İlk bölüm seni kandırmıyor. Şimdilik.",
-          ruleName:"Hiçbiri",
-          ruleDescription:"Kaydırdığın yönde bir kare ilerlersin.",
-          chip:"Kurallar yerinde",
-          start:[0,6], goal:[[6,0]],
-          walls:[[2,1],[2,2],[2,3],[4,3],[4,4],[4,5]]
-        },
-        {
-          title:"Yönler ters döndü.",
-          intro:"Oyun okları yanlış anlamaya karar verdi.",
-          ruleName:"Ters kontroller",
-          ruleDescription:"Yukarı kaydırırsan aşağı, sağa kaydırırsan sola gidersin.",
-          chip:"Her yön ters",
-          reverse:true,
-          start:[6,6], goal:[[0,0]],
-          walls:[[4,1],[4,2],[4,3],[2,3],[2,4],[2,5]]
-        },
-        {
-          title:"Zemin sabun oldu.",
-          intro:"Bir kez hareket edince durmayı unutuyorsun.",
-          ruleName:"Kaygan kâğıt",
-          ruleDescription:"Karakter duvara veya kâğıdın kenarına çarpana kadar kayar.",
-          chip:"Durmak yasak",
-          ice:true,
-          start:[0,6], goal:[[6,0]],
-          walls:[[2,0],[2,1],[2,2],[4,4],[4,5],[4,6]]
-        },
-        {
-          title:"Kâğıdın kenarı yok.",
-          intro:"Sayfanın bir ucundan çıkınca öbür ucundan giriyorsun.",
-          ruleName:"Kenarlar birleşti",
-          ruleDescription:"Dışarı çıkan hareket karşı tarafta devam eder.",
-          chip:"Kenarlar portal",
-          wrap:true,
-          start:[1,3], goal:[[5,3]],
-          walls:[[3,0],[3,1],[3,2],[3,3],[3,4],[3,5],[3,6]]
-        },
-        {
-          title:"Işıklar söndü.",
-          intro:"Oyun alanı hâlâ orada. Sadece çoğunu göremiyorsun.",
-          ruleName:"Karanlık alan",
-          ruleDescription:"Yalnızca karakterin yakınındaki kareler görünür.",
-          chip:"Yakınını görebilirsin",
-          dark:true,
-          start:[0,6], goal:[[6,0]],
-          walls:[[1,4],[2,4],[3,4],[3,3],[3,2],[4,2],[5,2]]
-        },
-        {
-          title:"Aynı yön küstü.",
-          intro:"Bir yöne gittikten sonra hemen tekrar aynı yöne gidemezsin.",
-          ruleName:"Tekrar yasak",
-          ruleDescription:"Arka arkaya iki kez aynı yönü kullanamazsın.",
-          chip:"Aynı yön 2 kez yok",
-          noRepeat:true,
-          start:[0,6], goal:[[6,0]],
-          walls:[[2,6],[3,5],[4,4],[5,3],[6,2]]
-        },
-        {
-          title:"Hedef kaçıyor.",
-          intro:"Pembe damga her hamleden sonra sayfanın öbür köşesine sıçrıyor.",
-          ruleName:"Kaçan hedef",
-          ruleDescription:"Hedef iki köşe arasında yer değiştirir. Üzerine doğru zamanda basmalısın.",
-          chip:"Hedef her adım kaçar",
-          movingGoal:true,
-          start:[3,6], goal:[[6,0],[0,0]],
-          walls:[[2,4],[4,4],[2,2],[4,2]]
-        },
-        {
-          title:"Oyun fikrini değiştiriyor.",
-          intro:"Her hamlede kontroller normal ve ters arasında değişiyor. Üstelik ortalık karanlık.",
-          ruleName:"Her adımda yön değişir",
-          ruleDescription:"Bir hamle normal, sonraki hamle ters çalışır. Yakındaki kareler dışında her yer gizlidir.",
-          chip:"Normal ↔ ters",
-          alternateReverse:true,
-          dark:true,
-          start:[0,6], goal:[[6,0]],
-          walls:[[1,4],[2,4],[2,2],[3,2],[4,2],[4,4],[5,4]]
-        }
+              {
+                      "title": "Kurallar yerinde.",
+                      "intro": "İlk bölüm seni kandırmıyor. Şimdilik.",
+                      "ruleName": "Hiçbiri",
+                      "ruleDescription": "Kaydırdığın yönde bir kare ilerlersin.",
+                      "chip": "Kurallar yerinde",
+                      "start": [
+                              0,
+                              6
+                      ],
+                      "goal": [
+                              [
+                                      6,
+                                      0
+                              ]
+                      ],
+                      "walls": [
+                              [
+                                      2,
+                                      1
+                              ],
+                              [
+                                      2,
+                                      2
+                              ],
+                              [
+                                      2,
+                                      3
+                              ],
+                              [
+                                      4,
+                                      3
+                              ],
+                              [
+                                      4,
+                                      4
+                              ],
+                              [
+                                      4,
+                                      5
+                              ]
+                      ]
+              },
+              {
+                      "title": "Yönler ters döndü.",
+                      "intro": "Oyun okları yanlış anlamaya karar verdi.",
+                      "ruleName": "Ters kontroller",
+                      "ruleDescription": "Yukarı kaydırırsan aşağı, sağa kaydırırsan sola gidersin.",
+                      "chip": "Her yön ters",
+                      "reverse": true,
+                      "start": [
+                              6,
+                              6
+                      ],
+                      "goal": [
+                              [
+                                      0,
+                                      0
+                              ]
+                      ],
+                      "walls": [
+                              [
+                                      4,
+                                      1
+                              ],
+                              [
+                                      4,
+                                      2
+                              ],
+                              [
+                                      4,
+                                      3
+                              ],
+                              [
+                                      2,
+                                      3
+                              ],
+                              [
+                                      2,
+                                      4
+                              ],
+                              [
+                                      2,
+                                      5
+                              ]
+                      ]
+              },
+              {
+                      "title": "Zemin sabun oldu.",
+                      "intro": "Bir kez hareket edince durmayı unutuyorsun.",
+                      "ruleName": "Kaygan kâğıt",
+                      "ruleDescription": "Karakter duvara veya kâğıdın kenarına çarpana kadar kayar.",
+                      "chip": "Durmak yasak",
+                      "ice": true,
+                      "start": [
+                              0,
+                              6
+                      ],
+                      "goal": [
+                              [
+                                      6,
+                                      0
+                              ]
+                      ],
+                      "walls": [
+                              [
+                                      2,
+                                      0
+                              ],
+                              [
+                                      2,
+                                      1
+                              ],
+                              [
+                                      2,
+                                      2
+                              ],
+                              [
+                                      4,
+                                      4
+                              ],
+                              [
+                                      4,
+                                      5
+                              ],
+                              [
+                                      4,
+                                      6
+                              ]
+                      ]
+              },
+              {
+                      "title": "Kâğıdın kenarı yok.",
+                      "intro": "Sayfanın bir ucundan çıkınca öbür ucundan giriyorsun.",
+                      "ruleName": "Kenarlar birleşti",
+                      "ruleDescription": "Dışarı çıkan hareket karşı tarafta devam eder.",
+                      "chip": "Kenarlar portal",
+                      "wrap": true,
+                      "start": [
+                              1,
+                              3
+                      ],
+                      "goal": [
+                              [
+                                      5,
+                                      3
+                              ]
+                      ],
+                      "walls": [
+                              [
+                                      3,
+                                      0
+                              ],
+                              [
+                                      3,
+                                      1
+                              ],
+                              [
+                                      3,
+                                      2
+                              ],
+                              [
+                                      3,
+                                      3
+                              ],
+                              [
+                                      3,
+                                      4
+                              ],
+                              [
+                                      3,
+                                      5
+                              ],
+                              [
+                                      3,
+                                      6
+                              ]
+                      ]
+              },
+              {
+                      "title": "Işıklar söndü.",
+                      "intro": "Oyun alanı hâlâ orada. Sadece çoğunu göremiyorsun.",
+                      "ruleName": "Karanlık alan",
+                      "ruleDescription": "Yalnızca karakterin yakınındaki kareler görünür.",
+                      "chip": "Yakınını görebilirsin",
+                      "dark": true,
+                      "start": [
+                              0,
+                              6
+                      ],
+                      "goal": [
+                              [
+                                      6,
+                                      0
+                              ]
+                      ],
+                      "walls": [
+                              [
+                                      1,
+                                      4
+                              ],
+                              [
+                                      2,
+                                      4
+                              ],
+                              [
+                                      3,
+                                      4
+                              ],
+                              [
+                                      3,
+                                      3
+                              ],
+                              [
+                                      3,
+                                      2
+                              ],
+                              [
+                                      4,
+                                      2
+                              ],
+                              [
+                                      5,
+                                      2
+                              ]
+                      ]
+              },
+              {
+                      "title": "Aynı yön küstü.",
+                      "intro": "Bir yöne gittikten sonra hemen tekrar aynı yöne gidemezsin.",
+                      "ruleName": "Tekrar yasak",
+                      "ruleDescription": "Arka arkaya iki kez aynı yönü kullanamazsın.",
+                      "chip": "Aynı yön 2 kez yok",
+                      "noRepeat": true,
+                      "start": [
+                              0,
+                              6
+                      ],
+                      "goal": [
+                              [
+                                      6,
+                                      0
+                              ]
+                      ],
+                      "walls": [
+                              [
+                                      2,
+                                      6
+                              ],
+                              [
+                                      3,
+                                      5
+                              ],
+                              [
+                                      4,
+                                      4
+                              ],
+                              [
+                                      5,
+                                      3
+                              ],
+                              [
+                                      6,
+                                      2
+                              ]
+                      ]
+              },
+              {
+                      "title": "Hedef kaçıyor.",
+                      "intro": "Pembe damga her hamleden sonra sayfanın öbür köşesine sıçrıyor.",
+                      "ruleName": "Kaçan hedef",
+                      "ruleDescription": "Hedef iki köşe arasında yer değiştirir. Üzerine doğru zamanda basmalısın.",
+                      "chip": "Hedef her adım kaçar",
+                      "movingGoal": true,
+                      "start": [
+                              3,
+                              6
+                      ],
+                      "goal": [
+                              [
+                                      6,
+                                      0
+                              ],
+                              [
+                                      0,
+                                      0
+                              ]
+                      ],
+                      "walls": [
+                              [
+                                      2,
+                                      4
+                              ],
+                              [
+                                      4,
+                                      4
+                              ],
+                              [
+                                      2,
+                                      2
+                              ],
+                              [
+                                      4,
+                                      2
+                              ]
+                      ]
+              },
+              {
+                      "title": "Oyun fikrini değiştiriyor.",
+                      "intro": "Her hamlede kontroller normal ve ters arasında değişiyor. Üstelik ortalık karanlık.",
+                      "ruleName": "Her adımda yön değişir",
+                      "ruleDescription": "Bir hamle normal, sonraki hamle ters çalışır. Yakındaki kareler dışında her yer gizlidir.",
+                      "chip": "Normal ↔ ters",
+                      "alternateReverse": true,
+                      "dark": true,
+                      "start": [
+                              0,
+                              6
+                      ],
+                      "goal": [
+                              [
+                                      6,
+                                      0
+                              ]
+                      ],
+                      "walls": [
+                              [
+                                      1,
+                                      4
+                              ],
+                              [
+                                      2,
+                                      4
+                              ],
+                              [
+                                      2,
+                                      2
+                              ],
+                              [
+                                      3,
+                                      2
+                              ],
+                              [
+                                      4,
+                                      2
+                              ],
+                              [
+                                      4,
+                                      4
+                              ],
+                              [
+                                      5,
+                                      4
+                              ]
+                      ]
+              },
+              {
+                      "title": "Sağ sol yer değiştiriyor.",
+                      "intro": "Hamle sayısı tek olunca sağ ve sol birbirinin yerine geçer.",
+                      "ruleName": "Değişken yatay",
+                      "ruleDescription": "Her hamleden sonra sağ ve sol komutları yer değiştirir.",
+                      "chip": "Sağ-sol sırayla değişir",
+                      "leftRightSwap": true,
+                      "start": [
+                              0,
+                              6
+                      ],
+                      "goal": [
+                              [
+                                      6,
+                                      0
+                              ]
+                      ],
+                      "walls": [
+                              [
+                                      1,
+                                      1
+                              ],
+                              [
+                                      2,
+                                      1
+                              ],
+                              [
+                                      4,
+                                      1
+                              ],
+                              [
+                                      5,
+                                      1
+                              ],
+                              [
+                                      3,
+                                      3
+                              ],
+                              [
+                                      1,
+                                      5
+                              ],
+                              [
+                                      5,
+                                      5
+                              ]
+                      ]
+              },
+              {
+                      "title": "Yalancı çizgiler.",
+                      "intro": "Güvenli görünen bazı karalamalar duvar değildir.",
+                      "ruleName": "Sahte engel",
+                      "ruleDescription": "Açık renk lekeler fiziksel değildir; koyu mürekkep duvardır.",
+                      "chip": "Bazı çizgiler sahte",
+                      "fakeWalls": [
+                              [
+                                      3,
+                                      1
+                              ],
+                              [
+                                      3,
+                                      2
+                              ],
+                              [
+                                      3,
+                                      3
+                              ]
+                      ],
+                      "start": [
+                              0,
+                              6
+                      ],
+                      "goal": [
+                              [
+                                      6,
+                                      0
+                              ]
+                      ],
+                      "walls": [
+                              [
+                                      1,
+                                      4
+                              ],
+                              [
+                                      2,
+                                      4
+                              ],
+                              [
+                                      4,
+                                      4
+                              ],
+                              [
+                                      5,
+                                      4
+                              ],
+                              [
+                                      5,
+                                      2
+                              ]
+                      ]
+              },
+              {
+                      "title": "Hedef usulca kaçıyor.",
+                      "intro": "Pembe damga her iki hamlede bir yan köşeye süzülür.",
+                      "ruleName": "Yavaş hedef",
+                      "ruleDescription": "Hedef birden fazla konum arasında yavaşça sıra değiştirir.",
+                      "chip": "Hedef iki hamlede kaçar",
+                      "movingGoal": true,
+                      "slowGoal": true,
+                      "start": [
+                              0,
+                              6
+                      ],
+                      "goal": [
+                              [
+                                      6,
+                                      0
+                              ],
+                              [
+                                      6,
+                                      3
+                              ],
+                              [
+                                      3,
+                                      0
+                              ]
+                      ],
+                      "walls": [
+                              [
+                                      2,
+                                      2
+                              ],
+                              [
+                                      2,
+                                      3
+                              ],
+                              [
+                                      2,
+                                      4
+                              ],
+                              [
+                                      4,
+                                      1
+                              ],
+                              [
+                                      4,
+                                      2
+                              ],
+                              [
+                                      4,
+                                      5
+                              ]
+                      ]
+              },
+              {
+                      "title": "Önceki kural taşındı.",
+                      "intro": "Kenarlar hâlâ portal, ama aynı yöne iki kez basmak yasak.",
+                      "ruleName": "Kural mirası",
+                      "ruleDescription": "Portal kenarlar ve tekrar yasağı aynı anda geçerlidir.",
+                      "chip": "Portal + tekrar yok",
+                      "wrap": true,
+                      "noRepeat": true,
+                      "start": [
+                              1,
+                              6
+                      ],
+                      "goal": [
+                              [
+                                      5,
+                                      0
+                              ]
+                      ],
+                      "walls": [
+                              [
+                                      3,
+                                      1
+                              ],
+                              [
+                                      3,
+                                      2
+                              ],
+                              [
+                                      3,
+                                      3
+                              ],
+                              [
+                                      0,
+                                      3
+                              ],
+                              [
+                                      6,
+                                      3
+                              ],
+                              [
+                                      2,
+                                      5
+                              ],
+                              [
+                                      4,
+                                      5
+                              ]
+                      ]
+              },
+              {
+                      "title": "Gölge önden gidiyor.",
+                      "intro": "Silik gölge bir sonraki kareyi işaret eder, ama karar yine sende.",
+                      "ruleName": "Öncü gölge",
+                      "ruleDescription": "Hamle yaptığında gölge hedef yönü önceden gösterir.",
+                      "chip": "Gölge yolu fısıldar",
+                      "shadowLead": true,
+                      "start": [
+                              0,
+                              6
+                      ],
+                      "goal": [
+                              [
+                                      6,
+                                      0
+                              ]
+                      ],
+                      "walls": [
+                              [
+                                      1,
+                                      2
+                              ],
+                              [
+                                      2,
+                                      2
+                              ],
+                              [
+                                      3,
+                                      2
+                              ],
+                              [
+                                      3,
+                                      4
+                              ],
+                              [
+                                      4,
+                                      4
+                              ],
+                              [
+                                      5,
+                                      4
+                              ]
+                      ]
+              },
+              {
+                      "title": "Karanlık buz.",
+                      "intro": "Kaygan zemin karanlıkta daha tehlikeli görünür.",
+                      "ruleName": "Buz + karanlık",
+                      "ruleDescription": "Duvara kadar kayarsın; yalnız çevreni görebilirsin.",
+                      "chip": "Karanlıkta kay",
+                      "ice": true,
+                      "dark": true,
+                      "start": [
+                              0,
+                              6
+                      ],
+                      "goal": [
+                              [
+                                      6,
+                                      0
+                              ]
+                      ],
+                      "walls": [
+                              [
+                                      1,
+                                      1
+                              ],
+                              [
+                                      2,
+                                      1
+                              ],
+                              [
+                                      4,
+                                      1
+                              ],
+                              [
+                                      5,
+                                      3
+                              ],
+                              [
+                                      4,
+                                      5
+                              ],
+                              [
+                                      2,
+                                      5
+                              ]
+                      ]
+              },
+              {
+                      "title": "Ters portal.",
+                      "intro": "Dışarı çıkmak serbest ama kontroller ters çalışır.",
+                      "ruleName": "Ters kenarlar",
+                      "ruleDescription": "Ters yönler ve portal kenarlar birlikte kullanılır.",
+                      "chip": "Ters + portal",
+                      "reverse": true,
+                      "wrap": true,
+                      "start": [
+                              5,
+                              6
+                      ],
+                      "goal": [
+                              [
+                                      1,
+                                      0
+                              ]
+                      ],
+                      "walls": [
+                              [
+                                      3,
+                                      0
+                              ],
+                              [
+                                      3,
+                                      2
+                              ],
+                              [
+                                      3,
+                                      4
+                              ],
+                              [
+                                      0,
+                                      3
+                              ],
+                              [
+                                      6,
+                                      3
+                              ]
+                      ]
+              },
+              {
+                      "title": "Final kural defteri.",
+                      "intro": "Hedef kaçar, kontroller değişir ve sahte duvarlar dikkat dağıtır.",
+                      "ruleName": "Karma final",
+                      "ruleDescription": "Normal/ters hamleler sırayla gelir; hedef konum değiştirir ve bazı çizgiler sahte kalır.",
+                      "chip": "Final kargaşası",
+                      "alternateReverse": true,
+                      "movingGoal": true,
+                      "fakeWalls": [
+                              [
+                                      2,
+                                      2
+                              ],
+                              [
+                                      4,
+                                      4
+                              ],
+                              [
+                                      5,
+                                      1
+                              ]
+                      ],
+                      "start": [
+                              0,
+                              6
+                      ],
+                      "goal": [
+                              [
+                                      6,
+                                      0
+                              ],
+                              [
+                                      0,
+                                      0
+                              ],
+                              [
+                                      6,
+                                      6
+                              ]
+                      ],
+                      "walls": [
+                              [
+                                      1,
+                                      4
+                              ],
+                              [
+                                      2,
+                                      4
+                              ],
+                              [
+                                      3,
+                                      4
+                              ],
+                              [
+                                      4,
+                                      2
+                              ],
+                              [
+                                      5,
+                                      2
+                              ],
+                              [
+                                      3,
+                                      0
+                              ]
+                      ]
+              }
       ];
 
       const paper = document.getElementById("paper");
@@ -969,6 +1645,9 @@
 
         let dx = original.dx;
         let dy = original.dy;
+        if (level.leftRightSwap && moves%2===1 && (name==="left" || name==="right")) { dx *= -1; dy *= -1; }
+        if (level.leftRightSwap && moves%2===1 && (name==="left" || name==="right")) { dx *= -1; dy *= -1; }
+        if (level.leftRightSwap && moves%2===1 && (name==="left" || name==="right")) { dx *= -1; dy *= -1; }
         const reversed = level.reverse || (level.alternateReverse && moves%2===1);
         if (reversed) {
           dx *= -1;
@@ -1173,6 +1852,9 @@
       function drawWalls() {
         const level = levels[currentLevel];
         if (!level) return;
+        (level.fakeWalls||[]).forEach(([x,y],index)=>{const px=x*cell,py=y*cell;ctx.save();ctx.translate(px+cell/2,py+cell/2);ctx.strokeStyle=css.muted;ctx.globalAlpha=.42;ctx.lineWidth=Math.max(2,cell*.025);ctx.setLineDash([cell*.12,cell*.08]);roughBlob(-cell*.32,-cell*.29,cell*.64,cell*.58,index);ctx.stroke();ctx.setLineDash([]);ctx.restore();});
+        (level.fakeWalls||[]).forEach(([x,y],index)=>{const px=x*cell,py=y*cell;ctx.save();ctx.translate(px+cell/2,py+cell/2);ctx.strokeStyle=css.muted;ctx.globalAlpha=.42;ctx.lineWidth=Math.max(2,cell*.025);ctx.setLineDash([cell*.12,cell*.08]);roughBlob(-cell*.32,-cell*.29,cell*.64,cell*.58,index);ctx.stroke();ctx.setLineDash([]);ctx.restore();});
+        (level.fakeWalls||[]).forEach(([x,y],index)=>{const px=x*cell,py=y*cell;ctx.save();ctx.translate(px+cell/2,py+cell/2);ctx.strokeStyle=css.muted;ctx.globalAlpha=.42;ctx.lineWidth=Math.max(2,cell*.025);ctx.setLineDash([cell*.12,cell*.08]);roughBlob(-cell*.32,-cell*.29,cell*.64,cell*.58,index);ctx.stroke();ctx.setLineDash([]);ctx.restore();});
         level.walls.forEach(([x,y],index) => {
           const px=x*cell;
           const py=y*cell;
@@ -1248,6 +1930,16 @@
         ctx.closePath();
         ctx.fill();
         ctx.restore();
+        const level = levels[currentLevel];
+        if (level && level.shadowLead && state === "playing") {
+          ctx.save();
+          ctx.globalAlpha = .24;
+          ctx.fillStyle = css.purple;
+          ctx.beginPath();
+          ctx.arc(cx + cell*.35, cy - cell*.25, size*.42, 0, Math.PI*2);
+          ctx.fill();
+          ctx.restore();
+        }
       }
 
       function roughRoundRect(x,y,w,h,r) {

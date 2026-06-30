@@ -370,7 +370,7 @@
           <h3>Tek oyunculu</h3>
           <p>Kendi hızında ilerle, bulmacaları çöz, çiz ve geçmişteki hareketlerinle yarış.</p>
           <div class="mode-footer">
-            <span class="mode-count">4 oyun hazır</span>
+            <span class="mode-count">9 oyun hazır</span>
             <span class="arrow">→</span>
           </div>
         </button>
@@ -380,7 +380,7 @@
           <h3>İki oyunculu</h3>
           <p>Oda kodu oluştur, arkadaşınla bağlan ve aynı kâğıtta rekabet et veya birlikte üret.</p>
           <div class="mode-footer">
-            <span class="mode-count">5 oyun hazır</span>
+            <span class="mode-count">10 oyun hazır</span>
             <span class="arrow">→</span>
           </div>
         </button>
@@ -426,97 +426,196 @@
 <script>
   const games = [
     {
-      id: "ghost",
-      category: "single",
-      title: "Kendi Geçmişinle Yarış",
-      icon: "◌",
-      description: "Önceki koşunun hayaleti aynı hareketleri tekrarlar. Bu kez daha uzağa git.",
-      meta: "Koşu · zamanlama",
-      accent: "purple",
-      file: "kagitlik-kendi-gecmisinle-yaris-v1.html"
+        "id": "ghost",
+        "category": "single",
+        "title": "Kendi Geçmişinle Yarış",
+        "icon": "◌",
+        "description": "Altı meydan okumada eski koşunun hayaletine karşı daha iyi zıpla.",
+        "meta": "Koşu · 6 meydan okuma",
+        "accent": "purple",
+        "file": "kagitlik-kendi-gecmisinle-yaris-v1.html"
     },
     {
-      id: "rulebreak",
-      category: "single",
-      title: "Kurallar Her Tur Bozuluyor",
-      icon: "↔",
-      description: "Her bölümde oyunun başka bir kuralı değişir: ters kontrol, buz, karanlık ve daha fazlası.",
-      meta: "Bulmaca · 8 bölüm",
-      accent: "yellow",
-      file: "kagitlik-kurallar-her-tur-bozuluyor-v1.html"
+        "id": "rulebreak",
+        "category": "single",
+        "title": "Kurallar Her Tur Bozuluyor",
+        "icon": "↔",
+        "description": "Her bölümde oyunun başka bir kuralı değişir: ters kontrol, buz, karanlık, sahte duvar ve daha fazlası.",
+        "meta": "Bulmaca · 16 bölüm",
+        "accent": "yellow",
+        "file": "kagitlik-kurallar-her-tur-bozuluyor-v1.html"
     },
     {
-      id: "detective",
-      category: "single",
-      title: "Bir Ekranlık Dedektif",
-      icon: "⌕",
-      description: "Olay yerini incele, ifadeleri karşılaştır ve doğru şüpheliyi suçla.",
-      meta: "Dedektif · gözlem",
-      accent: "blue",
-      file: "kagitlik-bir-ekranlik-dedektif-v1.html"
+        "id": "detective",
+        "category": "single",
+        "title": "Bir Ekranlık Dedektif",
+        "icon": "⌕",
+        "description": "Sekiz farklı olay yerini incele, ifadeleri karşılaştır ve doğru şüpheliyi suçla.",
+        "meta": "Dedektif · 8 olay",
+        "accent": "blue",
+        "file": "kagitlik-bir-ekranlik-dedektif-v1.html"
     },
     {
-      id: "drawlevel",
-      category: "single",
-      title: "Bölümünü Kendin Çiz",
-      icon: "✎",
-      description: "Sınırlı mürekkeple yollar çiz; karakteri engellerin üzerinden hedefe ulaştır.",
-      meta: "Çizim · fizik",
-      accent: "green",
-      file: "kagitlik-bolumunu-kendin-ciz-v2.html"
-    },
-
-    {
-      id: "pixel",
-      category: "multi",
-      title: "Pixel Hafıza",
-      icon: "▦",
-      description: "Kısa süre görünen deseni hatırla ve rakibinden daha doğru, daha hızlı tamamla.",
-      meta: "Online · 3 raund",
-      accent: "blue",
-      file: "kagitlik-pixel-hafiza-online-v1.html"
+        "id": "drawlevel",
+        "category": "single",
+        "title": "Bölümünü Kendin Çiz",
+        "icon": "✎",
+        "description": "Sınırlı mürekkeple yollar çiz; karakteri 15 el tasarımı bölümde hedefe ulaştır.",
+        "meta": "Çizim · 15 bölüm",
+        "accent": "green",
+        "file": "kagitlik-bolumunu-kendin-ciz-v2.html"
     },
     {
-      id: "canvas",
-      category: "multi",
-      title: "Tek Resim, Tek Tuval",
-      icon: "✣",
-      description: "Aynı tuvale sırayla çiz; altı turun sonunda ortak ve garip bir resim oluştur.",
-      meta: "Online · ortak çizim",
-      accent: "yellow",
-      file: "kagitlik-tek-resim-tek-tuval-online-v2.html"
+        "id": "rescue",
+        "category": "single",
+        "title": "Bir Çizgiyle Kurtar",
+        "icon": "/",
+        "description": "Tek kesintisiz çizgiyle yağmur, taş, çukur ve dar alan problemlerini çöz.",
+        "meta": "Çizim · 12 bölüm",
+        "accent": "pink",
+        "file": "kagitlik-bir-cizgiyle-kurtar-v1.html"
     },
     {
-      id: "pulse",
-      category: "multi",
-      title: "Grid Pulse",
-      icon: "⊞",
-      description: "Parlayan kareyi ilk bul. Tepki süreleri yerel ölçülür ve on iki tur karşılaştırılır.",
-      meta: "Online · refleks",
-      accent: "pink",
-      file: "kagitlik-grid-pulse-online-v1.html"
+        "id": "eraser",
+        "category": "single",
+        "title": "Silgiyi Sadece Bir Kez Kullan",
+        "icon": "⌫",
+        "description": "Yanlış parçayı tek silgi hareketiyle kaldır; doğru bölgeye yakın silmek yeterli.",
+        "meta": "Mantık · 12 bölüm",
+        "accent": "yellow",
+        "file": "kagitlik-silgiyi-bir-kez-kullan-v1.html"
     },
     {
-      id: "slingshot",
-      category: "multi",
-      title: "Slingshot Arena",
-      icon: "➶",
-      description: "Karakterini geriye çekip bırak; topu sektirerek rakibin canını azalt.",
-      meta: "Online · sıra tabanlı",
-      accent: "orange",
-      file: "kagitlik-slingshot-arena-online-v2.html"
+        "id": "train",
+        "category": "single",
+        "title": "Çizgi Treni",
+        "icon": "T",
+        "description": "Sınırlı mürekkeple ray çiz, istasyonlara sırayla uğra ve raydan çıkma.",
+        "meta": "Rota · 10 bölüm",
+        "accent": "blue",
+        "file": "kagitlik-cizgi-treni-v1.html"
     },
     {
-      id: "deflect",
-      category: "multi",
-      title: "Deflect",
-      icon: "↔",
-      description: "Kalkanını yukarı-aşağı sürükle, topu rakibin arkasına geçir ve ilk beş sayıyı al.",
-      meta: "Online · gerçek zamanlı",
-      accent: "purple",
-      file: "kagitlik-deflect-online-v1.html"
+        "id": "monster",
+        "category": "single",
+        "title": "Karalama Canavarı",
+        "icon": "M",
+        "description": "Canavarın istediği 20 kısa çizim görevini basit geometrik ölçülerle tamamla.",
+        "meta": "Karalama · 20 görev",
+        "accent": "purple",
+        "file": "kagitlik-karalama-canavari-v1.html"
+    },
+    {
+        "id": "plane",
+        "category": "single",
+        "title": "Kâğıt Uçağın Yolunu Çiz",
+        "icon": ">",
+        "description": "Uçak kalkmadan önce rüzgar çizgileri kur; halkalardan geçip masaya in.",
+        "meta": "Planlama · 10 bölüm",
+        "accent": "green",
+        "file": "kagitlik-kagit-ucagi-yolunu-ciz-v1.html"
+    },
+    {
+        "id": "pixel",
+        "category": "multi",
+        "title": "Pixel Hafıza",
+        "icon": "▦",
+        "description": "Kısa süre görünen deseni hatırla ve rakibinden daha doğru, daha hızlı tamamla.",
+        "meta": "Online · 3 raund",
+        "accent": "blue",
+        "file": "kagitlik-pixel-hafiza-online-v1.html"
+    },
+    {
+        "id": "canvas",
+        "category": "multi",
+        "title": "Tek Resim, Tek Tuval",
+        "icon": "✣",
+        "description": "Aynı tuvale sırayla çiz; altı turun sonunda ortak ve garip bir resim oluştur.",
+        "meta": "Online · ortak çizim",
+        "accent": "yellow",
+        "file": "kagitlik-tek-resim-tek-tuval-online-v2.html"
+    },
+    {
+        "id": "pulse",
+        "category": "multi",
+        "title": "Grid Pulse",
+        "icon": "⊞",
+        "description": "Parlayan kareyi ilk bul. Tepki süreleri yerel ölçülür ve turlar karşılaştırılır.",
+        "meta": "Online · refleks",
+        "accent": "pink",
+        "file": "kagitlik-grid-pulse-online-v1.html"
+    },
+    {
+        "id": "slingshot",
+        "category": "multi",
+        "title": "Slingshot Arena",
+        "icon": "➤",
+        "description": "Karakterini geriye çekip bırak; topu sektirerek rakibin canını azalt.",
+        "meta": "Online · sıra tabanlı",
+        "accent": "orange",
+        "file": "kagitlik-slingshot-arena-online-v2.html"
+    },
+    {
+        "id": "deflect",
+        "category": "multi",
+        "title": "Deflect",
+        "icon": "⇄",
+        "description": "Kalkanını sürükle, topu rakibin arkasına geçir ve ilk beş sayıyı al.",
+        "meta": "Online · gerçek zamanlı",
+        "accent": "purple",
+        "file": "kagitlik-deflect-online-v1.html"
+    },
+    {
+        "id": "three",
+        "category": "multi",
+        "title": "Üç Çizgide Anlat",
+        "icon": "///",
+        "description": "Gizli kelimeyi yalnız üç çizgiyle anlat, rakibin dört seçenekten bulsun.",
+        "meta": "Online · 8 tur",
+        "accent": "green",
+        "file": "kagitlik-uc-cizgide-anlat-online-v1.html"
+    },
+    {
+        "id": "inkwar",
+        "category": "multi",
+        "title": "Mürekkep Savaşı",
+        "icon": "▧",
+        "description": "Nokta ağına çizgiler ekle, kapanan alanları boya ve süre sonunda öne geç.",
+        "meta": "Online · alan kapma",
+        "accent": "blue",
+        "file": "kagitlik-murekkep-savasi-online-v1.html"
+    },
+    {
+        "id": "bridge",
+        "category": "multi",
+        "title": "Ortak Köprü",
+        "icon": "═",
+        "description": "İki oyuncu birer çizgi çizer; host köprünün çalışıp çalışmadığını yönetir.",
+        "meta": "Online · iş birliği",
+        "accent": "yellow",
+        "file": "kagitlik-ortak-kopru-online-v1.html"
+    },
+    {
+        "id": "closer",
+        "category": "multi",
+        "title": "Hangimiz Daha Yakın Çizdi?",
+        "icon": "◇",
+        "description": "Hedef şekli kısa gör, hafızadan çiz ve daha yakın olan turu alsın.",
+        "meta": "Online · hafıza çizimi",
+        "accent": "pink",
+        "file": "kagitlik-hangimiz-daha-yakin-cizdi-online-v1.html"
+    },
+    {
+        "id": "hidden",
+        "category": "multi",
+        "title": "Gizli Karalama",
+        "icon": "◐",
+        "description": "Çizim parça parça açılır; erken doğru tahmin daha çok puan verir.",
+        "meta": "Online · gizli çizim",
+        "accent": "purple",
+        "file": "kagitlik-gizli-karalama-online-v1.html"
     }
-  ];
+];
 
   const accentMap = {
     yellow: "var(--yellow)",
