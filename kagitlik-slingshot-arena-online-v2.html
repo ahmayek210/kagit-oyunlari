@@ -566,12 +566,16 @@ function vibrate(pattern) {
 function username() {
   const value = $("nameInput").value.trim().replace(/\s+/g, " ");
 
+  if (/[\x00-\x1F\x7F]/.test(value)) {
+    throw new Error("Kullanici adi kontrol karakteri iceremez.");
+  }
+
   if (value.length < 2 || value.length > 22) {
-    throw new Error("Kullanıcı adı 2 ile 22 karakter arasında olmalı.");
+    throw new Error("Kullanici adi 2 ile 22 karakter arasinda olmali.");
   }
 
   $("nameInput").value = value;
-  localStorage.setItem(STORAGE.name, value);
+  localStorage.setItem("kagitlik-name", value);
   return value;
 }
 
@@ -632,7 +636,8 @@ async function boot() {
     await ensureSession();
 
     $("diagUser").textContent = state.user.id.slice(0, 8) + "…";
-    $("nameInput").value = localStorage.getItem(STORAGE.name) || "";
+    const savedName = localStorage.getItem("kagitlik-name") || "";
+    $("nameInput").value = savedName;
 
     $("homeStatus").classList.add("online");
     $("homeStatusText").textContent = "Supabase bağlantısı hazır.";
@@ -848,59 +853,56 @@ async function subscribeRoom() {
 function renderRoom() {
   if (!state.room) return;
 
-  $("roomCode").textContent =
-    state.room.code || localStorage.getItem(STORAGE.roomCode) || "------";
-
+  const roomCodeKey = typeof STORAGE !== "undefined" ? STORAGE.roomCode : ST.rcode;
+  const players = [...state.players].sort((a, b) => a.player_number - b.player_number);
   const playing = state.room.status === "playing";
 
-  $("roomTitle").textContent =
-    playing
-      ? "İki oyuncu da hazır."
-      : state.players.length < 2
-        ? "Oyuncu bekleniyor."
-        : "Hazır olmayı bekliyoruz.";
+  $("roomCode").textContent = state.room.code || localStorage.getItem(roomCodeKey) || "------";
+  $("roomTitle").textContent = playing
+    ? "Oyun basliyor."
+    : players.length < 2
+      ? "Oyuncu bekleniyor."
+      : "Hazir olmayi bekliyoruz.";
+  $("roomLead").textContent = playing
+    ? "Iki cihaz oyun ekranina geciyor."
+    : players.length < 2
+      ? "Kodu diger oyuncuya gonder."
+      : "Ikiniz de Hazirim dugmesine basin.";
 
-  $("roomLead").textContent =
-    playing
-      ? "Arena açılıyor…"
-      : state.players.length < 2
-        ? "Kodu diğer oyuncuya gönder."
-        : "İkiniz de Hazırım düğmesine basın.";
+  const host = $("players");
+  host.replaceChildren();
 
-  $("players").innerHTML = "";
-
-  for (let number = 1; number <= 2; number++) {
-    const player = state.players.find(item => item.player_number === number);
+  for (let number = 1; number <= 2; number += 1) {
+    const player = players.find(item => item.player_number === number);
     const element = document.createElement("article");
+    const label = document.createElement("small");
+    const name = document.createElement("strong");
+    const status = document.createElement("div");
+    const mark = document.createElement("i");
+
+    status.className = "pstate";
+    status.appendChild(mark);
 
     if (!player) {
       element.className = "player empty";
-      element.innerHTML = `
-        <small>Oyuncu ${number}</small>
-        <strong>Bekleniyor…</strong>
-        <div class="pstate"><i></i>Henüz katılmadı</div>
-      `;
+      label.textContent = "Oyuncu " + number;
+      name.textContent = "Bekleniyor...";
+      status.appendChild(document.createTextNode("Henuz katilmadi"));
     } else {
       const me = player.user_id === state.user?.id;
-      element.className = `player${player.ready ? " ready" : ""}`;
-      element.innerHTML = `
-        <small>Oyuncu ${number}${me ? " · sen" : ""}</small>
-        <strong>${escapeHtml(player.username)}</strong>
-        <div class="pstate"><i></i>${player.ready ? "Hazır" : "Hazır değil"}</div>
-      `;
+      element.className = "player" + (player.ready ? " ready" : "");
+      label.textContent = "Oyuncu " + number + (me ? " - sen" : "");
+      name.textContent = player.username || "Oyuncu";
+      status.appendChild(document.createTextNode(player.ready ? "Hazir" : "Hazir degil"));
     }
 
-    $("players").appendChild(element);
+    element.append(label, name, status);
+    host.appendChild(element);
   }
 
   const me = currentPlayer();
-
-  $("readyBtn").textContent = me?.ready ? "Hazır değilim" : "Hazırım";
-  $("readyBtn").disabled =
-    state.busy ||
-    !me ||
-    playing ||
-    state.players.length < 2;
+  $("readyBtn").textContent = me?.ready ? "Hazir degilim" : "Hazirim";
+  $("readyBtn").disabled = state.busy || !me || playing || players.length < 2;
 }
 
 async function toggleReady() {

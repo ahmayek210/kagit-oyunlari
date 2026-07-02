@@ -291,7 +291,7 @@ function playerByNumber(n){return state.players.find(p=>p.player_number===n)}
 function myNumber(){return currentPlayer()?.player_number||0}
 function isMyTurn(){return game.started&&!game.finished&&myNumber()===game.activeNumber}
 function setBusy(v){state.busy=v;["createBtn","joinBtn","readyBtn","refreshBtn","leaveBtn"].forEach(id=>$(id).disabled=v);if(!v)renderRoom()}
-function username(){const n=$("nameInput").value.trim().replace(/\s+/g," ");if(n.length<2||n.length>22)throw Error("Kullanıcı adı 2 ile 22 karakter arasında olmalı.");localStorage.setItem(ST.name,n);$("nameInput").value=n;return n}
+function username(){const n=$("nameInput").value.trim().replace(/\s+/g," ");if(/[\x00-\x1F\x7F]/.test(n))throw Error("Kullanici adi kontrol karakteri iceremez.");if(n.length<2||n.length>22)throw Error("Kullanici adi 2 ile 22 karakter arasinda olmali.");localStorage.setItem("kagitlik-name",n);$("nameInput").value=n;return n}
 async function ensureSession(){const{data,error}=await sb.auth.getSession();if(error)throw error;if(data.session?.user){state.user=data.session.user;return}const r=await sb.auth.signInAnonymously();if(r.error)throw r.error;state.user=r.data.user}
 
 async function boot(){
@@ -304,7 +304,7 @@ async function boot(){
   try{
     await ensureSession();
     $("diagUser").textContent=state.user.id.slice(0,8)+"…";
-    $("nameInput").value=localStorage.getItem(ST.name)||"";
+    const savedName=localStorage.getItem("kagitlik-name")||"";$("nameInput").value=savedName;
     $("homeStatus").classList.add("online");
     $("homeStatusText").textContent="Supabase bağlantısı hazır.";
     $("createBtn").disabled=false;
@@ -358,19 +358,59 @@ async function subscribeRoom(){
       if(st==="SUBSCRIBED"&&state.gameReady)await trackGame()
     })
 }
-function renderRoom(){
-  if(!state.room)return;$("roomCode").textContent=state.room.code||localStorage.getItem(ST.rcode)||"------";
-  const playing=state.room.status==="playing";
-  $("roomTitle").textContent=playing?"İki oyuncu da hazır.":state.players.length<2?"Oyuncu bekleniyor.":"Hazır olmayı bekliyoruz.";
-  $("roomLead").textContent=playing?"Ortak tuval açılıyor…":state.players.length<2?"Kodu diğer oyuncuya gönder.":"İkiniz de Hazırım düğmesine basın.";
-  $("players").innerHTML="";
-  for(let n=1;n<=2;n++){
-    const p=state.players.find(x=>x.player_number===n),el=document.createElement("article");
-    if(!p){el.className="player empty";el.innerHTML=`<small>Oyuncu ${n}</small><strong>Bekleniyor…</strong><div class="pstate"><i></i>Henüz katılmadı</div>`}
-    else{el.className="player"+(p.ready?" ready":"");el.innerHTML=`<small>Oyuncu ${n}${p.user_id===state.user?.id?" · sen":""}</small><strong>${esc(p.username)}</strong><div class="pstate"><i></i>${p.ready?"Hazır":"Hazır değil"}</div>`}
-    $("players").appendChild(el)
+function renderRoom() {
+  if (!state.room) return;
+
+  const roomCodeKey = typeof STORAGE !== "undefined" ? STORAGE.roomCode : ST.rcode;
+  const players = [...state.players].sort((a, b) => a.player_number - b.player_number);
+  const playing = state.room.status === "playing";
+
+  $("roomCode").textContent = state.room.code || localStorage.getItem(roomCodeKey) || "------";
+  $("roomTitle").textContent = playing
+    ? "Oyun basliyor."
+    : players.length < 2
+      ? "Oyuncu bekleniyor."
+      : "Hazir olmayi bekliyoruz.";
+  $("roomLead").textContent = playing
+    ? "Iki cihaz oyun ekranina geciyor."
+    : players.length < 2
+      ? "Kodu diger oyuncuya gonder."
+      : "Ikiniz de Hazirim dugmesine basin.";
+
+  const host = $("players");
+  host.replaceChildren();
+
+  for (let number = 1; number <= 2; number += 1) {
+    const player = players.find(item => item.player_number === number);
+    const element = document.createElement("article");
+    const label = document.createElement("small");
+    const name = document.createElement("strong");
+    const status = document.createElement("div");
+    const mark = document.createElement("i");
+
+    status.className = "pstate";
+    status.appendChild(mark);
+
+    if (!player) {
+      element.className = "player empty";
+      label.textContent = "Oyuncu " + number;
+      name.textContent = "Bekleniyor...";
+      status.appendChild(document.createTextNode("Henuz katilmadi"));
+    } else {
+      const me = player.user_id === state.user?.id;
+      element.className = "player" + (player.ready ? " ready" : "");
+      label.textContent = "Oyuncu " + number + (me ? " - sen" : "");
+      name.textContent = player.username || "Oyuncu";
+      status.appendChild(document.createTextNode(player.ready ? "Hazir" : "Hazir degil"));
+    }
+
+    element.append(label, name, status);
+    host.appendChild(element);
   }
-  const me=currentPlayer();$("readyBtn").textContent=me?.ready?"Hazır değilim":"Hazırım";$("readyBtn").disabled=state.busy||!me||playing||state.players.length<2
+
+  const me = currentPlayer();
+  $("readyBtn").textContent = me?.ready ? "Hazir degilim" : "Hazirim";
+  $("readyBtn").disabled = state.busy || !me || playing || players.length < 2;
 }
 async function toggleReady(){
   const me=currentPlayer();if(!me||state.busy)return;
