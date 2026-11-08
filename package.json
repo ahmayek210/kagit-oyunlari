@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
-    "test": "playwright test"
+    "test": "npm run test:unit && playwright test",
+    "test:unit": "node --test tests/unit/*.test.mjs"
   },
   "repository": {
     "type": "git",
@@ -18,6 +19,11 @@
   },
   "homepage": "https://github.com/ahmayek210/kagit-oyunlari#readme",
   "devDependencies": {
-    "@playwright/test": "^1.65.0"
+    "@playwright/test": "^1.65.0",
+    "esbuild": "^0.28.2"
+  },
+  "dependencies": {
+    "@neon/functions": "^0.11.0",
+    "pg": "^8.23.1"
   }
 }
