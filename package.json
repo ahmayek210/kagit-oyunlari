@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
-    "test": "playwright test"
+    "test": "npm run test:unit && playwright test",
+    "test:unit": "node --test tests/unit/*.test.mjs"
   },
   "repository": {
     "type": "git",
