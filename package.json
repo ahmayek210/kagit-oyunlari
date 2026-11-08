@@ -1,0 +1,23 @@
+{
+  "name": "kagit-oyunlari",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "test": "playwright test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ahmayek210/kagit-oyunlari.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/ahmayek210/kagit-oyunlari/issues"
+  },
+  "homepage": "https://github.com/ahmayek210/kagit-oyunlari#readme",
+  "devDependencies": {
+    "@playwright/test": "^1.65.0"
+  }
+}
