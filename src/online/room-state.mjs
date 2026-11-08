@@ -6,10 +6,24 @@ export function transition(room, actorId, command, now) {
   const member = room.members.find(m => m.id === actorId);
   if (!member) throw new Error('not_member');
   if (typeof command.eventId !== 'string' || !/^[a-zA-Z0-9-]{8,64}$/.test(command.eventId)) throw new Error('invalid_event');
-  if (room.events.includes(command.eventId)) return room;
+  // Scope idempotency keys to the authenticated player. Legacy string keys remain
+  // readable for rooms created before this change.
+  if (room.events.some(e => typeof e === 'string' ? e === command.eventId : e.actorId === actorId && e.eventId === command.eventId)) return room;
   const next = structuredClone(room);
   const player = next.members.find(m => m.id === actorId);
   switch (command.type) {
+    case 'leave':
+      next.members = next.members.filter(m => m.id !== actorId);
+      if (next.members.length) {
+        next.hostId = next.members[0].id;
+        next.members.forEach(m => { m.ready = false; m.rematch = false; });
+        next.phase = 'lobby';
+        next.round = null;
+      } else {
+        next.phase = 'closed';
+        next.round = null;
+      }
+      break;
     case 'ready':
       if (next.phase !== 'lobby' || typeof command.ready !== 'boolean') throw new Error('invalid_state');
       player.ready = command.ready;
@@ -43,6 +57,6 @@ export function transition(room, actorId, command, now) {
       break;
     default: throw new Error('invalid_command');
   }
-  next.events.push(command.eventId);
+  next.events.push({ actorId, eventId: command.eventId });
   return next;
 }

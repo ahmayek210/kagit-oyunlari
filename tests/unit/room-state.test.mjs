@@ -8,3 +8,15 @@ test('only host starts and both must be ready',()=>{assert.throws(()=>transition
 test('scores and player identity from client are ignored; submissions finish once',()=>{let r=playing();const s1=[{x:120,y:390},{x:430,y:200}],s2=[{x:430,y:200},{x:740,y:250}];r=transition(r,'a',cmd('submit','submit-01',{stroke:s1,score:999,userId:'b'}),1);assert.throws(()=>transition(r,'a',cmd('submit','submit-02',{stroke:s1}),2),/already_submitted/);r=transition(r,'b',cmd('submit','submit-03',{stroke:s2,score:999}),2);assert.equal(r.phase,'finished');assert.equal(r.round.result.success,true);assert.strictEqual(transition(r,'b',cmd('submit','submit-03',{stroke:s2}),3),r);});
 test('invalid stroke, late submission and premature timeout rejected',()=>{const r=playing();assert.throws(()=>transition(r,'a',cmd('submit','submit-01',{stroke:[]}),1),/invalid_stroke/);assert.throws(()=>transition(r,'a',cmd('submit','submit-02',{stroke:[]}),34000),/invalid_state/);assert.throws(()=>transition(r,'a',cmd('timeout','timeout-1'),33999),/invalid_state/);});
 test('rematch requires both players and resets ready state',()=>{let r=transition(playing(),'a',cmd('timeout','timeout-1'),34000);r=transition(r,'a',cmd('rematch','rematch-1'),34001);assert.equal(r.phase,'finished');r=transition(r,'b',cmd('rematch','rematch-2'),34002);assert.equal(r.phase,'lobby');assert.ok(r.members.every(m=>!m.ready));});
+
+test('event identifiers are scoped to the authenticated player',()=>{
+ let r=lobby();r=transition(r,'a',cmd('ready','same-key-1',{ready:true}),0);
+ r=transition(r,'b',cmd('ready','same-key-1',{ready:true}),0);
+ assert.ok(r.members.every(m=>m.ready));
+});
+test('leaving transfers host, resets an active round and allows a fresh lobby',()=>{
+ let r=transition(playing(),'a',cmd('leave','leave-001'),1);
+ assert.equal(r.hostId,'b');assert.equal(r.phase,'lobby');assert.equal(r.round,null);
+ assert.equal(r.members.length,1);assert.equal(r.members[0].ready,false);
+ r=transition(r,'b',cmd('leave','leave-002'),2);assert.equal(r.phase,'closed');
+});

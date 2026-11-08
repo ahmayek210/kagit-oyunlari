@@ -54,7 +54,8 @@ async function fetch(request) {
     if(!body.command || typeof body.command!=='object')throw Error('invalid_command');
     state=transition(state,session.id,body.command,Date.now());
    } else throw Error('not_found');
-   await client.query('UPDATE rooms SET aggregate=$1 WHERE id=$2',[state,row.id]);
+   if (state.phase === 'closed') await client.query('DELETE FROM rooms WHERE id=$1',[row.id]);
+   else await client.query('UPDATE rooms SET aggregate=$1 WHERE id=$2',[state,row.id]);
    await client.query('COMMIT');return reply(200,{code,state});
   } catch(e){await client.query('ROLLBACK');throw e;} finally{client.release();}
  } catch(e) {const known=['room_full','not_member','invalid_state','invalid_event','invalid_stroke','invalid_command','already_submitted','not_found'];return reply(known.includes(e.message)?400:500,{error:known.includes(e.message)?e.message:'server_error'});}
