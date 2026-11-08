@@ -5,3 +5,6 @@ playwright-report/
 .env
 .env.local
 .neon/
+
+work-function/
+work-function.zip
