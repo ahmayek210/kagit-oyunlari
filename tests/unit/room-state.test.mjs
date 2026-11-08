@@ -1,0 +1,10 @@
+import { test } from 'node:test';
+import assert from 'node:assert/strict';
+import { transition } from '../../src/online/room-state.mjs';
+const cmd=(type,id,extra={})=>({type,eventId:id,...extra});
+function lobby(){return {hostId:'a',members:[{id:'a',ready:false},{id:'b',ready:false}],phase:'lobby',round:null,events:[]};}
+function playing(){let r=lobby();r=transition(r,'a',cmd('ready','ready-001',{ready:true}),0);r=transition(r,'b',cmd('ready','ready-002',{ready:true}),0);return transition(r,'a',cmd('start','start-001'),0);}
+test('only host starts and both must be ready',()=>{assert.throws(()=>transition(lobby(),'a',cmd('start','start-001'),0));assert.throws(()=>transition(playing(),'c',cmd('start','start-002'),0),/not_member/);});
+test('scores and player identity from client are ignored; submissions finish once',()=>{let r=playing();const s1=[{x:120,y:390},{x:430,y:200}],s2=[{x:430,y:200},{x:740,y:250}];r=transition(r,'a',cmd('submit','submit-01',{stroke:s1,score:999,userId:'b'}),1);assert.throws(()=>transition(r,'a',cmd('submit','submit-02',{stroke:s1}),2),/already_submitted/);r=transition(r,'b',cmd('submit','submit-03',{stroke:s2,score:999}),2);assert.equal(r.phase,'finished');assert.equal(r.round.result.success,true);assert.strictEqual(transition(r,'b',cmd('submit','submit-03',{stroke:s2}),3),r);});
+test('invalid stroke, late submission and premature timeout rejected',()=>{const r=playing();assert.throws(()=>transition(r,'a',cmd('submit','submit-01',{stroke:[]}),1),/invalid_stroke/);assert.throws(()=>transition(r,'a',cmd('submit','submit-02',{stroke:[]}),34000),/invalid_state/);assert.throws(()=>transition(r,'a',cmd('timeout','timeout-1'),33999),/invalid_state/);});
+test('rematch requires both players and resets ready state',()=>{let r=transition(playing(),'a',cmd('timeout','timeout-1'),34000);r=transition(r,'a',cmd('rematch','rematch-1'),34001);assert.equal(r.phase,'finished');r=transition(r,'b',cmd('rematch','rematch-2'),34002);assert.equal(r.phase,'lobby');assert.ok(r.members.every(m=>!m.ready));});
